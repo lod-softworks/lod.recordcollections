@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Product>Lod.RecordCollections</Product>
+    <AssemblyName>Lod.RecordCollections</AssemblyName>
+    <RootNamespace>System.Collections</RootNamespace>
+    <Copyright>MIT License</Copyright>
+    <Description>A set of common, strongly typed, collection types which support record equality.</Description>
+    <Authors>Lod Softworks LLC</Authors>
+    <TargetFrameworks>net4.5;net461;net48;netstandard2.0;net6.0</TargetFrameworks>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Lod.RecordCollections</PackageId>
+    <Version>0.1.0</Version>
+    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>record collection recordlist recordhset recordarray, recorddictionary</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+    <_Parameter1>Lod.RecordCollections.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+</Project>
