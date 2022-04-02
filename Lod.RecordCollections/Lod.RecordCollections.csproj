@@ -18,12 +18,20 @@
     <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>record collection recordlist recordhset recordarray, recorddictionary</PackageTags>
+    <PackageIcon>images\icon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
     <_Parameter1>Lod.RecordCollections.Tests</_Parameter1>
     </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="lod-softworks.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include=".\lod-softworks.png" Pack="true" Visible="false" PackagePath="images\icon.png" />
   </ItemGroup>
 
 </Project>
