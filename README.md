@@ -26,6 +26,7 @@ The current implementation of this library loops through each record in the coll
 This can become very expensive when doing equality comparisons with large collections.
 
 Record\* collections also attempt to clone the underlying collection elements every time the record is cloned.
+If an element is not value/record like the original element is retained and may be modified between seperate record collections.
 
 The library is intended to provide a default but extendable implementation of common collections. It works great for data models with small collections; however, when used with large data sets preformance will start to deteriorate.
 
