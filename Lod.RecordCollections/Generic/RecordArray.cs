@@ -15,6 +15,11 @@ namespace System.Collections.Generic
         #region Properties
 
         /// <summary>
+        /// Gets a factory for instantiating a new instance of the underlying collection.
+        /// </summary>
+        protected override Func<int, ICollection<T>> CollectionFactory => length => new T[length];
+
+        /// <summary>
         /// Gets the underlying array.
         /// </summary>
         protected virtual T[] Array => (T[])Collection;

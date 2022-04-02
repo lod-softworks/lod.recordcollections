@@ -13,6 +13,18 @@
         #region Properties
 
         /// <summary>
+        /// Gets a factory for instantiating a new instance of the underlying collection.
+        /// </summary>
+        protected override Func<int, ICollection<T>> CollectionFactory => count =>
+        {
+#if NET48_OR_GREATER || NET6_0_OR_GREATER
+            return new HashSet<T>(count);
+#else
+            return new HashSet<T>();
+#endif
+        };
+
+        /// <summary>
         /// Gets the underlying set.
         /// </summary>
         protected virtual HashSet<T> Set => (HashSet<T>)Collection;

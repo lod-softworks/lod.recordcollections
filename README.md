@@ -25,7 +25,7 @@ The collections should behave the same as the wrapped class as well. Updating a 
 The current implementation of this library loops through each record in the collection to determine the current hash code of the collection.
 This can become very expensive when doing equality comparisons with large collections.
 
-Another pitfall of this implementation is the fact that the underlying collections are not record copied. So a cloned instance of the parent record is still working with the same underlying collection reference as the initial record.
+Record\* collections also attempt
 
 The library is intended to provide a default but extendable implementation of common collections. It works great for data models with small collections; however, when used with large data sets preformance will start to deteriorate.
 

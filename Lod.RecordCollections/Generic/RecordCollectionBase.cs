@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 
 namespace System.Collections.Generic
 {
@@ -13,11 +14,17 @@ namespace System.Collections.Generic
     // this will need to be enforeced on each derived class
     {
         const int DefaultHash = -2018520234;
+        static Lazy<MethodInfo?> CloneMethod { get; } = new(() => typeof(T).GetMethod("<Clone>$", BindingFlags.Instance | BindingFlags.Public));
 
         /// <summary>
         /// Gets the underlying collection container.
         /// </summary>
         protected virtual CollectionContainer Container { get; }
+
+        /// <summary>
+        /// Gets a factory for instantiating a new instance of the underlying collection.
+        /// </summary>
+        protected abstract Func<int, ICollection<T>> CollectionFactory { get; }
 
         /// <summary>
         /// Gets the underlying collection.
@@ -30,9 +37,52 @@ namespace System.Collections.Generic
         protected virtual ICollection LegacyCollection => (ICollection)Collection;
 
         /// <summary>
+        /// Gets a value indicaintg whether the underlying collection is read-only.
+        /// </summary>
+        public virtual bool IsReadOnly => Collection.IsReadOnly;
+
+        /// <summary>
         /// Gets the number of elements contained in the <see cref="RecordCollection{T}"/>.
         /// </summary>
         public virtual int Count => Collection.Count;
+
+        /// <summary>
+        /// Instantiates a new instance of the record using values from an existing collection.
+        /// </summary>
+        /// <param name="collection"/>
+        protected RecordCollectionBase(RecordCollectionBase<T> collection)
+        {
+            if (collection == null) throw new ArgumentNullException(nameof(collection));
+
+            ICollection<T> newCollection = CollectionFactory(collection.Count);
+            
+            if (!newCollection.IsReadOnly)
+            {
+                foreach (T element in collection.Collection)
+                {
+                    T? newElement = CloneElement(element);
+
+                    newCollection.Add((!ReferenceEquals(newElement, default(T)) ? newElement : element)!);
+                }
+            }
+            else if (newCollection is IList newList && collection.Collection is IList oldList)
+            {
+                // loop through not using the Add function to support read-only lists (i.e. arrays)
+                for (int i = 0; i < oldList.Count; i++)
+                {
+                    T? element = (T?)oldList[i];
+                    T? newElement = CloneElement(element);
+
+                    newList[i] = !ReferenceEquals(newElement, default(T)) ? newElement : element;
+                }
+            }
+            else
+            {
+                newCollection = collection.Collection;
+            }
+
+            Container = new(newCollection);
+        }
 
         /// <summary>
         /// Instantiates the base record collection.
@@ -49,12 +99,28 @@ namespace System.Collections.Generic
         public virtual bool Equals(RecordCollectionBase<T>? other) => Equals(this, other);
 
         /// <summary>
+        /// Returns a value indicating whether an <paramref name="other"/> collection is equal to the current instances underlying collection.
+        /// </summary>
+        /// <param name="other">The collection to compare the current collection to.</param>
+        /// <return>True if the underlying collection's elements are equivalent to the current collection's elements.</return>
+        public virtual bool Equals(ICollection<T>? other) => Equals(this, other);
+
+        /// <summary>
         /// Returns a value indicating whether an <paramref name="other"/> collection is equal to the current instance.
         /// </summary>
         /// <param name="left">The original collection to compare the other collection to.</param>
         /// <param name="right">The collection to compare the current collection to.</param>
         /// <return>True if the underlying collection's elements are equivalent to the current collection.</return>
-        public virtual bool Equals(RecordCollectionBase<T>? left, RecordCollectionBase<T>? right)
+        public virtual bool Equals(RecordCollectionBase<T>? left, RecordCollectionBase<T>? right) =>
+            Equals((ICollection<T>?)left, (ICollection<T>?)right);
+
+        /// <summary>
+        /// Returns a value indicating whether an <paramref name="other"/> collection is equal to the current instance's underlying collection.
+        /// </summary>
+        /// <param name="left">The original collection to compare the other collection to.</param>
+        /// <param name="right">The collection to compare the current collection to.</param>
+        /// <return>True if the underlying collection's elements are equivalent to the current collection.</return>
+        protected virtual bool Equals(ICollection<T>? left, ICollection<T>? right)
         {
             if (left == null && right == null) return true;
             if (left == null && right != null) return false;
@@ -62,7 +128,11 @@ namespace System.Collections.Generic
             if (ReferenceEquals(left, right)) return true;
             if (left!.Count != right!.Count) return false;
 
-            return left.GetHashCode() == right.GetHashCode();
+            CollectionContainer leftContainer = new(left);
+            CollectionContainer rightContainer = new(right);
+            bool areEqual = leftContainer.GetHashCode() == rightContainer.GetHashCode();
+
+            return areEqual;
         }
 
         /// <summary>
@@ -70,6 +140,22 @@ namespace System.Collections.Generic
         /// </summary>
         /// <returns>The hash of the underlying elements.</returns>
         public override int GetHashCode() => Container.GetHashCode();
+
+        /// <summary>
+        /// Returns a cloned instance of a specific element.
+        /// </summary>
+        /// <returns/>
+        protected virtual T? CloneElement(T? element)
+        {
+            T? newElement = default;
+
+            if (element != null && CloneMethod.Value != null)
+            {
+                newElement = (T?)CloneMethod.Value.Invoke(element, null);
+            }
+
+            return newElement;
+        }
 
         #region IRecordCollection
 
@@ -134,9 +220,6 @@ namespace System.Collections.Generic
         /// <param name="value">The object to remove from the collection.</param>
         /// <exception cref="NotSupportedException">Thrown when the collection is read-only.</exception>
         public virtual bool Remove(T value) => Collection.Remove(value);
-
-        [DebuggerHidden]
-        bool ICollection<T>.IsReadOnly => Collection.IsReadOnly;
 
         /// <summary>
         /// Copies the elements of the collection to an System.Array, starting at a particular System.Array index.

@@ -75,6 +75,22 @@ public class RecordDictionaryTests
     }
 
     [TestMethod]
+    public void RecordList_ClonedRecords_NewUnderlyingElements()
+    {
+        // arrange
+        RecordList<Number> list1 = new() { new Number(92), new Number(117), new Number(420), };
+
+        // act
+        RecordList<Number> list2 = list1 with { };
+
+        // assert
+        for (int i = 0; i < list1.Count; i++)
+        {
+            Assert.IsFalse(ReferenceEquals(list1[i], list2[i]), $"Reference of item {i} are equivielent.");
+        }
+    }
+
+    [TestMethod]
     public void RecordList_DeserializedNewtonsoft_EqualsReserialized()
     {
         // arrange

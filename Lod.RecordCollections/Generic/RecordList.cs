@@ -13,6 +13,11 @@
         #region Properties
 
         /// <summary>
+        /// Gets a factory for instantiating a new instance of the underlying collection.
+        /// </summary>
+        protected override Func<int, ICollection<T>> CollectionFactory => count => new List<T>(count);
+
+        /// <summary>
         /// Gets the underlying list.
         /// </summary>
         protected virtual List<T> List => (List<T>)Collection;

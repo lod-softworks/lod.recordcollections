@@ -78,6 +78,22 @@ public class RecordArrayTests
     }
 
     [TestMethod]
+    public void RecordArray_ClonedRecord_NewUnderlyingElements()
+    {
+        // arrange
+        RecordArray<Number> array1 = new() { new Number(92), new Number(117), new Number(420), };
+
+        // act
+        RecordArray<Number> array2 = array1 with { };
+
+        // assert
+        for (int i = 0; i < array1.Count; i++)
+        {
+            Assert.IsFalse(ReferenceEquals(array1[i], array2[i]), $"Reference of item {i} are equivielent.");
+        }
+    }
+
+    [TestMethod]
     public void RecordArray_DeserializedNewtonsoft_EqualsReserialized()
     {
         // arrange

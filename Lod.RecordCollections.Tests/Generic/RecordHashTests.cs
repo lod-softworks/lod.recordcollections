@@ -75,6 +75,22 @@ public class RecordSetTests
     }
 
     [TestMethod]
+    public void RecordSet_ClonedRecord_NewUnderlyingElements()
+    {
+        // arrange
+        RecordSet<Number> set1 = new() { new Number(92), new Number(117), new Number(420), };
+
+        // act
+        RecordSet<Number> set2 = set1 with { };
+
+        // assert
+        foreach (Number number in set1)
+        {
+            Assert.IsFalse(!set2.Contains(number), $"Reference of items are equivielent.");
+        }
+    }
+
+    [TestMethod]
     public void RecordSet_DeserializedNewtonsoft_EqualsReserialized()
     {
         // arrange
