@@ -16,10 +16,11 @@
   <PropertyGroup>
     <PackageId>Lod.RecordCollections</PackageId>
     <Version>0.1.0</Version>
-    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageLicenseUrl>https://github.com/linkofdarkness/lod.recordcollections/blob/main/LICENSE.txt</PackageLicenseUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>record collection recordlist recordhset recordarray, recorddictionary</PackageTags>
+    <PackageTags>record collection recordcollection recordlist recordhset recordarray recorddictionary</PackageTags>
     <PackageIcon>images\icon.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/linkofdarkness/lod.recordcollections</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
