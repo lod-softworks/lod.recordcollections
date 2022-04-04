@@ -159,9 +159,9 @@ namespace System.Collections.Generic
 
         #region Operators
 
-        public static implicit operator RecordDictionary<TKey, TValue>(Dictionary<TKey, TValue> dictionary) => new(dictionary);
+        public static implicit operator RecordDictionary<TKey, TValue>(Dictionary<TKey, TValue> dictionary) => dictionary != null ? new(dictionary) : null!;
 
-        public static implicit operator Dictionary<TKey, TValue>(RecordDictionary<TKey, TValue> dictionary) => dictionary.Dictionary;
+        public static implicit operator Dictionary<TKey, TValue>(RecordDictionary<TKey, TValue> dictionary) => dictionary?.Dictionary!;
 
         #endregion
     }

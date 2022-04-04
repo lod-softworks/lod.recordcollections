@@ -144,9 +144,9 @@
 
         #region Operators
 
-        public static implicit operator RecordList<T>(List<T> list) => new(list);
+        public static implicit operator RecordList<T>(List<T> list) => list != null ? new(list) : null!;
 
-        public static implicit operator List<T>(RecordList<T> list) => list.List;
+        public static implicit operator List<T>(RecordList<T> list) => list?.List!;
 
         #endregion
     }

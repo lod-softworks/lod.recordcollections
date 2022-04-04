@@ -126,9 +126,9 @@ namespace System.Collections.Generic
 
         #region Operators
 
-        public static implicit operator RecordArray<T>(T[] array) => new(array);
+        public static implicit operator RecordArray<T>(T[] array) => array != null ? new(array) : null!;
 
-        public static implicit operator T[](RecordArray<T> array) => array.Array;
+        public static implicit operator T[](RecordArray<T> array) => array?.Array!;
 
         #endregion
     }

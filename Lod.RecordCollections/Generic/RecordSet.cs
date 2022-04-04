@@ -140,9 +140,9 @@
 
         #region Operators
 
-        public static implicit operator RecordSet<T>(HashSet<T> set) => new(set);
+        public static implicit operator RecordSet<T>(HashSet<T> set) => set != null ? new(set) : null!;
 
-        public static implicit operator HashSet<T>(RecordSet<T> set) => set.Set;
+        public static implicit operator HashSet<T>(RecordSet<T> set) => set?.Set!;
 
         #endregion
     }
