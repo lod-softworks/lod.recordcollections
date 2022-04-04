@@ -140,8 +140,16 @@
 
         #region Operators
 
+        /// <summary>
+        /// Casts the <pararmref name="set"/> to a record set, wrapping the existing set reference.
+        /// </summary>
+        /// <param name="set">The set to wrap in a record set.</param>
         public static implicit operator RecordSet<T>(HashSet<T> set) => set != null ? new(set) : null!;
 
+        /// <summary>
+        /// Casts the <pararmref name="set"/> to set, returning the underling set reference.
+        /// </summary>
+        /// <param name="set">The set to unwrap.</param>
         public static implicit operator HashSet<T>(RecordSet<T> set) => set?.Set!;
 
         #endregion

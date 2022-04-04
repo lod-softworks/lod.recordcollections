@@ -7,7 +7,8 @@ namespace System.Collections.Generic
     /// Provides methods to search, sort, and manipulate dictionarys.
     /// Record dictionaries support value based comparison of dictionary data.
     /// </summary>
-    /// <typeparam name="TKey">The type of elements in the dictionary.</typeparam>
+    /// <typeparam name="TKey">The type of keys in the dictionary.</typeparam>
+    /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
     /// <remarks>Uses an underlying collection of <see cref="Dictionary{TKey, TValue}"/>.</remarks>
     public record RecordDictionary<TKey, TValue> : RecordCollectionBase<KeyValuePair<TKey, TValue>>, IDictionary, IDictionary<TKey, TValue>
         where TKey : IEquatable<TKey>
@@ -37,6 +38,7 @@ namespace System.Collections.Generic
 
         /// <summary>
         /// Gets or sets the element at the specified index.
+        /// </summary>
         /// <param name="key">The key of the value to get or set.</param>
         public virtual TValue this[TKey key]
         {
@@ -115,8 +117,14 @@ namespace System.Collections.Generic
 
         #region IDictionary<TKey, TValue>
 
+        /// <summary>
+        /// Gets a collection of all the keys in the dictionary.
+        /// </summary>
         public ICollection<TKey> Keys => Dictionary.Keys;
 
+        /// <summary>
+        /// Gets a collection of all the values in the dictionary.
+        /// </summary>
         public ICollection<TValue> Values => Dictionary.Values;
 
         /// <summary>
@@ -147,20 +155,28 @@ namespace System.Collections.Generic
         /// <param name="key">The key of the value to get.</param>
         /// <param name="value">
         /// When this method returns, contains the value associated with the specified key,
-        //  if the key is found; otherwise, the default value for the type of the value parameter.
-        //  This parameter is passed uninitialized.
-        //  </param>
+        /// if the key is found; otherwise, the default value for the type of the value parameter.
+        /// This parameter is passed uninitialized.
+        /// </param>
         /// <returns>
         /// true if the dictionary contains an element with the specified key; otherwise, false.
-        //  </returns>
+        /// </returns>
         public virtual bool TryGetValue(TKey key, out TValue value) => Dictionary.TryGetValue(key, out value!);
 
         #endregion
 
         #region Operators
 
+        /// <summary>
+        /// Casts the <pararmref name="dictionary"/> to a record dictionary, wrapping the existing dictionary reference.
+        /// </summary>
+        /// <param name="dictionary">The dictionary to wrap in a record dictionary.</param>
         public static implicit operator RecordDictionary<TKey, TValue>(Dictionary<TKey, TValue> dictionary) => dictionary != null ? new(dictionary) : null!;
 
+        /// <summary>
+        /// Casts the <pararmref name="dictionary"/> to a standard dictionary, returning the underlying dictionary reference.
+        /// </summary>
+        /// <param name="dictionary">The dictionary to unwrap.</param>
         public static implicit operator Dictionary<TKey, TValue>(RecordDictionary<TKey, TValue> dictionary) => dictionary?.Dictionary!;
 
         #endregion

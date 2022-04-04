@@ -17,7 +17,7 @@
         public bool Equals(IRecordCollection<T>? other);
 
         /// <summary>
-        /// Returns a value indicating whether an <paramref name="other"/> collection is equal to the current instance.
+        /// Returns a value indicating whether the <paramref name="left"/> collection is equal to the <paramref name="right"/> collection.
         /// </summary>
         /// <param name="left">The original collection to compare the other collection to.</param>
         /// <param name="right">The collection to compare the current collection to.</param>

@@ -34,6 +34,7 @@
 
         /// <summary>
         /// Gets or sets the element at the specified index.
+        /// </summary>
         /// <param name="index">The zero-based index of the element to get or set.</param>
         public virtual T this[int index]
         {
@@ -82,7 +83,7 @@
         /// Searches for the specified object and returns the zero-based index of the first
         /// occurrence within the entire System.Collections.Generic.List`1.
         /// </summary>
-        /// <param name="item">The object to locate in collection. The value can be null for reference types.</summary>
+        /// <param name="item">The object to locate in collection. The value can be null for reference types.</param>
         /// <remarks>The zero-based index of the first occurrence of item within the collection, if found; otherwise, –1.</remarks>
         public virtual int IndexOf(T item) => List.IndexOf(item);
 
@@ -144,8 +145,16 @@
 
         #region Operators
 
+        /// <summary>
+        /// Casts the <pararmref name="list"/> to a record list, wrapping the existing list reference.
+        /// </summary>
+        /// <param name="list">The list to wrap in a record list.</param>
         public static implicit operator RecordList<T>(List<T> list) => list != null ? new(list) : null!;
 
+        /// <summary>
+        /// Casts the <pararmref name="list"/> to list, returning the underling list reference.
+        /// </summary>
+        /// <param name="list">The list to unwrap.</param>
         public static implicit operator List<T>(RecordList<T> list) => list?.List!;
 
         #endregion

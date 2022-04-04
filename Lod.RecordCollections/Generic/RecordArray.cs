@@ -46,6 +46,7 @@ namespace System.Collections.Generic
 
         /// <summary>
         /// Gets or sets the element at the specified index.
+        /// </summary>
         /// <param name="index">The zero-based index of the element to get or set.</param>
         public virtual T this[int index]
         {
@@ -126,8 +127,16 @@ namespace System.Collections.Generic
 
         #region Operators
 
+        /// <summary>
+        /// Casts the <pararmref name="array"/> to a record array, wrapping the existing array reference.
+        /// </summary>
+        /// <param name="array">The array to wrap in a record array.</param>
         public static implicit operator RecordArray<T>(T[] array) => array != null ? new(array) : null!;
 
+        /// <summary>
+        /// Casts the <pararmref name="array"/> to array, returning the underling array reference.
+        /// </summary>
+        /// <param name="array">The array to unwrap.</param>
         public static implicit operator T[](RecordArray<T> array) => array?.Array!;
 
         #endregion

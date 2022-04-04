@@ -10,6 +10,7 @@
     <TargetFrameworks>net4.5;net461;net48;netstandard2.0;net6.0</TargetFrameworks>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup>

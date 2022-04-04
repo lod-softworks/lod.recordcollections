@@ -106,16 +106,16 @@ namespace System.Collections.Generic
         public virtual bool Equals(ICollection<T>? other) => Equals(this, other);
 
         /// <summary>
-        /// Returns a value indicating whether an <paramref name="other"/> collection is equal to the current instance.
+        /// Returns a value indicating whether the <paramref name="left"/> collection is equal to the <paramref name="right"/> collection.
         /// </summary>
         /// <param name="left">The original collection to compare the other collection to.</param>
         /// <param name="right">The collection to compare the current collection to.</param>
         /// <return>True if the underlying collection's elements are equivalent to the current collection.</return>
         public virtual bool Equals(RecordCollectionBase<T>? left, RecordCollectionBase<T>? right) =>
-            Equals((ICollection<T>?)left, (ICollection<T>?)right);
+            Equals((ICollection<T>?)left, right);
 
         /// <summary>
-        /// Returns a value indicating whether an <paramref name="other"/> collection is equal to the current instance's underlying collection.
+        /// Returns a value indicating whether the <paramref name="left"/> collection is equal to the <paramref name="right"/> collection.
         /// </summary>
         /// <param name="left">The original collection to compare the other collection to.</param>
         /// <param name="right">The collection to compare the current collection to.</param>
@@ -159,11 +159,20 @@ namespace System.Collections.Generic
 
         #region IRecordCollection
 
-        [DebuggerHidden]
-        public bool Equals(IRecordCollection<T>? other) => Equals(this, other);
+        /// <summary>
+        /// Returns a value indicating whether an <paramref name="other"/> collection is equal to the current instances underlying collection.
+        /// </summary>
+        /// <param name="other">The collection to compare the current collection to.</param>
+        /// <return>True if the underlying collection's elements are equivalent to the current collection's elements.</return>
+        public virtual bool Equals(IRecordCollection<T>? other) => Equals((ICollection<T>?)this, other);
 
-        [DebuggerHidden]
-        public bool Equals(IRecordCollection<T>? left, IRecordCollection<T>? right) => Equals(left, right);
+        /// <summary>
+        /// Returns a value indicating whether the <paramref name="left"/> collection is equal to the <paramref name="right"/> collection.
+        /// </summary>
+        /// <param name="left">The original collection to compare the other collection to.</param>
+        /// <param name="right">The collection to compare the current collection to.</param>
+        /// <return>True if the underlying collection's elements are equivalent to the current collection.</return>
+        public virtual bool Equals(IRecordCollection<T>? left, IRecordCollection<T>? right) => Equals((ICollection<T>?)left, right);
 
         #endregion
 
@@ -204,7 +213,6 @@ namespace System.Collections.Generic
         /// <summary>
         /// Removes all items from the collection.
         /// </summary>
-        /// <param name="value">The object to be added to the end of the collection.</param>
         /// <exception cref="NotSupportedException">Thrown when the collection is read-only.</exception>
         public virtual void Clear() => Collection.Clear();
 
@@ -229,10 +237,10 @@ namespace System.Collections.Generic
         /// from the collection. The System.Array must have zero-based indexing.
         /// </param>
         /// <param name="arrayIndex">The zero-based index in array at which copying begins.</param>
-        /// <exception cref="ArgumentNullException"><param name="arrayIndex"/> is less than zero.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="arrayIndex"/> is less than zero.</exception>
         /// <exception cref="ArgumentException">
         /// The number of elements in the source collection is greater than the available space from
-        /// <param name="arrayIndex"/> to the end of the destination array.
+        /// <paramref name="arrayIndex"/> to the end of the destination array.
         /// </exception>
         public virtual void CopyTo(T[] array, int arrayIndex) => Collection.CopyTo(array, arrayIndex);
 
@@ -328,7 +336,7 @@ namespace System.Collections.Generic
             /// Indicates whether the current object is equal to another object of the same type.
             /// </summary>
             /// <param name="other">An object to compare with this object.</param>
-            public override bool Equals(object? obj) => obj is CollectionContainer collection && Equals(collection);
+            public override bool Equals(object? other) => other is CollectionContainer collection && Equals(collection);
 
             /// <summary>
             /// Indicates whether the current object is equal to another object of the same type.
