@@ -16,7 +16,6 @@
   <PropertyGroup>
     <PackageId>Lod.RecordCollections</PackageId>
     <Version>0.1.0</Version>
-    <PackageLicenseUrl>https://github.com/linkofdarkness/lod.recordcollections/blob/main/LICENSE.txt</PackageLicenseUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>record collection recordcollection recordlist recordhset recordarray recorddictionary</PackageTags>
     <PackageIcon>images\icon.png</PackageIcon>
@@ -30,10 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="lod-softworks.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include=".\lod-softworks.png" Pack="true" Visible="false" PackagePath="images\icon.png" />
+    <None Include="..\..\assets\lod-softworks.png" Pack="true" Visible="false" PackagePath="images\icon.png" />
   </ItemGroup>
 
 </Project>
