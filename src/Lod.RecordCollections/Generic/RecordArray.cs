@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 
 namespace System.Collections.Generic
 {
@@ -103,24 +104,22 @@ namespace System.Collections.Generic
             set => this[index] = (T)value!;
         }
 
-        /// <summary>
-        /// Determines whether the array contains a specific value.
-        /// </summary>
-        /// <param name="value">The object to locate in the array.</param>
-        public virtual bool Contains(object? value) => LegacyList.Contains(value);
+        [DebuggerHidden]
+        bool IList.Contains(object value) => LegacyList.Contains(value);
 
-        /// <summary>
-        /// Determines whether the array contains a specific value.
-        /// </summary>
-        /// <param name="value">The object to locate in the array.</param>
-        public virtual int IndexOf(object? value) => LegacyList.IndexOf(value);
-        
+        [DebuggerHidden]
+        int IList.IndexOf(object value) => LegacyList.IndexOf(value);
+
+        [DebuggerHidden]
         int IList.Add(object? value) => LegacyList.Add(value);
 
+        [DebuggerHidden]
         void IList.Insert(int index, object? value) => LegacyList.Insert(index, value);
 
+        [DebuggerHidden]
         void IList.Remove(object? value) => LegacyList.Remove(value);
 
+        [DebuggerHidden]
         void IList.RemoveAt(int index) => LegacyList.RemoveAt(index);
 
         #endregion

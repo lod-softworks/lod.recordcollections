@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 
 namespace System.Collections.Generic
 {
@@ -82,8 +83,10 @@ namespace System.Collections.Generic
 
         #region IDictionary
 
+        [DebuggerHidden]
         ICollection IDictionary.Keys => LegacyDictionary.Keys;
 
+        [DebuggerHidden]
         ICollection IDictionary.Values => LegacyDictionary.Values;
 
         object? IDictionary.this[object key]
@@ -92,25 +95,16 @@ namespace System.Collections.Generic
             set => this[(TKey)key] = (TValue)value!;
         }
 
-        /// <summary>
-        /// Adds an object to the end of the dictionary.
-        /// </summary>
-        /// <param name="key">The key which identifies the specified <paramref name="value"/> within the dictionary.</param>
-        /// <param name="value">The object to be added to the end of the dictionary. The value can be null for reference types.</param>
-        public virtual void Add(object key, object? value) => LegacyDictionary.Add(key, value);
+        [DebuggerHidden]
+        void IDictionary.Add(object key, object? value) => LegacyDictionary.Add(key, value);
 
-        /// <summary>
-        /// Determines whether the dictionary contains a specific value.
-        /// </summary>
-        /// <param name="key">The key to locate in the dictionary.</param>
-        public virtual bool Contains(object key) => LegacyDictionary.Contains(key);
+        [DebuggerHidden]
+        bool IDictionary.Contains(object key) => LegacyDictionary.Contains(key);
 
-        /// <summary>
-        /// Removes the first occurrence of a specific object from the dictionary.
-        /// </summary>
-        /// <param name="key">The key to remove from the dictionary.</param>
-        public virtual void Remove(object key) => LegacyDictionary.Remove(key);
+        [DebuggerHidden]
+        void IDictionary.Remove(object key) => LegacyDictionary.Remove(key);
 
+        [DebuggerHidden]
         IDictionaryEnumerator IDictionary.GetEnumerator() => LegacyDictionary.GetEnumerator();
 
         #endregion

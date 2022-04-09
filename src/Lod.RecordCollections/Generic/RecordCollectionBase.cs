@@ -178,6 +178,7 @@ namespace System.Collections.Generic
 
         #region IEnumerable
 
+        [DebuggerHidden]
         IEnumerator IEnumerable.GetEnumerator() => Collection.GetEnumerator();
 
         /// <summary>

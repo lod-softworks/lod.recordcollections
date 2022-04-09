@@ -1,4 +1,6 @@
-﻿namespace System.Collections.Generic
+﻿using System.Diagnostics;
+
+namespace System.Collections.Generic
 {
     /// <summary>
     /// Represents a strongly typed list of objects that can be accessed by index.
@@ -77,6 +79,31 @@
 
         #endregion
 
+        #region IList
+
+        object? IList.this[int index]
+        {
+            get => this[index];
+            set => this[index] = (T)value!;
+        }
+
+        [DebuggerHidden]
+        int IList.Add(object value) => LegacyList.Add(value);
+
+        [DebuggerHidden]
+        bool IList.Contains(object value) => LegacyList.Contains(value);
+
+        [DebuggerHidden]
+        int IList.IndexOf(object value) => LegacyList.IndexOf(value);
+
+        [DebuggerHidden]
+        void IList.Insert(int index, object value) => LegacyList.Insert(index, value);
+
+        [DebuggerHidden]
+        void IList.Remove(object? value) => LegacyList.Remove(value);
+
+        #endregion
+
         #region IList<T>
 
         /// <summary>
@@ -99,47 +126,6 @@
         /// </summary>
         /// <param name="index">The zero-based index of the element to remove.</param>
         public virtual void RemoveAt(int index) => List.RemoveAt(index);
-
-        #endregion
-
-        #region IList
-
-        object? IList.this[int index]
-        {
-            get => this[index];
-            set => this[index] = (T)value!;
-        }
-
-        /// <summary>
-        /// Adds an object to the end of the list.
-        /// </summary>
-        /// <param name="value">The object to be added to the end of the list. The value can be null for reference types.</param>
-        public virtual int Add(object? value) => LegacyList.Add(value);
-
-        /// <summary>
-        /// Determines whether the list contains a specific value.
-        /// </summary>
-        /// <param name="value">The object to locate in the list.</param>
-        public virtual bool Contains(object? value) => LegacyList.Contains(value);
-
-        /// <summary>
-        /// Determines whether the list contains a specific value.
-        /// </summary>
-        /// <param name="value">The object to locate in the list.</param>
-        public virtual int IndexOf(object? value) => LegacyList.IndexOf(value);
-
-        /// <summary>
-        /// Inserts an item to the System.Collections.IList at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index at which value should be inserted.</param>
-        /// <param name="value">The object to insert into the list.</param>
-        public virtual void Insert(int index, object? value) => LegacyList.Insert(index, value);
-
-        /// <summary>
-        /// Removes the first occurrence of a specific object from the list.
-        /// </summary>
-        /// <param name="value">The object to remove from the list.</param>
-        public virtual void Remove(object? value) => LegacyList.Remove(value);
 
         #endregion
 
