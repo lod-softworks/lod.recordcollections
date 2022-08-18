@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Product>Lod.RecordCollections.IlAssembler</Product>
+    <AssemblyName>Lod.RecordCollections.IlAssembler</AssemblyName>
+    <Copyright>MIT License</Copyright>
+    <Description>IL disembler and assembler to make record compliant classes.</Description>
+    <Authors>Lod Softworks LLC</Authors>
+    <TargetFramework>net6.0</TargetFramework>
+    <TargetType>exe</TargetType>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateProgramFile>false</GenerateProgramFile>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="runtime.win-x64.Microsoft.NETCore.ILAsm" Version="6.0.0" />
+    <PackageReference Include="runtime.win-x64.Microsoft.NETCore.ILDasm" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lod.RecordCollections\Lod.RecordCollections.csproj" />
+  </ItemGroup>
+
+</Project>

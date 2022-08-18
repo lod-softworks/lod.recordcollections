@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Lod.RecordCollections.IlAssembler": {
+      "commandName": "Project",
+      "commandLineArgs": "..\\..\\..\\..\\Lod.RecordCollections\\bin\\Debug\\netstandard2.0\\Lod.RecordCollections.dll"
+    }
+  }
+}
