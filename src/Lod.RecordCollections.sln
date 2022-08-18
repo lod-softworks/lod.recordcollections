@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lod.RecordCollections", "Lod.RecordCollections\Lod.RecordCollections.csproj", "{BBB76FCD-9EA1-43F2-B258-BA137619F2F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lod.RecordCollections.Tests", "Lod.RecordCollections.Tests\Lod.RecordCollections.Tests.csproj", "{CAC7A45E-E533-48EC-B531-CC444CD19230}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lod.RecordCollections.Tests", "Lod.RecordCollections.Tests\Lod.RecordCollections.Tests.csproj", "{CAC7A45E-E533-48EC-B531-CC444CD19230}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

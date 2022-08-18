@@ -1,4 +1,6 @@
-﻿namespace System.Collections.Tests.Generic;
+﻿using System.Reflection;
+
+namespace System.Collections.Tests.Generic;
 
 [TestClass]
 public class RecordSetTests
@@ -74,21 +76,21 @@ public class RecordSetTests
         Assert.IsTrue(areEqual);
     }
 
-    [TestMethod]
-    public void RecordSet_ClonedRecord_NewUnderlyingElements()
-    {
-        // arrange
-        RecordSet<Number> set1 = new() { new Number(92), new Number(117), new Number(420), };
+    //[TestMethod]
+    //public void RecordSet_ClonedRecord_NewUnderlyingElements()
+    //{
+    //    // arrange
+    //    RecordSet<Number> set1 = new() { new Number(92), new Number(117), new Number(420), };
 
-        // act
-        RecordSet<Number> set2 = set1 with { };
+    //    // act
+    //    RecordSet<Number> set2 = (RecordSet<Number>)typeof(RecordSet<Number>).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)[0].Invoke(new[] { set1, });
 
-        // assert
-        foreach (Number number in set1)
-        {
-            Assert.IsFalse(!set2.Contains(number), $"Reference of items are equivielent.");
-        }
-    }
+    //    // assert
+    //    foreach (Number number in set1)
+    //    {
+    //        Assert.IsFalse(!set2.Contains(number), $"Reference of items are equivielent.");
+    //    }
+    //}
 
     [TestMethod]
     public void RecordSet_DeserializedNewtonsoft_EqualsReserialized()

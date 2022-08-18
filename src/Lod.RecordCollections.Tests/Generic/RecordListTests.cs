@@ -1,4 +1,6 @@
-﻿namespace System.Collections.Tests.Generic;
+﻿using System.Reflection;
+
+namespace System.Collections.Tests.Generic;
 
 [TestClass]
 public class RecordListTests
@@ -74,21 +76,21 @@ public class RecordListTests
         Assert.IsFalse(areEqual);
     }
 
-    [TestMethod]
-    public void RecordList_ClonedRecord_NewUnderlyingElements()
-    {
-        // arrange
-        RecordList<Number> list1 = new() { new Number(92), new Number(117), new Number(420), };
+    //[TestMethod]
+    //public void RecordList_ClonedRecord_NewUnderlyingElements()
+    //{
+    //    // arrange
+    //    RecordList<Number> list1 = new() { new Number(92), new Number(117), new Number(420), };
 
-        // act
-        RecordList<Number> list2 = list1 with { };
+    //    // act
+    //    RecordList<Number> list2 = (RecordList<Number>)typeof(RecordList<Number>).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)[0].Invoke(new[] { list1, });
 
-        // assert
-        for (int i = 0; i < list1.Count; i++)
-        {
-            Assert.IsFalse(ReferenceEquals(list1[i], list2[i]), $"Reference of item {i} are equivielent.");
-        }
-    }
+    //    // assert
+    //    for (int i = 0; i < list1.Count; i++)
+    //    {
+    //        Assert.IsFalse(ReferenceEquals(list1[i], list2[i]), $"Reference of item {i} are equivielent.");
+    //    }
+    //}
 
     [TestMethod]
     public void RecordList_DeserializedNewtonsoft_EqualsReserialized()

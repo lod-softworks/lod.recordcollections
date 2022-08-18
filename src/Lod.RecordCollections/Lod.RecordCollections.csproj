@@ -7,7 +7,8 @@
     <Copyright>MIT License</Copyright>
     <Description>A set of common, strongly typed, collection types which support record equality.</Description>
     <Authors>Lod Softworks LLC</Authors>
-    <TargetFrameworks>net4.5;net461;net48;netstandard2.0;net6.0</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <!--<TargetFrameworks>net4.5;net461;net48;netstandard2.0;net6.0</TargetFrameworks>-->
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
