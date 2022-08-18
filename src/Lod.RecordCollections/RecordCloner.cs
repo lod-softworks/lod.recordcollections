@@ -1,58 +1,56 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 
-namespace System.Collections
+namespace System.Collections;
+
+/// <summary>
+/// A static utility for cloning items within a record collection.
+/// </summary>
+internal static class RecordCloner
 {
+    static Dictionary<Type, MethodBase?> Cloners { get; } = new();
+
     /// <summary>
-    /// A static utility for cloning items within a record collection.
+    /// Returns a cloned instance of <typeparamref name="T"/> if it's a record type.
+    /// If the type is not clonable the original instance is returned.
     /// </summary>
-    internal static class RecordCloner
+    /// <typeparam name="T"></typeparam>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public static T? TryClone<T>(T? obj)
     {
-        static Dictionary<Type, MethodBase?> Cloners { get; } = new();
+        T? result = obj;
 
-        /// <summary>
-        /// Returns a cloned instance of <typeparamref name="T"/> if it's a record type.
-        /// If the type is not clonable the original instance is returned.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public static T? TryClone<T>(T? obj)
+        if (obj != null)
         {
-            T? result = obj;
+            MethodBase? cloner = AddOrGetCloner<T>();
 
-            if (obj != null)
+            if (cloner != null)
             {
-                MethodBase? cloner = AddOrGetCloner<T>();
+                result = (T)cloner.Invoke(null, new object[] { obj, });
+            }
+        }
 
-                if (cloner != null)
+        return result;
+    }
+
+    static MethodBase? AddOrGetCloner<T>()
+    {
+        Type type = typeof(T);
+
+        if (!Cloners.TryGetValue(type, out MethodBase? cloner))
+        {
+            cloner = type.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)
+                .FirstOrDefault(c =>
                 {
-                    result = (T)cloner.Invoke(null, new object[] { obj, });
-                }
-            }
+                    ParameterInfo[] parameters = c.GetParameters();
 
-            return result;
+                    return c.IsFamily && parameters.Length == 1 && parameters[0].ParameterType == type;
+                });
+
+            Cloners[type] = cloner;
         }
 
-        static MethodBase? AddOrGetCloner<T>()
-        {
-            Type type = typeof(T);
-
-            if (!Cloners.TryGetValue(type, out MethodBase? cloner))
-            {
-                cloner = type.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)
-                    .FirstOrDefault(c =>
-                    {
-                        ParameterInfo[] parameters = c.GetParameters();
-
-                        return c.IsFamily && parameters.Length == 1 && parameters[0].ParameterType == type;
-                    });
-
-                Cloners[type] = cloner;
-            }
-
-            return cloner;
-        }
+        return cloner;
     }
 }
+
