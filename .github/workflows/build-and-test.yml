@@ -1,0 +1,31 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore -c Release -o ./dist
+
+    - name: Test
+      run: dotnet test --no-restore -c Release --no-build --verbosity normal
+
+    - name: Convert classes to records
+      run: ./dist/Lod.RecordCollections.IlAssembler/bin/Release/net6.0/Lod.RecordCollections.IlAssembler.exe ./dist/Lod.RecordCollections.IlAssembler/bin/Release/netstandard2.0/Lod.RecordCollections.dll
