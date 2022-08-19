@@ -19,13 +19,13 @@ jobs:
         dotnet-version: 6.0.x
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ./src/Lod.RecordCollections.sln
 
     - name: Build
-      run: dotnet build --no-restore -c Release -o ./dist
+      run: dotnet build ./src/Lod.RecordCollections.sln -c Release --no-restore -o ./dist
 
     - name: Test
-      run: dotnet test --no-restore -c Release --no-build --verbosity normal
+      run: dotnet test ./src/Lod.RecordCollections.sln -c Release --no-restore --no-build --verbosity normal
 
     - name: Convert classes to records
       run: ./dist/Lod.RecordCollections.IlAssembler/bin/Release/net6.0/Lod.RecordCollections.IlAssembler.exe ./dist/Lod.RecordCollections.IlAssembler/bin/Release/netstandard2.0/Lod.RecordCollections.dll
