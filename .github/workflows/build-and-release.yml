@@ -1,0 +1,30 @@
+name: Build & Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore ./src/Lod.RecordCollections.sln
+
+    - name: Build
+      run: dotnet build ./src/Lod.RecordCollections.sln -c Release --no-restore
+
+    - name: Test
+      run: dotnet test ./src/Lod.RecordCollections.sln -c Release --no-restore --no-build
+
+    - name: Convert classes to records
+      run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net6.0/Lod.RecordCollections.IlAssembler.dll D:\a\lod.recordcollections\lod.recordcollections\src\Lod.RecordCollections\bin\Release\netstandard2.0\Lod.RecordCollections.dll
+      
+    - name: NuGet Pack
+      run dotnet pack ./src/Lod.RecordCollections/Lod.RecordCollections.csproj -c Release --no-restore --no-build
