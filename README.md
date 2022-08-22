@@ -16,10 +16,9 @@ Many immutable (and mutable) records may contain arrays, lists, or other collect
 
 ## Usage
 The library places a Record\* collection type in the same namespace as it's underlying implementation.
-  - RecordList\<T\>, which uses an underlying List\<T\> both reside in the System.Collections.Generic namespace.
-  
-Each of the wrapped types should expose as many of the underlying methods as possible.
-The collections should behave the same as the wrapped class as well. Updating a RecordList<T> while enumerating will still throw an `InvalidOperationException`, while the RecordArray will not.
+  - RecordList\<T\>, which inherits from List\<T\> both reside in the System.Collections.Generic namespace.
+
+The collections should behave the same as it's parent class as well. Updating a RecordList<T> while enumerating will still throw an `InvalidOperationException`, while the RecordArray will not.
 
 ## ⚠ Drawbacks & Warnings
 The current implementation of this library loops through each record in the collection to determine the current hash code of the collection.
