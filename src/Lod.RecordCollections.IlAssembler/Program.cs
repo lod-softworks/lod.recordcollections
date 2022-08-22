@@ -1,11 +1,12 @@
 ﻿using System.Diagnostics;
 
-Console.WriteLine("Preparing IL modification of Lod.RecordCollections");
+Console.WriteLine($"Preparing IL modification of Lod.RecordCollections to '{args.FirstOrDefault()}'");
 
 string dllPath = !string.IsNullOrWhiteSpace(args.FirstOrDefault()) ? args.First()
     : throw new ArgumentException("Lod.RecordCollections DLL not found in args.");
 if (!File.Exists(dllPath)) throw new FileNotFoundException("Lod.RecordCollections.dll");
 string directory = Directory.GetCurrentDirectory();
+Console.WriteLine($"Searching for ilasm/ildasm in directory '{directory}'.");
 string ilasmPath = Directory.EnumerateFiles(directory, "ilasm.exe", SearchOption.AllDirectories).FirstOrDefault()
     ?? throw new FileNotFoundException("ilasm.exe");
 string ildasmPath = Directory.EnumerateFiles(directory, "ildasm.exe", SearchOption.AllDirectories).FirstOrDefault()
