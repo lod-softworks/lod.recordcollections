@@ -92,47 +92,47 @@ public class RecordDictionaryTests
     //    }
     //}
 
-    //[TestMethod]
-    //public void RecordDictionary_DeserializedNewtonsoft_EqualsReserialized()
-    //{
-    //    // arrange
-    //    RecordDictionary<string, Number> dictionary = new() { { "1", new Number(92) }, { "2", new Number(117) }, { "3", new Number(420) }, };
+    [TestMethod]
+    public void RecordDictionary_DeserializedNewtonsoft_EqualsReserialized()
+    {
+        // arrange
+        RecordDictionary<string, Number> dictionary = new() { { "1", new Number(92) }, { "2", new Number(117) }, { "3", new Number(420) }, };
 
-    //    // act
-    //    string json = Newtonsoft.Json.JsonConvert.SerializeObject(dictionary);
-    //    RecordDictionary<string, Number>? recordDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<RecordDictionary<string, Number>>(json);
-    //    Number[]? systemDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Number[]>(json);
+        // act
+        string json = Newtonsoft.Json.JsonConvert.SerializeObject(dictionary);
+        RecordDictionary<string, Number>? recordDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<RecordDictionary<string, Number>>(json);
+        Dictionary<string, Number>? systemDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Number>>(json);
 
-    //    // assert
-    //    Assert.IsNotNull(recordDictionary, "Deserialized record dictionary is null.");
-    //    Assert.IsNotNull(systemDictionary, "Deserialized dictionary is null.");
-    //    Assert.IsTrue(dictionary.Equals(recordDictionary), "Deserialized dictionary is not equal to the original dictionary.");
-    //    foreach (KeyValuePair<string, Number> kv in dictionary)
-    //    {
-    //        Assert.IsTrue(dictionary[kv.Key] == recordDictionary[kv.Key], "Deserialized dictionary is not a subset of the original dictionary.");
-    //    }
-    //}
+        // assert
+        Assert.IsNotNull(recordDictionary, "Deserialized record dictionary is null.");
+        Assert.IsNotNull(systemDictionary, "Deserialized dictionary is null.");
+        Assert.IsTrue(dictionary.Equals(recordDictionary), "Deserialized dictionary is not equal to the original dictionary.");
+        foreach (KeyValuePair<string, Number> kv in dictionary)
+        {
+            Assert.IsTrue(dictionary[kv.Key] == recordDictionary[kv.Key], "Deserialized dictionary is not a subset of the original dictionary.");
+        }
+    }
 
-    //[TestMethod]
-    //public void RecordDictionary_DeserializedSystemTextJson_EqualsReserialized()
-    //{
-    //    // arrange
-    //    RecordDictionary<string, Number> dictionary = new() { { "1", new Number(92) }, { "2", new Number(117) }, { "3", new Number(420) }, };
+    [TestMethod]
+    public void RecordDictionary_DeserializedSystemTextJson_EqualsReserialized()
+    {
+        // arrange
+        RecordDictionary<string, Number> dictionary = new() { { "1", new Number(92) }, { "2", new Number(117) }, { "3", new Number(420) }, };
 
-    //    // act
-    //    string json = System.Text.Json.JsonSerializer.Serialize(dictionary);
-    //    RecordDictionary<string, Number>? recordDictionary = System.Text.Json.JsonSerializer.Deserialize<RecordDictionary<string, Number>>(json);
-    //    Number[]? systemDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Number[]>(json);
+        // act
+        string json = System.Text.Json.JsonSerializer.Serialize(dictionary);
+        RecordDictionary<string, Number>? recordDictionary = System.Text.Json.JsonSerializer.Deserialize<RecordDictionary<string, Number>>(json);
+        Dictionary<string, Number>? systemDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Number>>(json);
 
-    //    // assert
-    //    Assert.IsNotNull(recordDictionary, "Deserialized record dictionary is null.");
-    //    Assert.IsNotNull(systemDictionary, "Deserialized dictionary is null.");
-    //    Assert.IsTrue(dictionary.Equals(recordDictionary), "Deserialized dictionary is not equal to the original dictionary.");
-    //    foreach (KeyValuePair<string, Number> kv in dictionary)
-    //    {
-    //        Assert.IsTrue(dictionary[kv.Key] == recordDictionary[kv.Key], "Deserialized dictionary is not a subset of the original dictionary.");
-    //    }
-    //}
+        // assert
+        Assert.IsNotNull(recordDictionary, "Deserialized record dictionary is null.");
+        Assert.IsNotNull(systemDictionary, "Deserialized dictionary is null.");
+        Assert.IsTrue(dictionary.Equals(recordDictionary), "Deserialized dictionary is not equal to the original dictionary.");
+        foreach (KeyValuePair<string, Number> kv in dictionary)
+        {
+            Assert.IsTrue(dictionary[kv.Key] == recordDictionary[kv.Key], "Deserialized dictionary is not a subset of the original dictionary.");
+        }
+    }
 
     #region Support Types
 
