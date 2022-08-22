@@ -8,8 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-
+  build-and-test:
     runs-on: windows-latest
 
     steps:
@@ -23,10 +22,10 @@ jobs:
       run: dotnet restore ./src/Lod.RecordCollections.sln
 
     - name: Build
-      run: dotnet build ./src/Lod.RecordCollections.sln -c Release --no-restore -o ./dist
+      run: dotnet build ./src/Lod.RecordCollections.sln -c Release --no-restore
 
     - name: Test
       run: dotnet test ./src/Lod.RecordCollections.sln -c Release --no-restore --no-build --verbosity normal
 
     - name: Convert classes to records
-      run: ./dist/Lod.RecordCollections.IlAssembler/bin/Release/net6.0/Lod.RecordCollections.IlAssembler.exe ./dist/Lod.RecordCollections.IlAssembler/bin/Release/netstandard2.0/Lod.RecordCollections.dll
+      run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net6.0/Lod.RecordCollections.IlAssembler.dll D:\a\lod.recordcollections\lod.recordcollections\src\Lod.RecordCollections\bin\Release\netstandard2.0\Lod.RecordCollections.dll
