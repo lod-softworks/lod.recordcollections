@@ -22,7 +22,7 @@ jobs:
       run: dotnet restore ./src/Lod.RecordCollections.sln
 
     - name: Build
-      run: dotnet build ./src/Lod.RecordCollections.sln -c Release --no-restore
+      run: dotnet build ./src/Lod.RecordCollections.sln -c Release --no-restore -p:DebugType=portable
 
     - name: Test
       run: dotnet test ./src/Lod.RecordCollections.sln -c Release --no-restore --no-build
@@ -32,7 +32,7 @@ jobs:
 
     - name: NuGet Pack
       if: ${{ github.event.release.tag_name != null }}
-      run: dotnet pack ./src/Lod.RecordCollections/Lod.RecordCollections.csproj -c Release --no-restore --no-build /p:Version=${{ github.event.release.tag_name }} /p:PackageVersion=${{ github.event.release.tag_name }}
+      run: dotnet pack ./src/Lod.RecordCollections/Lod.RecordCollections.csproj -c Release --no-restore --no-build -p:Version=${{ github.event.release.tag_name }} -p:PackageVersion=${{ github.event.release.tag_name }}
     - name: NuGet Pack
       if: ${{ inputs.tag != null }}
-      run: dotnet pack ./src/Lod.RecordCollections/Lod.RecordCollections.csproj -c Release --no-restore --no-build /p:Version=${{ inputs.tag }} /p:PackageVersion=${{ inputs.tag }}
+      run: dotnet pack ./src/Lod.RecordCollections/Lod.RecordCollections.csproj -c Release --no-restore --no-build -p:Version=${{ inputs.tag }} -p:PackageVersion=${{ inputs.tag }}
