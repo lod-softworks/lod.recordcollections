@@ -35,4 +35,8 @@ jobs:
       run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net6.0/Lod.RecordCollections.IlAssembler.dll D:\a\lod.recordcollections\lod.recordcollections\src\Lod.RecordCollections\bin\Release\netstandard2.0\Lod.RecordCollections.dll
 
     - name: NuGet Pack
-      run: dotnet pack ./src/Lod.RecordCollections/Lod.RecordCollections.csproj -c Release --no-restore --no-build /p:Version=${version} /p:PackageVersion=${version}
+      if: $GITHUB_REF_NAME != null
+      run: dotnet pack ./src/Lod.RecordCollections/Lod.RecordCollections.csproj -c Release --no-restore --no-build /p:Version=$GITHUB_REF_NAME /p:PackageVersion=$GITHUB_REF_NAME
+    - name: NuGet Pack
+      if: ${{ inputs.tag != null }}
+      run: dotnet pack ./src/Lod.RecordCollections/Lod.RecordCollections.csproj -c Release --no-restore --no-build /p:Version=${{ inputs.tag }} /p:PackageVersion=${{ inputs.tag }}
