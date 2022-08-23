@@ -15,7 +15,7 @@ public class RecordSet<T> : HashSet<T>
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordSet{T}"/> class that is empty and has the default initial capacity.
     /// </summary>
-    public RecordSet() : base(new HashSet<T>()) { }
+    public RecordSet() : base() { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordSet{T}"/> class that uses the specified underlying set.

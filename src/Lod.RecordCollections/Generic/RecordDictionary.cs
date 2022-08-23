@@ -17,7 +17,7 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordDictionary{TKey, TValue}"/> class that is empty and has the default initial capacity.
     /// </summary>
-    public RecordDictionary() : base(new Dictionary<TKey, TValue>()) { }
+    public RecordDictionary() : base() { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordDictionary{TKey, TValue}"/> class that uses the specified underlying dictionary.
