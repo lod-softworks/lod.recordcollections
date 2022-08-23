@@ -13,6 +13,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>true</ImplicitUsings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -21,7 +22,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>record collection recordcollection recordlist recordhset recordarray recorddictionary</PackageTags>
     <PackageIcon>images\icon.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/linkofdarkness/lod.recordcollections</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/lod-softworks/lod.recordcollections</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
