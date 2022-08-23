@@ -2,6 +2,10 @@ name: Build & Release
 
 on:
   workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Release Version Tag'
+        required: true
 
 jobs:
   build-and-test:
@@ -14,6 +18,10 @@ jobs:
       with:
         dotnet-version: 6.0.x
 
+    - name: Set variables
+      run: |
+        version = $GITHUB_REF_NAME || ${{ inputs.tag }}
+
     - name: Restore dependencies
       run: dotnet restore ./src/Lod.RecordCollections.sln
 
@@ -25,6 +33,6 @@ jobs:
 
     - name: Convert classes to records
       run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net6.0/Lod.RecordCollections.IlAssembler.dll D:\a\lod.recordcollections\lod.recordcollections\src\Lod.RecordCollections\bin\Release\netstandard2.0\Lod.RecordCollections.dll
-      
+
     - name: NuGet Pack
-      run dotnet pack ./src/Lod.RecordCollections/Lod.RecordCollections.csproj -c Release --no-restore --no-build
+      run: dotnet pack ./src/Lod.RecordCollections/Lod.RecordCollections.csproj -c Release --no-restore --no-build /p:Version=${version} /p:PackageVersion=${version}
