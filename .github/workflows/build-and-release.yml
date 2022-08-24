@@ -29,6 +29,9 @@ jobs:
 
     - name: Convert classes to records
       run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net6.0/Lod.RecordCollections.IlAssembler.dll D:\a\lod.recordcollections\lod.recordcollections\src\Lod.RecordCollections\bin\Release\netstandard2.0\Lod.RecordCollections.dll
+      
+    - name: test
+      run: Get-ChildItem path -recurse -include *.*| ForEach-Object { $_.FullName }
 
     - name: NuGet Pack
       if: ${{ github.event.release.tag_name != null }}
