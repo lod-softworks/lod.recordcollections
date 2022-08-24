@@ -22,7 +22,7 @@ jobs:
       run: dotnet restore ./src/Lod.RecordCollections.sln
 
     - name: Build
-      run: dotnet build ./src/Lod.RecordCollections.sln -c Release --no-restore --include-symbols -p:DebugType=portable -p:CopyOutputSymbolsToOutputDirectory=true
+      run: dotnet build ./src/Lod.RecordCollections.sln -c Release --no-restore -p:DebugType=portable -p:CopyOutputSymbolsToOutputDirectory=true
 
     - name: Test
       run: dotnet test ./src/Lod.RecordCollections.sln -c Release --no-restore --no-build
