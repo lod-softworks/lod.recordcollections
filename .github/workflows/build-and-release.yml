@@ -8,7 +8,7 @@ on:
         required: true
 
 jobs:
-  build-and-test:
+  build-and-release:
     runs-on: windows-latest
 
     steps:
@@ -18,7 +18,7 @@ jobs:
       with:
         dotnet-version: 6.0.x
 
-    - name: Restore dependencies
+    - name: Restore Dependencies
       run: dotnet restore ./src/Lod.RecordCollections.sln
 
     - name: Build
@@ -27,11 +27,15 @@ jobs:
     - name: Test
       run: dotnet test ./src/Lod.RecordCollections.sln -c Release --no-restore --no-build
 
-    - name: Convert classes to records
+    - name: IL Class/Record Conversion
       run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net6.0/Lod.RecordCollections.IlAssembler.dll D:\a\lod.recordcollections\lod.recordcollections\src\Lod.RecordCollections\bin\Release\netstandard2.0\Lod.RecordCollections.dll
       
     - name: test
       run: Get-ChildItem ./ -recurse | ForEach-Object { $_.FullName }
+      
+    # This step shouldn't be required but cannot get pdb to build into netstandard2.0 directory and nuget pack won't pack without it
+    - name: Copy Debug Files
+      run: Copy-Item ./src/Lod.RecordCollections.IlAssembler/bin/Release/net6.0/Lod.RecordCollections.pdb -Destination ./src/LodRecordCollections/bin/Release/netstandard2.0
 
     - name: NuGet Pack
       if: ${{ github.event.release.tag_name != null }}
