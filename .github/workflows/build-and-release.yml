@@ -49,4 +49,4 @@ jobs:
       run: dotnet nuget push ./src/Lod.RecordCollections/bin/Release/Lod.RecordCollections.${{ github.event.release.tag_name }}.nupkg --api-key ${{ secrets.NUGET }} -s https://api.nuget.org/v3/index.json
     - name: NuGet Push (Manual)
       if: ${{ inputs.tag != null }}
-      run: dotnet nuget push ./src/Lod.RecordCollections/bin/Release/Lod.RecordCollections.${{ inputs.tag }}.nupkg --api-key --api-key ${{ secrets.NUGET }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./src/Lod.RecordCollections/bin/Release/Lod.RecordCollections.${{ inputs.tag }}.nupkg --api-key ${{ secrets.NUGET }} -s https://api.nuget.org/v3/index.json
