@@ -26,7 +26,13 @@ internal static class RecordCloner
 
             if (cloner != null)
             {
-                result = (T)cloner.Invoke(null, new object[] { obj, });
+                try
+                {
+                    result = cloner is ConstructorInfo cons
+                        ? (T)cons.Invoke(new object[] { obj, })
+                        : (T)cloner.Invoke(null, new object[] { obj, });
+                }
+                catch { }
             }
         }
 
