@@ -7,10 +7,13 @@
     <Copyright>MIT License</Copyright>
     <Description>A set of common, strongly typed, collection types which support record equality.</Description>
     <Authors>Lod Softworks LLC</Authors>
-    <TargetFrameworks>net4.5;net461;net48;netstandard2.0;net6.0</TargetFrameworks>
-    <LangVersion>9.0</LangVersion>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <!--<TargetFrameworks>net4.5;net461;net48;netstandard2.0;net6.0</TargetFrameworks>-->
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>true</ImplicitUsings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -19,7 +22,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>record collection recordcollection recordlist recordhset recordarray recorddictionary</PackageTags>
     <PackageIcon>images\icon.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/linkofdarkness/lod.recordcollections</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/lod-softworks/lod.recordcollections</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
