@@ -13,11 +13,11 @@ public static class RecordCollectionComparer
     /// </summary>
     /// <param name="collection">The collection whose elements should be hashed.</param>
     /// <returns>The hash of the collection elements.</returns>
-    public static int GetHashCode(IEnumerable? collection)
+    public static int GetHashCode(ICollection? collection)
     {
         // use hash of collection type. Type.GetHashCode is consistent per type
         int startingHash = collection?.GetType().GetHashCode() ?? default;
-        int hash = GetHashCode(collection, startingHash);
+        int hash = GetHashCode(collection, startingHash, out _);
 
         return hash;
     }
@@ -28,9 +28,12 @@ public static class RecordCollectionComparer
     /// </summary>
     /// <param name="collection">The collection whose elements should be hashed.</param>
     /// <param name="startingHash">The starting base hash to calculate the hash against.</param>
+    /// <param name="rollovers">The number of times the hash has exceeded <see cref="int.MaxValue"/>.</param>
     /// <returns>The hash of the collection elements.</returns>
-    public static int GetHashCode(IEnumerable? collection, int startingHash)
+    public static int GetHashCode(ICollection? collection, int startingHash, out int rollovers)
     {
+        rollovers = 0;
+
         if (collection == null) return default; // EqualityComparer<object>.Default.GetHashCode(null) returns 0
 
         // use hash of collection type. Type.GetHashCode is consistent per type
@@ -43,7 +46,13 @@ public static class RecordCollectionComparer
                 // order is important
                 for (int i = list.Count - 1; i >= 0; i--)
                 {
+                    int oldHash = hash;
                     hash += (list[i]?.GetHashCode() ?? default) ^ i;
+
+                    if (oldHash > hash)
+                    {
+                        rollovers += 1;
+                    }
                 }
             }
             else if (collection is IDictionary dictionary)
@@ -51,9 +60,15 @@ public static class RecordCollectionComparer
                 // hash key & value
                 foreach (DictionaryEntry entry in dictionary)
                 {
+                    int oldHash = hash;
                     int entryHash = ((entry.Key?.GetHashCode() ?? default) + 1) * ((entry.Value?.GetHashCode() ?? default) + 1);
 
                     hash += entryHash;
+
+                    if (oldHash > hash)
+                    {
+                        rollovers += 1;
+                    }
                 }
             }
             else
@@ -61,7 +76,13 @@ public static class RecordCollectionComparer
                 // order is not important
                 foreach (object item in collection)
                 {
+                    int oldHash = hash;
                     hash += (item?.GetHashCode() ?? default) ^ 3;
+
+                    if (oldHash > hash)
+                    {
+                        rollovers += 1;
+                    }
                 }
             }
         }
@@ -78,32 +99,16 @@ public static class RecordCollectionComparer
     /// </summary>
     /// <param name="x">The first collection to compare.</param>
     /// <param name="y">The second collection to compare.</param>
-    public static bool Equals(ICollection? x, object? y) => y is ICollection collection && Equals(x, x?.Count, collection, collection?.Count);
+    public static bool Equals(ICollection? x, object? y) => y is ICollection collection && Equals(x, collection);
 
     /// <summary>
     /// Indicates whether a collection is equal to another object of the same type.
     /// </summary>
     /// <param name="x">The first collection to compare.</param>
     /// <param name="y">The second collection to compare.</param>
-    public static bool Equals<T>(Generic.ISet<T>? x, object? y) => y is Generic.ISet<T> collection && Equals(x, x?.Count, collection, collection?.Count);
-
-    /// <summary>
-    /// Indicates whether a collection is equal to another object of the same type.
-    /// </summary>
-    /// <param name="x">The first collection to compare.</param>
-    /// <param name="y">The second collection to compare.</param>
-    public static bool Equals(ICollection? x, ICollection? y) => Equals(x, x?.Count, y, y?.Count);
-
-    /// <summary>
-    /// Indicates whether a collection is equal to another object of the same type.
-    /// </summary>
-    /// <param name="x">The first collection to compare.</param>
-    /// <param name="y">The second collection to compare.</param>
-    public static bool Equals<T>(Generic.ISet<T>? x, Generic.ISet<T>? y) => Equals(x, x?.Count, y, y?.Count);
-
-    static bool Equals(IEnumerable? x, int? xCount, IEnumerable? y, int? yCount)
+    public static bool Equals(ICollection? x, ICollection? y)
     {
-        bool areEqual = xCount == yCount && GetHashCode(x) == GetHashCode(y);
+        bool areEqual = x?.Count == y?.Count && GetHashCode(x) == GetHashCode(y);
 
         return areEqual;
     }
