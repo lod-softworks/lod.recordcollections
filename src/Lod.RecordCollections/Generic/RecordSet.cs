@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace System.Collections.Generic;
@@ -9,7 +10,12 @@ namespace System.Collections.Generic;
 /// Record sets support value based comparison.
 /// </summary>
 /// <typeparam name="T">The type of elements in the set.</typeparam>
-public class RecordSet<T> : HashSet<T>
+public class RecordSet<T> : HashSet<T>, IRecordCollection<T>
+    , IEnumerable, IEnumerable<T>
+    , ICollection, ICollection<T>, IReadOnlyCollection<T>
+    , IEquatable<RecordSet<T>>, IEqualityComparer, IEqualityComparer<RecordSet<T>>
+    //, IComparable, IComparable<RecordSet<T>>
+    , IStructuralEquatable, IStructuralComparable
     where T : IEquatable<T>
 {
     /// <summary>
@@ -48,6 +54,12 @@ public class RecordSet<T> : HashSet<T>
     /// </summary>
     // [RecordImp!]: This needs to be protected, virtual, returning it's own type to meet the `record` spec.
     protected virtual Type EqualityContract => typeof(RecordSet<T>);
+
+    [DebuggerHidden]
+    bool ICollection.IsSynchronized => false;
+
+    [DebuggerHidden]
+    object ICollection.SyncRoot => this;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordSet{T}"/> class that uses records from an existing collection.
@@ -89,6 +101,7 @@ public class RecordSet<T> : HashSet<T>
     {
         RuntimeHelpers.EnsureSufficientExecutionStack();
         builder.Append($"Count = {Count}");
+
         return true;
     }
 
@@ -96,13 +109,107 @@ public class RecordSet<T> : HashSet<T>
     /// Returns a value indicating whether two <see cref="RecordSet{T}"/> represent the same collection of records.
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
-    public static bool operator ==(RecordSet<T> left, RecordSet<T> right) => RecordCollectionComparer.Equals(left, right);
+    public static bool operator ==(RecordSet<T> left, RecordSet<T> right) =>
+        RecordCollectionComparer.Equals(left, right);
 
     /// <summary>
     /// Returns a value indicating whether two <see cref="RecordSet{T}"/> represent a different collection of records.
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
-    public static bool operator !=(RecordSet<T> left, RecordSet<T> right) => !RecordCollectionComparer.Equals(left, right);
+    public static bool operator !=(RecordSet<T> left, RecordSet<T> right) =>
+        !RecordCollectionComparer.Equals(left, right);
+
+    #endregion
+
+    #region ICollection
+
+    [DebuggerHidden]
+    void ICollection.CopyTo(Array array, int index)
+    {
+        foreach (T item in this)
+        {
+            array.SetValue(item, index++);
+        }
+    }
+
+    #endregion
+
+    #region IEqualityComparer
+
+    /// <summary>
+    /// Determines whether the specified objects are equal.
+    /// </summary>
+    /// <param name="x"/>
+    /// <param name="y"/>
+    /// <returns/>
+    public bool Equals(RecordSet<T> x, RecordSet<T> y) =>
+        RecordCollectionComparer.Equals(x, y);
+
+    [DebuggerHidden]
+    bool IEqualityComparer.Equals(object x, object y) =>
+        x is RecordSet<T> set && RecordCollectionComparer.Equals(set, y);
+
+    /// <summary>
+    /// Returns a hash code for the specified object.
+    /// </summary>
+    /// <param name="x"/>
+    /// <returns/>
+    public int GetHashCode(RecordSet<T> x) =>
+        RecordCollectionComparer.GetHashCode(x);
+
+    [DebuggerHidden]
+    int IEqualityComparer.GetHashCode(object obj) =>
+        obj is RecordSet<T> set ? RecordCollectionComparer.GetHashCode(set) : 0;
+
+    #endregion
+
+    #region IStructuralEquatable
+
+    [DebuggerHidden]
+    bool IStructuralEquatable.Equals(object other, IEqualityComparer comparer) =>
+        comparer.Equals(this, other);
+
+    [DebuggerHidden]
+    int IStructuralEquatable.GetHashCode(IEqualityComparer comparer) =>
+        comparer.GetHashCode(this);
+
+    #endregion
+
+    #region IComparable
+
+    //[DebuggerHidden]
+    //int IComparable.CompareTo(object obj) => obj is RecordSet<T> set ? CompareTo(set) : -1;
+
+    //public int CompareTo(RecordSet<T> other) =>
+
+    #endregion
+
+    #region IStructuralComparable
+
+    [DebuggerHidden]
+    int IStructuralComparable.CompareTo(object other, IComparer comparer) =>
+        comparer.Compare(this, other);
+
+    #endregion
+
+    #region IRecordCollection
+
+    /// <summary>
+    /// Returns a value indicating whether an <paramref name="other"/> collection is equal to the current instance.
+    /// </summary>
+    /// <param name="other">The collection to compare the current collection to.</param>
+    /// <return>True if the underlying collection's elements are equivalent to the current collection.</return>
+    public bool Equals(IRecordCollection<T>? other) =>
+        RecordCollectionComparer.Equals(this, other);
+
+    /// <summary>
+    /// Returns a value indicating whether the <paramref name="left"/> collection is equal to the <paramref name="right"/> collection.
+    /// </summary>
+    /// <param name="left">The original collection to compare the other collection to.</param>
+    /// <param name="right">The collection to compare the current collection to.</param>
+    /// <return>True if the underlying collection's elements are equivalent to the current collection.</return>
+    public bool Equals(IRecordCollection<T>? left, IRecordCollection<T>? right) =>
+        RecordCollectionComparer.Equals(left, right);
 
     #endregion
 }
