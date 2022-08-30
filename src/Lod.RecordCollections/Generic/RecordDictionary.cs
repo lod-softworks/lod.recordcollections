@@ -21,6 +21,11 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
     where TValue : IEquatable<TValue>
 {
     /// <summary>
+    /// Gets the comparer used to compare elements and collections.
+    /// </summary>
+    protected virtual new IRecordCollectionComparer Comparer { get; } = new RecordCollectionComparer();
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="RecordDictionary{TKey, TValue}"/> class that is empty and has the default initial capacity.
     /// </summary>
     public RecordDictionary() : base() { }
@@ -63,11 +68,11 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
 
     /// <inheritdoc/>
     // [RecordImp!]: This needs to be overriden to meet the `record` spec.
-    public override int GetHashCode() => RecordCollectionComparer.GetHashCode(this);
+    public override int GetHashCode() => Comparer.GetHashCode(this);
 
     /// <inheritdoc/>
     // [RecordImp!]: This needs to be overriden to meet the `record` spec.
-    public override bool Equals(object obj) => RecordCollectionComparer.Equals(this, obj);
+    public override bool Equals(object obj) => Comparer.Equals(this, obj);
 
     /// <summary>
     /// Returns a value indicating whether the collection is equal to another <see cref="Dictionary{TKey, TValue}"/>.
@@ -75,7 +80,7 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
     /// <param name="other"/>
     /// <returns/>
     // [RecordImp!]: This needs to be public, non-virtual to meet the `record` spec.
-    public bool Equals(Dictionary<TKey, TValue> other) => RecordCollectionComparer.Equals(this, other);
+    public bool Equals(Dictionary<TKey, TValue> other) => Comparer.Equals(this, other);
 
     /// <summary>
     /// Returns a value indicating whether the collection is equal to another <see cref="RecordDictionary{TKey, TValue}"/>.
@@ -83,7 +88,7 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
     /// <param name="other"/>
     /// <returns/>
     // [RecordImp!]: This needs to be public, non-virtual to meet the `record` spec.
-    public virtual bool Equals(RecordDictionary<TKey, TValue> other) => RecordCollectionComparer.Equals(this, other);
+    public virtual bool Equals(RecordDictionary<TKey, TValue> other) => Comparer.Equals(this, other);
 
     /// <summary>
     /// Appends the specified <paramref name="builder"/> with value information for the collection.
@@ -101,13 +106,13 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
     /// Returns a value indicating whether two <see cref="RecordDictionary{TKey, TValue}"/> represent the same collection of records.
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
-    public static bool operator ==(RecordDictionary<TKey, TValue> left, RecordDictionary<TKey, TValue> right) => RecordCollectionComparer.Equals(left, right);
+    public static bool operator ==(RecordDictionary<TKey, TValue> left, RecordDictionary<TKey, TValue> right) => RecordCollectionComparer.Default.Equals(left, right);
 
     /// <summary>
     /// Returns a value indicating whether two <see cref="RecordDictionary{TKey, TValue}"/> represent a different collection of records.
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
-    public static bool operator !=(RecordDictionary<TKey, TValue> left, RecordDictionary<TKey, TValue> right) => !RecordCollectionComparer.Equals(left, right);
+    public static bool operator !=(RecordDictionary<TKey, TValue> left, RecordDictionary<TKey, TValue> right) => !RecordCollectionComparer.Default.Equals(left, right);
 
     #endregion
 
@@ -120,11 +125,11 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
     /// <param name="y"/>
     /// <returns/>
     public bool Equals(RecordDictionary<TKey, TValue> x, RecordDictionary<TKey, TValue> y) =>
-        RecordCollectionComparer.Equals(x, y);
+        Comparer.Equals(x, y);
 
     [DebuggerHidden]
     bool IEqualityComparer.Equals(object x, object y) =>
-        x is RecordDictionary<TKey, TValue> set && RecordCollectionComparer.Equals(set, y);
+        x is RecordDictionary<TKey, TValue> set && Comparer.Equals(set, y);
 
     /// <summary>
     /// Returns a hash code for the specified object.
@@ -132,11 +137,11 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
     /// <param name="x"/>
     /// <returns/>
     public int GetHashCode(RecordDictionary<TKey, TValue> x) =>
-        RecordCollectionComparer.GetHashCode(x);
+        Comparer.GetHashCode(x);
 
     [DebuggerHidden]
     int IEqualityComparer.GetHashCode(object obj) =>
-        obj is RecordDictionary<TKey, TValue> set ? RecordCollectionComparer.GetHashCode(set) : 0;
+        obj is RecordDictionary<TKey, TValue> set ? Comparer.GetHashCode(set) : 0;
 
     #endregion
 
@@ -177,7 +182,7 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
     /// <param name="other">The collection to compare the current collection to.</param>
     /// <return>True if the underlying collection's elements are equivalent to the current collection.</return>
     public bool Equals(IReadOnlyRecordCollection? other) =>
-        RecordCollectionComparer.Equals(this, other);
+        Comparer.Equals(this, other);
 
     /// <summary>
     /// Returns a value indicating whether the <paramref name="left"/> collection is equal to the <paramref name="right"/> collection.
@@ -186,31 +191,31 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
     /// <param name="right">The collection to compare the current collection to.</param>
     /// <return>True if the underlying collection's elements are equivalent to the current collection.</return>
     public bool Equals(IReadOnlyRecordCollection? left, IReadOnlyRecordCollection? right) =>
-        RecordCollectionComparer.Equals(left, right);
+        Comparer.Equals(left, right);
 
     [DebuggerHidden]
     bool IEquatable<IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>> other) =>
-        RecordCollectionComparer.Equals(this, other);
+        Comparer.Equals(this, other);
 
     [DebuggerHidden]
     bool IEqualityComparer<IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>> x, IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>> y) =>
-        RecordCollectionComparer.Equals(x, y);
+        Comparer.Equals(x, y);
 
     [DebuggerHidden]
     int IEqualityComparer<IRecordCollection<KeyValuePair<TKey, TValue>>>.GetHashCode(IRecordCollection<KeyValuePair<TKey, TValue>> obj) =>
-        RecordCollectionComparer.GetHashCode(obj);
+        Comparer.GetHashCode(obj);
 
     [DebuggerHidden]
     bool IEquatable<IRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IRecordCollection<KeyValuePair<TKey, TValue>> other) =>
-        RecordCollectionComparer.Equals(this, other);
+        Comparer.Equals(this, other);
 
     [DebuggerHidden]
     bool IEqualityComparer<IRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IRecordCollection<KeyValuePair<TKey, TValue>> x, IRecordCollection<KeyValuePair<TKey, TValue>> y) =>
-        RecordCollectionComparer.Equals(x, y);
+        Comparer.Equals(x, y);
 
     [DebuggerHidden]
     int IEqualityComparer<IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>>.GetHashCode(IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>> obj) =>
-        RecordCollectionComparer.GetHashCode(obj);
+        Comparer.GetHashCode(obj);
 
     #endregion
 }

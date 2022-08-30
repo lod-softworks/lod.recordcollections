@@ -19,6 +19,11 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     where T : IEquatable<T>
 {
     /// <summary>
+    /// Gets the comparer used to compare elements and collections.
+    /// </summary>
+    protected virtual IRecordCollectionComparer Comparer { get; } = new RecordCollectionComparer();
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="RecordList{T}"/> class that is empty and has the default initial capacity.
     /// </summary>
     public RecordList() : base() { }
@@ -60,11 +65,11 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
 
     /// <inheritdoc/>
     // [RecordImp!]: This needs to be overriden to meet the `record` spec.
-    public override int GetHashCode() => RecordCollectionComparer.GetHashCode(this);
+    public override int GetHashCode() => Comparer.GetHashCode(this);
 
     /// <inheritdoc/>
     // [RecordImp!]: This needs to be overriden to meet the `record` spec.
-    public override bool Equals(object obj) => RecordCollectionComparer.Equals(this, obj);
+    public override bool Equals(object obj) => Comparer.Equals(this, obj);
 
     /// <summary>
     /// Returns a value indicating whether the collection is equal to another <see cref="List{T}"/>.
@@ -72,7 +77,7 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// <param name="other"/>
     /// <returns/>
     // [RecordImp!]: This needs to be public, non-virtual to meet the `record` spec.
-    public bool Equals(List<T> other) => RecordCollectionComparer.Equals(this, other);
+    public bool Equals(List<T> other) => Comparer.Equals(this, other);
 
     /// <summary>
     /// Returns a value indicating whether the collection is equal to another <see cref="RecordList{T}"/>.
@@ -80,7 +85,7 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// <param name="other"/>
     /// <returns/>
     // [RecordImp!]: This needs to be public, non-virtual to meet the `record` spec.
-    public virtual bool Equals(RecordList<T> other) => RecordCollectionComparer.Equals(this, other);
+    public virtual bool Equals(RecordList<T> other) => Comparer.Equals(this, other);
 
     /// <summary>
     /// Appends the specified <paramref name="builder"/> with value information for the collection.
@@ -98,13 +103,13 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// Returns a value indicating whether two <see cref="RecordList{T}"/> represent the same collection of records.
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
-    public static bool operator ==(RecordList<T> left, RecordList<T> right) => RecordCollectionComparer.Equals(left, right);
+    public static bool operator ==(RecordList<T> left, RecordList<T> right) => RecordCollectionComparer.Default.Equals(left, right);
 
     /// <summary>
     /// Returns a value indicating whether two <see cref="RecordList{T}"/> represent a different collection of records.
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
-    public static bool operator !=(RecordList<T> left, RecordList<T> right) => !RecordCollectionComparer.Equals(left, right);
+    public static bool operator !=(RecordList<T> left, RecordList<T> right) => !RecordCollectionComparer.Default.Equals(left, right);
 
     #endregion
 
@@ -117,11 +122,11 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// <param name="y"/>
     /// <returns/>
     public bool Equals(RecordList<T> x, RecordList<T> y) =>
-        RecordCollectionComparer.Equals(x, y);
+        Comparer.Equals(x, y);
 
     [DebuggerHidden]
     bool IEqualityComparer.Equals(object x, object y) =>
-        x is RecordList<T> set && RecordCollectionComparer.Equals(set, y);
+        x is RecordList<T> set && Comparer.Equals(set, y);
 
     /// <summary>
     /// Returns a hash code for the specified object.
@@ -129,11 +134,11 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// <param name="x"/>
     /// <returns/>
     public int GetHashCode(RecordList<T> x) =>
-        RecordCollectionComparer.GetHashCode(x);
+        Comparer.GetHashCode(x);
 
     [DebuggerHidden]
     int IEqualityComparer.GetHashCode(object obj) =>
-        obj is RecordList<T> set ? RecordCollectionComparer.GetHashCode(set) : 0;
+        obj is RecordList<T> set ? Comparer.GetHashCode(set) : 0;
 
     #endregion
 
@@ -174,7 +179,7 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// <param name="other">The collection to compare the current collection to.</param>
     /// <return>True if the underlying collection's elements are equivalent to the current collection.</return>
     public bool Equals(IReadOnlyRecordCollection? other) =>
-        RecordCollectionComparer.Equals(this, other);
+        Comparer.Equals(this, other);
 
     /// <summary>
     /// Returns a value indicating whether the <paramref name="left"/> collection is equal to the <paramref name="right"/> collection.
@@ -183,31 +188,31 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// <param name="right">The collection to compare the current collection to.</param>
     /// <return>True if the underlying collection's elements are equivalent to the current collection.</return>
     public bool Equals(IReadOnlyRecordCollection? left, IReadOnlyRecordCollection? right) =>
-        RecordCollectionComparer.Equals(left, right);
+        Comparer.Equals(left, right);
 
     [DebuggerHidden]
     bool IEquatable<IReadOnlyRecordCollection<T>>.Equals(IReadOnlyRecordCollection<T> other) =>
-        RecordCollectionComparer.Equals(this, other);
+        Comparer.Equals(this, other);
 
     [DebuggerHidden]
     bool IEqualityComparer<IReadOnlyRecordCollection<T>>.Equals(IReadOnlyRecordCollection<T> x, IReadOnlyRecordCollection<T> y) =>
-        RecordCollectionComparer.Equals(x, y);
+        Comparer.Equals(x, y);
 
     [DebuggerHidden]
     int IEqualityComparer<IRecordCollection<T>>.GetHashCode(IRecordCollection<T> obj) =>
-        RecordCollectionComparer.GetHashCode(obj);
+        Comparer.GetHashCode(obj);
 
     [DebuggerHidden]
     bool IEquatable<IRecordCollection<T>>.Equals(IRecordCollection<T> other) =>
-        RecordCollectionComparer.Equals(this, other);
+        Comparer.Equals(this, other);
 
     [DebuggerHidden]
     bool IEqualityComparer<IRecordCollection<T>>.Equals(IRecordCollection<T> x, IRecordCollection<T> y) =>
-        RecordCollectionComparer.Equals(x, y);
+        Comparer.Equals(x, y);
 
     [DebuggerHidden]
     int IEqualityComparer<IReadOnlyRecordCollection<T>>.GetHashCode(IReadOnlyRecordCollection<T> obj) =>
-        RecordCollectionComparer.GetHashCode(obj);
+        Comparer.GetHashCode(obj);
 
     #endregion
 }
