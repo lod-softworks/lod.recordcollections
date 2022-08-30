@@ -24,6 +24,7 @@
     <PackageProjectUrl>https://github.com/linkofdarkness/lod.recordcollections</PackageProjectUrl>
     <PackageIcon>docs\icon.png</PackageIcon>
     <PackageReadmeFile>docs\README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/linkofdarkness/lod.recordcollections</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
