@@ -55,12 +55,6 @@ public class RecordSet<T> : HashSet<T>, IRecordCollection<T>
     // [RecordImp!]: This needs to be protected, virtual, returning it's own type to meet the `record` spec.
     protected virtual Type EqualityContract => typeof(RecordSet<T>);
 
-    [DebuggerHidden]
-    bool ICollection.IsSynchronized => false;
-
-    [DebuggerHidden]
-    object ICollection.SyncRoot => this;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordSet{T}"/> class that uses records from an existing collection.
     /// </summary>
@@ -122,6 +116,12 @@ public class RecordSet<T> : HashSet<T>, IRecordCollection<T>
     #endregion
 
     #region ICollection
+
+    [DebuggerHidden]
+    bool ICollection.IsSynchronized => false;
+
+    [DebuggerHidden]
+    object ICollection.SyncRoot => this;
 
     [DebuggerHidden]
     void ICollection.CopyTo(Array array, int index)
@@ -199,7 +199,7 @@ public class RecordSet<T> : HashSet<T>, IRecordCollection<T>
     /// </summary>
     /// <param name="other">The collection to compare the current collection to.</param>
     /// <return>True if the underlying collection's elements are equivalent to the current collection.</return>
-    public bool Equals(IRecordCollection<T>? other) =>
+    public bool Equals(IReadOnlyRecordCollection? other) =>
         RecordCollectionComparer.Equals(this, other);
 
     /// <summary>
@@ -208,8 +208,32 @@ public class RecordSet<T> : HashSet<T>, IRecordCollection<T>
     /// <param name="left">The original collection to compare the other collection to.</param>
     /// <param name="right">The collection to compare the current collection to.</param>
     /// <return>True if the underlying collection's elements are equivalent to the current collection.</return>
-    public bool Equals(IRecordCollection<T>? left, IRecordCollection<T>? right) =>
+    public bool Equals(IReadOnlyRecordCollection? left, IReadOnlyRecordCollection? right) =>
         RecordCollectionComparer.Equals(left, right);
+
+    [DebuggerHidden]
+    bool IEquatable<IReadOnlyRecordCollection<T>>.Equals(IReadOnlyRecordCollection<T> other) =>
+        RecordCollectionComparer.Equals(this, other);
+
+    [DebuggerHidden]
+    bool IEqualityComparer<IReadOnlyRecordCollection<T>>.Equals(IReadOnlyRecordCollection<T> x, IReadOnlyRecordCollection<T> y) =>
+        RecordCollectionComparer.Equals(x, y);
+
+    [DebuggerHidden]
+    int IEqualityComparer<IRecordCollection<T>>.GetHashCode(IRecordCollection<T> obj) =>
+        RecordCollectionComparer.GetHashCode(obj);
+
+    [DebuggerHidden]
+    bool IEquatable<IRecordCollection<T>>.Equals(IRecordCollection<T> other) =>
+        RecordCollectionComparer.Equals(this, other);
+
+    [DebuggerHidden]
+    bool IEqualityComparer<IRecordCollection<T>>.Equals(IRecordCollection<T> x, IRecordCollection<T> y) =>
+        RecordCollectionComparer.Equals(x, y);
+
+    [DebuggerHidden]
+    int IEqualityComparer<IReadOnlyRecordCollection<T>>.GetHashCode(IReadOnlyRecordCollection<T> obj) =>
+        RecordCollectionComparer.GetHashCode(obj);
 
     #endregion
 }

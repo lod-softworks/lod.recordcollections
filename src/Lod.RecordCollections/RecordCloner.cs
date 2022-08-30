@@ -13,9 +13,9 @@ internal static class RecordCloner
     /// Returns a cloned instance of <typeparamref name="T"/> if it's a record type.
     /// If the type is not clonable the original instance is returned.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="obj"></param>
-    /// <returns></returns>
+    /// <typeparam name="T"/>
+    /// <param name="obj"/>
+    /// <returns/>
     public static T? TryClone<T>(T? obj)
     {
         T? result = obj;

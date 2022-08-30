@@ -21,18 +21,20 @@
     <Version>0.1.0</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>record collection recordcollection recordlist recordhset recordarray recorddictionary</PackageTags>
-    <PackageIcon>images\icon.png</PackageIcon>
-    <PackageProjectUrl>https://github.com/lod-softworks/lod.recordcollections</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/linkofdarkness/lod.recordcollections</PackageProjectUrl>
+    <PackageIcon>docs\icon.png</PackageIcon>
+    <PackageReadmeFile>docs\README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-    <_Parameter1>Lod.RecordCollections.Tests</_Parameter1>
+      <_Parameter1>Lod.RecordCollections.Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\assets\lod-softworks.png" Pack="true" Visible="false" PackagePath="images\icon.png" />
+    <None Include="..\..\assets\lod-softworks.png" Pack="true" Visible="false" PackagePath="docs\icon.png" />
+    <None Include="..\..\README.md" Pack="true" Visible="false" PackagePath="docs\README.md" />
   </ItemGroup>
 
 </Project>

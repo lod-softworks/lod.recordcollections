@@ -13,7 +13,7 @@ public static class RecordCollectionComparer
     /// </summary>
     /// <param name="collection">The collection whose elements should be hashed.</param>
     /// <returns>The hash of the collection elements.</returns>
-    public static int GetHashCode(ICollection? collection)
+    public static int GetHashCode(IReadOnlyRecordCollection? collection)
     {
         // use hash of collection type. Type.GetHashCode is consistent per type
         int startingHash = collection?.GetType().GetHashCode() ?? default;
@@ -30,7 +30,7 @@ public static class RecordCollectionComparer
     /// <param name="startingHash">The starting base hash to calculate the hash against.</param>
     /// <param name="rollovers">The number of times the hash has exceeded <see cref="int.MaxValue"/>.</param>
     /// <returns>The hash of the collection elements.</returns>
-    public static int GetHashCode(ICollection? collection, int startingHash, out int rollovers)
+    public static int GetHashCode(IReadOnlyRecordCollection? collection, int startingHash, out int rollovers)
     {
         rollovers = 0;
 
@@ -99,14 +99,15 @@ public static class RecordCollectionComparer
     /// </summary>
     /// <param name="x">The first collection to compare.</param>
     /// <param name="y">The second collection to compare.</param>
-    public static bool Equals(ICollection? x, object? y) => y is ICollection collection && Equals(x, collection);
+    public static bool Equals(IReadOnlyRecordCollection? x, object? y) =>
+        y is ICollection collection && Equals(x, collection);
 
     /// <summary>
     /// Indicates whether a collection is equal to another object of the same type.
     /// </summary>
     /// <param name="x">The first collection to compare.</param>
     /// <param name="y">The second collection to compare.</param>
-    public static bool Equals(ICollection? x, ICollection? y)
+    public static bool Equals(IReadOnlyRecordCollection? x, IReadOnlyRecordCollection? y)
     {
         bool areEqual = x?.Count == y?.Count && GetHashCode(x) == GetHashCode(y);
 
