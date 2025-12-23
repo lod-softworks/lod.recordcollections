@@ -19,8 +19,7 @@ public partial class RecordSet<T> : HashSet<T>
     /// </summary>
     public RecordSet()
         : this(comparer: null)
-    {
-    }
+    { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordSet{T}"/> class that is empty,
@@ -39,8 +38,7 @@ public partial class RecordSet<T> : HashSet<T>
     /// <param name="hashSet">An existing <see cref="HashSet{T}"/> to use as the underlying collection.</param>
     public RecordSet(HashSet<T> hashSet)
         : this(hashSet, comparer: null)
-    {
-    }
+    { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordSet{T}"/> class that uses the specified underlying set
@@ -62,8 +60,7 @@ public partial class RecordSet<T> : HashSet<T>
     /// <param name="collection">The collection whose elements are copied to the new set.</param>
     public RecordSet(IEnumerable<T> collection)
         : this(collection, comparer: null)
-    {
-    }
+    { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordSet{T}"/> class that
@@ -85,8 +82,7 @@ public partial class RecordSet<T> : HashSet<T>
     /// <param name="capacity">The number of elements that the new set can initially store.</param>
     public RecordSet(int capacity)
         : this(capacity, comparer: null)
-    {
-    }
+    { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordSet{T}"/> class that is empty, has the specified initial capacity,

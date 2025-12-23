@@ -5,8 +5,10 @@
 /// Record collections support value based comparison.
 /// </summary>
 public interface IReadOnlyRecordCollection
-    : IEnumerable //, IComparable
-    , IStructuralEquatable, IStructuralComparable
+    : IEnumerable
+    //, IComparable
+    , IStructuralEquatable
+    , IStructuralComparable
 {
 #if NET6_0_OR_GREATER
     /// <summary>

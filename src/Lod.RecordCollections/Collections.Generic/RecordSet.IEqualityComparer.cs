@@ -3,24 +3,47 @@ namespace System.Collections.Generic;
 partial class RecordSet<T>
     : IEqualityComparer
     , IEqualityComparer<RecordSet<T>>
+    , IEqualityComparer<IReadOnlyRecordCollection>
+    , IEqualityComparer<IReadOnlyRecordCollection<T>>
+    , IEqualityComparer<IRecordCollection<T>>
 {
-    /// <summary>
-    /// Determines whether the specified objects are equal.
-    /// </summary>
-    public bool Equals(RecordSet<T>? x, RecordSet<T>? y) =>
+    [DebuggerHidden]
+    bool IEqualityComparer.Equals(object? x, object? y) =>
+        x is IReadOnlyRecordCollection xRecordCollection && Comparer.Equals(xRecordCollection, y);
+
+    [DebuggerHidden]
+    bool IEqualityComparer<RecordSet<T>>.Equals(RecordSet<T>? x, RecordSet<T>? y) =>
         Comparer.Equals(x, y);
 
     [DebuggerHidden]
-    bool IEqualityComparer.Equals(object? x, object? y) =>
-        x is RecordSet<T> set && Comparer.Equals(set, y);
+    bool IEqualityComparer<IReadOnlyRecordCollection>.Equals(IReadOnlyRecordCollection? x, IReadOnlyRecordCollection? y) =>
+        Comparer.Equals(x, y);
 
-    /// <summary>
-    /// Returns a hash code for the specified object.
-    /// </summary>
-    public int GetHashCode(RecordSet<T> x) =>
-        Comparer.GetHashCode(x);
+    [DebuggerHidden]
+    bool IEqualityComparer<IReadOnlyRecordCollection<T>>.Equals(IReadOnlyRecordCollection<T>? x, IReadOnlyRecordCollection<T>? y) =>
+        Comparer.Equals(x, y);
+
+    [DebuggerHidden]
+    bool IEqualityComparer<IRecordCollection<T>>.Equals(IRecordCollection<T>? x, IRecordCollection<T>? y) =>
+        Comparer.Equals(x, y);
 
     [DebuggerHidden]
     int IEqualityComparer.GetHashCode(object? obj) =>
-        obj is RecordSet<T> set ? Comparer.GetHashCode(set) : 0;
+        obj is IReadOnlyRecordCollection recordCollection ? Comparer.GetHashCode(recordCollection) : default;
+
+    [DebuggerHidden]
+    int IEqualityComparer<RecordSet<T>>.GetHashCode(RecordSet<T> obj) =>
+        Comparer.GetHashCode(obj);
+
+    [DebuggerHidden]
+    int IEqualityComparer<IReadOnlyRecordCollection>.GetHashCode(IReadOnlyRecordCollection obj) =>
+        Comparer.GetHashCode(obj);
+
+    [DebuggerHidden]
+    int IEqualityComparer<IReadOnlyRecordCollection<T>>.GetHashCode(IReadOnlyRecordCollection<T> obj) =>
+        Comparer.GetHashCode(obj);
+
+    [DebuggerHidden]
+    int IEqualityComparer<IRecordCollection<T>>.GetHashCode(IRecordCollection<T> obj) =>
+        Comparer.GetHashCode(obj);
 }

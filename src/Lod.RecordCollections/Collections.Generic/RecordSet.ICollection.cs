@@ -1,7 +1,8 @@
 namespace System.Collections.Generic;
 
 partial class RecordSet<T>
-    : ICollection, ICollection<T>
+    : ICollection
+    , ICollection<T>
 {
     [DebuggerHidden]
     bool ICollection.IsSynchronized => false;

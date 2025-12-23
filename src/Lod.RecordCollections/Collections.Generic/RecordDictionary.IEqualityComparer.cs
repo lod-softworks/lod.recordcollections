@@ -1,7 +1,8 @@
 namespace System.Collections.Generic;
 
 partial class RecordDictionary<TKey, TValue>
-    : IEqualityComparer, IEqualityComparer<RecordDictionary<TKey, TValue>>
+    : IEqualityComparer
+    , IEqualityComparer<RecordDictionary<TKey, TValue>>
     , IEqualityComparer<IReadOnlyRecordCollection>
     , IEqualityComparer<IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>>
     , IEqualityComparer<IRecordCollection<KeyValuePair<TKey, TValue>>>

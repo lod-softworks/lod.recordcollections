@@ -19,8 +19,7 @@ public partial class RecordList<T> : List<T>
     /// </summary>
     public RecordList()
         : this(comparer: null)
-    {
-    }
+    { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordList{T}"/> class that is empty,
@@ -39,8 +38,7 @@ public partial class RecordList<T> : List<T>
     /// <param name="list">An existing <see cref="List{T}"/> to use as the underlying collection.</param>
     public RecordList(List<T> list)
         : this(list, comparer: null)
-    {
-    }
+    { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordList{T}"/> class that uses the specified underlying list
@@ -62,8 +60,7 @@ public partial class RecordList<T> : List<T>
     /// <param name="collection">The collection whose elements are copied to the new list.</param>
     public RecordList(IEnumerable<T> collection)
         : this(collection, comparer: null)
-    {
-    }
+    { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordList{T}"/> class that
@@ -84,8 +81,7 @@ public partial class RecordList<T> : List<T>
     /// <param name="capacity">The number of elements that the new list can initially store.</param>
     public RecordList(int capacity)
         : this(capacity, comparer: null)
-    {
-    }
+    { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordList{T}"/> class that is empty, has the specified initial capacity,

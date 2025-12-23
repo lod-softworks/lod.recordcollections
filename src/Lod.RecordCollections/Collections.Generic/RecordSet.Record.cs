@@ -5,6 +5,9 @@ namespace System.Collections.Generic;
 
 partial class RecordSet<T>
 {
+    private static IEnumerable<T> CloneEnumerable(IEnumerable<T> source) =>
+        source.Select(o => RecordCloner.TryClone(o) ?? o);
+
     /// <summary>
     /// Gets the record equality contract for this collection.
     /// </summary>
@@ -17,18 +20,20 @@ partial class RecordSet<T>
     /// <param name="original">An existing <see cref="RecordSet{T}"/> to clone into the new record.</param>
     // [RecordImp!]: This needs to be protected, non-null with no null checks to meet the `record` spec.
     protected RecordSet(RecordSet<T> original)
-        : base(original.Select(o => RecordCloner.TryClone(o)!))
+        : base(CloneEnumerable(original))
     {
         Comparer = original?.Comparer ?? RecordCollectionComparer.Default;
     }
 
     /// <inheritdoc/>
     // [RecordImp!]: This needs to be overriden to meet the `record` spec.
-    public override int GetHashCode() => Comparer.GetHashCode(this);
+    public override int GetHashCode() =>
+        Comparer.GetHashCode(this);
 
     /// <inheritdoc/>
     // [RecordImp!]: This needs to be overriden to meet the `record` spec.
-    public override bool Equals(object? obj) => Comparer.Equals(this, obj);
+    public override bool Equals(object? obj) =>
+        Comparer.Equals(this, obj);
 
     /// <summary>
     /// Returns a value indicating whether the collection is equal to another <see cref="HashSet{T}"/>.
@@ -36,7 +41,8 @@ partial class RecordSet<T>
     /// <param name="other"/>
     /// <returns/>
     // [RecordImp!]: This needs to be public, non-virtual to meet the `record` spec.
-    public bool Equals(HashSet<T> other) => Comparer.Equals(this, other);
+    public bool Equals(HashSet<T> other) =>
+        Comparer.Equals(this, other);
 
     /// <summary>
     /// Returns a value indicating whether the collection is equal to another <see cref="RecordSet{T}"/>.
@@ -44,7 +50,8 @@ partial class RecordSet<T>
     /// <param name="other"/>
     /// <returns/>
     // [RecordImp!]: This needs to be public, virtual to meet the `record` spec.
-    public virtual bool Equals(RecordSet<T>? other) => Comparer.Equals(this, other);
+    public virtual bool Equals(RecordSet<T>? other) =>
+        Comparer.Equals(this, other);
 
     /// <summary>
     /// Appends the specified <paramref name="builder"/> with value information for the collection.
@@ -63,12 +70,12 @@ partial class RecordSet<T>
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
     public static bool operator ==(RecordSet<T> left, RecordSet<T> right) =>
-        left.Equals(right);
+        left?.Equals(right) ?? right?.Equals(left) ?? false;
 
     /// <summary>
     /// Returns a value indicating whether two <see cref="RecordSet{T}"/> represent a different collection of records.
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
     public static bool operator !=(RecordSet<T> left, RecordSet<T> right) =>
-        !left.Equals(right);
+        !(left?.Equals(right) ?? right?.Equals(left) ?? false);
 }

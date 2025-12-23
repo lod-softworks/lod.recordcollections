@@ -5,14 +5,15 @@ namespace System.Collections.Generic;
 
 partial class RecordDictionary<TKey, TValue>
 {
-    private static Dictionary<TKey, TValue> CloneDictionary(IDictionary<TKey, TValue> dictionary) =>
-        dictionary.ToDictionary(kv => kv.Key, kv => RecordCloner.TryClone(kv.Value) ?? kv.Value);
+    private static Dictionary<TKey, TValue> CloneDictionary(IDictionary<TKey, TValue> source) =>
+        source.ToDictionary(kv => kv.Key, kv => RecordCloner.TryClone(kv.Value) ?? kv.Value);
 
     /// <summary>
     /// Gets the record equality contract for this collection.
     /// </summary>
     // [RecordImp!]: This needs to be protected, virtual, returning it's own type to meet the `record` spec.
-    protected virtual Type EqualityContract => typeof(RecordDictionary<TKey, TValue>);
+    protected virtual Type EqualityContract =>
+        typeof(RecordDictionary<TKey, TValue>);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordDictionary{TKey, TValue}"/> class that uses records from an existing collection.
@@ -27,11 +28,13 @@ partial class RecordDictionary<TKey, TValue>
 
     /// <inheritdoc/>
     // [RecordImp!]: This needs to be overriden to meet the `record` spec.
-    public override int GetHashCode() => Comparer.GetHashCode(this);
+    public override int GetHashCode() =>
+        Comparer.GetHashCode(this);
 
     /// <inheritdoc/>
     // [RecordImp!]: This needs to be overriden to meet the `record` spec.
-    public override bool Equals(object? obj) => Comparer.Equals(this, obj);
+    public override bool Equals(object? obj) =>
+        Comparer.Equals(this, obj);
 
     /// <summary>
     /// Returns a value indicating whether the collection is equal to another <see cref="Dictionary{TKey, TValue}"/>.
@@ -39,7 +42,8 @@ partial class RecordDictionary<TKey, TValue>
     /// <param name="other"/>
     /// <returns/>
     // [RecordImp!]: This needs to be public, non-virtual to meet the `record` spec.
-    public bool Equals(Dictionary<TKey, TValue> other) => Comparer.Equals(this, other);
+    public bool Equals(Dictionary<TKey, TValue> other) =>
+        Comparer.Equals(this, other);
 
     /// <summary>
     /// Returns a value indicating whether the collection is equal to another <see cref="RecordDictionary{TKey, TValue}"/>.
@@ -47,7 +51,8 @@ partial class RecordDictionary<TKey, TValue>
     /// <param name="other"/>
     /// <returns/>
     // [RecordImp!]: This needs to be public, virtual to meet the `record` spec.
-    public virtual bool Equals(RecordDictionary<TKey, TValue>? other) => Comparer.Equals(this, other);
+    public virtual bool Equals(RecordDictionary<TKey, TValue>? other) =>
+        Comparer.Equals(this, other);
 
     /// <summary>
     /// Appends the specified <paramref name="builder"/> with value information for the collection.
@@ -66,12 +71,12 @@ partial class RecordDictionary<TKey, TValue>
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
     public static bool operator ==(RecordDictionary<TKey, TValue> left, RecordDictionary<TKey, TValue> right) =>
-        left.Equals(right);
+        left?.Equals(right) ?? right?.Equals(left) ?? false;
 
     /// <summary>
     /// Returns a value indicating whether two <see cref="RecordDictionary{TKey, TValue}"/> represent a different collection of records.
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
     public static bool operator !=(RecordDictionary<TKey, TValue> left, RecordDictionary<TKey, TValue> right) =>
-        !left.Equals(right);
+        !(left?.Equals(right) ?? right?.Equals(left) ?? false);
 }
