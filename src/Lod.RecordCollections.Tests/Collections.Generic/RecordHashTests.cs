@@ -10,8 +10,8 @@ public class RecordSetTests
     public void Set_SameInts_NotEqualsMatchingSet()
     {
         // arrange
-        HashSet<int> set1 = new() { 92, 117, 420, };
-        HashSet<int> set2 = new() { 92, 117, 420, };
+        HashSet<int> set1 = [92, 117, 420,];
+        HashSet<int> set2 = [92, 117, 420,];
 
         // act
         bool areEqual = set1.Equals(set2);
@@ -24,8 +24,8 @@ public class RecordSetTests
     public void RecordSet_SameInts_EqualsMatchingSet()
     {
         // arrange
-        RecordSet<int> set1 = new() { 92, 117, 420, };
-        RecordSet<int> set2 = new() { 92, 117, 420, };
+        RecordSet<int> set1 = [92, 117, 420,];
+        RecordSet<int> set2 = [92, 117, 420,];
 
         // act
         bool areEqual = set1.Equals(set2);
@@ -38,8 +38,8 @@ public class RecordSetTests
     public void RecordSet_SameStrings_EqualsMatchingSet()
     {
         // arrange
-        RecordSet<string> set1 = new() { "92", "117", "420", };
-        RecordSet<string> set2 = new() { "92", "117", "420", };
+        RecordSet<string> set1 = ["92", "117", "420",];
+        RecordSet<string> set2 = ["92", "117", "420",];
 
         // act
         bool areEqual = set1.Equals(set2);
@@ -52,8 +52,8 @@ public class RecordSetTests
     public void RecordSet_SameRecords_EqualsMatchingSet()
     {
         // arrange
-        RecordSet<Number> set1 = new() { new Number(92), new Number(117), new Number(420), };
-        RecordSet<Number> set2 = new() { new Number(92), new Number(117), new Number(420), };
+        RecordSet<Number> set1 = [new Number(92), new Number(117), new Number(420),];
+        RecordSet<Number> set2 = [new Number(92), new Number(117), new Number(420),];
 
         // act
         bool areEqual = set1.Equals(set2);
@@ -66,8 +66,8 @@ public class RecordSetTests
     public void RecordSet_SameInts_DifferentOrder_EqualsSimilarSet()
     {
         // arrange
-        RecordSet<int> set1 = new() { 92, 117, 420, };
-        RecordSet<int> set2 = new() { 117, 420, 92, };
+        RecordSet<int> set1 = [92, 117, 420,];
+        RecordSet<int> set2 = [117, 420, 92,];
 
         // act
         bool areEqual = set1.Equals(set2);
@@ -96,7 +96,7 @@ public class RecordSetTests
     public void RecordSet_DeserializedNewtonsoft_EqualsReserialized()
     {
         // arrange
-        RecordSet<Number> set = new() { new Number(92), new Number(117), new Number(420), };
+        RecordSet<Number> set = [new Number(92), new Number(117), new Number(420),];
 
         // act
         string json = Newtonsoft.Json.JsonConvert.SerializeObject(set);
@@ -114,7 +114,7 @@ public class RecordSetTests
     public void RecordSet_DeserializedSystemTextJson_EqualsReserialized()
     {
         // arrange
-        RecordSet<Number> set = new() { new Number(92), new Number(117), new Number(420), };
+        RecordSet<Number> set = [new Number(92), new Number(117), new Number(420),];
 
         // act
         string json = System.Text.Json.JsonSerializer.Serialize(set);

@@ -7,7 +7,7 @@ namespace System.Collections;
 /// </summary>
 internal static class RecordCloner
 {
-    static Dictionary<Type, MethodBase?> Cloners { get; } = new();
+    static Dictionary<Type, MethodBase?> Cloners { get; } = [];
 
     /// <summary>
     /// Returns a cloned instance of <typeparamref name="T"/> if it's a record type.
@@ -29,8 +29,8 @@ internal static class RecordCloner
                 try
                 {
                     result = cloner is ConstructorInfo cons
-                        ? (T)cons.Invoke(new object[] { obj, })
-                        : (T)cloner.Invoke(null, new object[] { obj, });
+                        ? (T)cons.Invoke([obj,])
+                        : (T?)cloner.Invoke(null, [obj,]);
                 }
                 catch { }
             }

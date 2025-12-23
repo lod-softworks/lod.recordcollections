@@ -16,7 +16,7 @@ public class RecordEnumerableTests
 
         // assert
         Assert.IsNotNull(recordList);
-        Assert.AreEqual(enumerable.Count(), recordList.Count);
+        Assert.HasCount(enumerable.Count(), recordList);
     }
 
     [TestMethod]
@@ -40,7 +40,7 @@ public class RecordEnumerableTests
         // assert
         Assert.IsNull(recordList);
         Assert.IsNotNull(exception);
-        Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
+        Assert.IsInstanceOfType<ArgumentNullException>(exception);
     }
 
     #endregion
@@ -59,7 +59,7 @@ public class RecordEnumerableTests
 
         // assert
         Assert.IsNotNull(recordDictionary);
-        Assert.AreEqual(enumerable.Count(), recordDictionary.Count);
+        Assert.HasCount(enumerable.Count(), recordDictionary);
     }
 
     [TestMethod]
@@ -84,7 +84,7 @@ public class RecordEnumerableTests
         // assert
         Assert.IsNull(recordDictionary);
         Assert.IsNotNull(exception);
-        Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
+        Assert.IsInstanceOfType<ArgumentNullException>(exception);
     }
 
     [TestMethod]
@@ -109,7 +109,7 @@ public class RecordEnumerableTests
         // assert
         Assert.IsNull(recordDictionary);
         Assert.IsNotNull(exception);
-        Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
+        Assert.IsInstanceOfType<ArgumentNullException>(exception);
     }
 
     [TestMethod]
@@ -135,7 +135,7 @@ public class RecordEnumerableTests
         // assert
         Assert.IsNull(recordDictionary);
         Assert.IsNotNull(exception);
-        Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
+        Assert.IsInstanceOfType<ArgumentNullException>(exception);
     }
 
     [TestMethod]
@@ -161,7 +161,7 @@ public class RecordEnumerableTests
         // assert
         Assert.IsNull(recordDictionary);
         Assert.IsNotNull(exception);
-        Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
+        Assert.IsInstanceOfType<ArgumentNullException>(exception);
     }
 
     [TestMethod]
@@ -187,7 +187,7 @@ public class RecordEnumerableTests
         // assert
         Assert.IsNull(recordDictionary);
         Assert.IsNotNull(exception);
-        Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
+        Assert.IsInstanceOfType<ArgumentNullException>(exception);
     }
 
     #pragma warning restore IDE0039 // Use local function
@@ -206,7 +206,7 @@ public class RecordEnumerableTests
 
         // assert
         Assert.IsNotNull(recordSet);
-        Assert.AreEqual(enumerable.Count(), recordSet.Count);
+        Assert.HasCount(enumerable.Count(), recordSet);
     }
 
     [TestMethod]
@@ -230,7 +230,7 @@ public class RecordEnumerableTests
         // assert
         Assert.IsNull(recordSet);
         Assert.IsNotNull(exception);
-        Assert.IsInstanceOfType(exception, typeof(ArgumentNullException));
+        Assert.IsInstanceOfType<ArgumentNullException>(exception);
     }
 
     #endregion

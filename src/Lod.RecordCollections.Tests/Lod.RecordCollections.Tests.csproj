@@ -4,10 +4,10 @@
     <Product>Lod.RecordCollections.Tests</Product>
     <AssemblyName>Lod.RecordCollections.Tests</AssemblyName>
     <RootNamespace>System.Collections.Tests</RootNamespace>
-    <Copyright>MIT License</Copyright>
+    <Copyright>Copyright © 2022-2025 Lod Softworks LLC</Copyright>
     <Description>Unit tests for the Lod.RecordCollections project.</Description>
     <Authors>Lod Softworks LLC</Authors>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <TargetType>library</TargetType>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
@@ -21,10 +21,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.7" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.7" />
-    <PackageReference Include="coverlet.collector" Version="3.1.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="4.0.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="4.0.2" />
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

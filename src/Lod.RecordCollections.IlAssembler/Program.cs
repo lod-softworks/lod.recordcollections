@@ -31,12 +31,12 @@ if (dasmProcess.ExitCode != 0) throw new InvalidOperationException("IL decompila
 Console.WriteLine("Modifying IL");
 
 string fileContent = await File.ReadAllTextAsync(ilPath);
-Type[] collectionNames = new[]
-{
+Type[] collectionNames =
+[
     typeof(RecordList<byte>).GetGenericTypeDefinition(),
     typeof(RecordSet<byte>).GetGenericTypeDefinition(),
     typeof(RecordDictionary<byte, byte>).GetGenericTypeDefinition(),
-};
+];
 string cloneTemplate = @"
     .method public hidebysig newslot virtual 
         instance class $!TYPE!$<!T> '<Clone>$' () cil managed 
