@@ -16,6 +16,7 @@ public class EqualityDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecor
     , IEquatable<EqualityDictionary<TKey, TValue>>, IEqualityComparer, IEqualityComparer<EqualityDictionary<TKey, TValue>>
     //, IComparable, IComparable<EqualityDictionary<TKey, TValue>>
     , IStructuralEquatable, IStructuralComparable
+    where TKey : notnull
     where TValue : IEquatable<TValue>
 {
     /// <summary>
@@ -61,21 +62,17 @@ public class EqualityDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecor
     public override int GetHashCode() => Comparer.GetHashCode(this);
 
     /// <inheritdoc/>
-    public override bool Equals(object obj) => Comparer.Equals(this, obj);
+    public override bool Equals(object? obj) => Comparer.Equals(this, obj);
 
     /// <summary>
     /// Returns a value indicating whether the collection is equal to another <see cref="Dictionary{TKey, TValue}"/>.
     /// </summary>
-    /// <param name="other"/>
-    /// <returns/>
     public bool Equals(Dictionary<TKey, TValue> other) => Comparer.Equals(this, other);
 
     /// <summary>
     /// Returns a value indicating whether the collection is equal to another <see cref="EqualityDictionary{TKey, TValue}"/>.
     /// </summary>
-    /// <param name="other"/>
-    /// <returns/>
-    public virtual bool Equals(EqualityDictionary<TKey, TValue> other) => Comparer.Equals(this, other);
+    public virtual bool Equals(EqualityDictionary<TKey, TValue>? other) => Comparer.Equals(this, other);
 
     /// <summary>
     /// Returns a value indicating whether two <see cref="EqualityDictionary{TKey, TValue}"/> represent the same collection of records.
@@ -96,21 +93,16 @@ public class EqualityDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecor
     /// <summary>
     /// Determines whether the specified objects are equal.
     /// </summary>
-    /// <param name="x"/>
-    /// <param name="y"/>
-    /// <returns/>
-    public bool Equals(EqualityDictionary<TKey, TValue> x, EqualityDictionary<TKey, TValue> y) =>
+    public bool Equals(EqualityDictionary<TKey, TValue>? x, EqualityDictionary<TKey, TValue>? y) =>
         Comparer.Equals(x, y);
 
     [DebuggerHidden]
-    bool IEqualityComparer.Equals(object x, object y) =>
+    bool IEqualityComparer.Equals(object? x, object? y) =>
         x is EqualityDictionary<TKey, TValue> set && Comparer.Equals(set, y);
 
     /// <summary>
     /// Returns a hash code for the specified object.
     /// </summary>
-    /// <param name="x"/>
-    /// <returns/>
     public int GetHashCode(EqualityDictionary<TKey, TValue> x) =>
         Comparer.GetHashCode(x);
 
@@ -123,7 +115,7 @@ public class EqualityDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecor
     #region IStructuralEquatable
 
     [DebuggerHidden]
-    bool IStructuralEquatable.Equals(object other, IEqualityComparer comparer) =>
+    bool IStructuralEquatable.Equals(object? other, IEqualityComparer comparer) =>
         comparer.Equals(this, other);
 
     [DebuggerHidden]
@@ -144,7 +136,7 @@ public class EqualityDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecor
     #region IStructuralComparable
 
     [DebuggerHidden]
-    int IStructuralComparable.CompareTo(object other, IComparer comparer) =>
+    int IStructuralComparable.CompareTo(object? other, IComparer comparer) =>
         comparer.Compare(this, other);
 
     #endregion
@@ -169,11 +161,11 @@ public class EqualityDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecor
         Comparer.Equals(left, right);
 
     [DebuggerHidden]
-    bool IEquatable<IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>> other) =>
+    bool IEquatable<IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>? other) =>
         Comparer.Equals(this, other);
 
     [DebuggerHidden]
-    bool IEqualityComparer<IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>> x, IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>> y) =>
+    bool IEqualityComparer<IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>? x, IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>? y) =>
         Comparer.Equals(x, y);
 
     [DebuggerHidden]
@@ -181,11 +173,11 @@ public class EqualityDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecor
         Comparer.GetHashCode(obj);
 
     [DebuggerHidden]
-    bool IEquatable<IRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IRecordCollection<KeyValuePair<TKey, TValue>> other) =>
+    bool IEquatable<IRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IRecordCollection<KeyValuePair<TKey, TValue>>? other) =>
         Comparer.Equals(this, other);
 
     [DebuggerHidden]
-    bool IEqualityComparer<IRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IRecordCollection<KeyValuePair<TKey, TValue>> x, IRecordCollection<KeyValuePair<TKey, TValue>> y) =>
+    bool IEqualityComparer<IRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IRecordCollection<KeyValuePair<TKey, TValue>>? x, IRecordCollection<KeyValuePair<TKey, TValue>>? y) =>
         Comparer.Equals(x, y);
 
     [DebuggerHidden]

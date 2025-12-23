@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace System.Collections.Generic;
 
@@ -10,11 +8,11 @@ namespace System.Collections.Generic;
 /// Record lists support value based comparison.
 /// </summary>
 /// <typeparam name="T">The type of elements in the list.</typeparam>
-public class RecordList<T> : List<T>, IRecordCollection<T>
+public class EqualityList<T> : List<T>, IRecordCollection<T>
     , IEnumerable, IEnumerable<T>
     , ICollection, ICollection<T>, IReadOnlyCollection<T>
-    , IEquatable<RecordList<T>>, IEqualityComparer, IEqualityComparer<RecordList<T>>
-    //, IComparable, IComparable<RecordList<T>>
+    , IEquatable<EqualityList<T>>, IEqualityComparer, IEqualityComparer<EqualityList<T>>
+    //, IComparable, IComparable<EqualityList<T>>
     , IStructuralEquatable, IStructuralComparable
     where T : IEquatable<T>
 {
@@ -24,92 +22,69 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     protected virtual IRecordCollectionComparer Comparer { get; } = new RecordCollectionComparer();
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RecordList{T}"/> class that is empty and has the default initial capacity.
+    /// Initializes a new instance of the <see cref="EqualityList{T}"/> class that is empty and has the default initial capacity.
     /// </summary>
-    public RecordList() : base() { }
+    public EqualityList() : base() { }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RecordList{T}"/> class that uses the specified underlying list.
+    /// Initializes a new instance of the <see cref="EqualityList{T}"/> class that uses the specified underlying list.
     /// </summary>
     /// <param name="list">An existing <see cref="List{T}"/> to use as the underlying collection.</param>
-    public RecordList(List<T> list) : base(list) { }
+    public EqualityList(List<T> list) : base(list) { }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RecordList{T}"/> class that
+    /// Initializes a new instance of the <see cref="EqualityList{T}"/> class that
     /// contains elements copied from the specified collection and has sufficient capacity
     /// to accommodate the number of elements copied.
     /// </summary>
     /// <param name="collection">The collection whose elements are copied to the new list.</param>
-    public RecordList(IEnumerable<T> collection) : base(collection) { }
+    public EqualityList(IEnumerable<T> collection) : base(collection) { }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RecordList{T}"/> class that is empty and has the specified initial capacity.
+    /// Initializes a new instance of the <see cref="EqualityList{T}"/> class that is empty and has the specified initial capacity.
     /// </summary>
     /// <param name="capacity">The number of elements that the new list can initially store.</param>
-    public RecordList(int capacity) : base(capacity) { }
+    public EqualityList(int capacity) : base(capacity) { }
 
     #region Record Specification
 
     /// <summary>
-    /// Gets the record equality contract for this collection.
+    /// Initializes a new instance of the <see cref="EqualityList{T}"/> class that uses records from an existing collection.
     /// </summary>
-    // [RecordImp!]: This needs to be protected, virtual, returning it's own type to meet the `record` spec.
-    protected virtual Type EqualityContract => typeof(RecordList<T>);
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RecordList{T}"/> class that uses records from an existing collection.
-    /// </summary>
-    /// <param name="original">An existing <see cref="RecordList{T}"/> to clone into the new record.</param>
-    // [RecordImp!]: This needs to be protected, non-null with no null checks to meet the `record` spec.
-    protected RecordList(RecordList<T> original) : base(original.Select(o => RecordCloner.TryClone(o)!)) { }
+    /// <param name="original">An existing <see cref="EqualityList{T}"/> to clone into the new record.</param>
+    protected EqualityList(EqualityList<T> original) : base(original.Select(o => RecordCloner.TryClone(o)!)) { }
 
     /// <inheritdoc/>
-    // [RecordImp!]: This needs to be overriden to meet the `record` spec.
     public override int GetHashCode() => Comparer.GetHashCode(this);
 
     /// <inheritdoc/>
-    // [RecordImp!]: This needs to be overriden to meet the `record` spec.
-    public override bool Equals(object obj) => Comparer.Equals(this, obj);
+    public override bool Equals(object? obj) => Comparer.Equals(this, obj);
 
     /// <summary>
     /// Returns a value indicating whether the collection is equal to another <see cref="List{T}"/>.
     /// </summary>
     /// <param name="other"/>
     /// <returns/>
-    // [RecordImp!]: This needs to be public, non-virtual to meet the `record` spec.
     public bool Equals(List<T> other) => Comparer.Equals(this, other);
 
     /// <summary>
-    /// Returns a value indicating whether the collection is equal to another <see cref="RecordList{T}"/>.
+    /// Returns a value indicating whether the collection is equal to another <see cref="EqualityList{T}"/>.
     /// </summary>
     /// <param name="other"/>
     /// <returns/>
-    // [RecordImp!]: This needs to be public, non-virtual to meet the `record` spec.
-    public virtual bool Equals(RecordList<T> other) => Comparer.Equals(this, other);
+    public virtual bool Equals(EqualityList<T>? other) => Comparer.Equals(this, other);
 
     /// <summary>
-    /// Appends the specified <paramref name="builder"/> with value information for the collection.
+    /// Returns a value indicating whether two <see cref="EqualityList{T}"/> represent the same collection of records.
     /// </summary>
-    /// <param name="builder"></param>
-    // [RecordImp!]: This needs to be protected, virtual to meet the `record` spec.
-    protected virtual bool PrintMembers(StringBuilder builder)
-    {
-        RuntimeHelpers.EnsureSufficientExecutionStack();
-        builder.Append($"Count = {Count}");
-        return true;
-    }
+    public static bool operator ==(EqualityList<T> left, EqualityList<T> right) =>
+        RecordCollectionComparer.Default.Equals(left, right);
 
     /// <summary>
-    /// Returns a value indicating whether two <see cref="RecordList{T}"/> represent the same collection of records.
+    /// Returns a value indicating whether two <see cref="EqualityList{T}"/> represent a different collection of records.
     /// </summary>
-    // [RecordImp!]: This operator is required to meet the `record` spec.
-    public static bool operator ==(RecordList<T> left, RecordList<T> right) => RecordCollectionComparer.Default.Equals(left, right);
-
-    /// <summary>
-    /// Returns a value indicating whether two <see cref="RecordList{T}"/> represent a different collection of records.
-    /// </summary>
-    // [RecordImp!]: This operator is required to meet the `record` spec.
-    public static bool operator !=(RecordList<T> left, RecordList<T> right) => !RecordCollectionComparer.Default.Equals(left, right);
+    public static bool operator !=(EqualityList<T> left, EqualityList<T> right) =>
+        !RecordCollectionComparer.Default.Equals(left, right);
 
     #endregion
 
@@ -121,31 +96,31 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// <param name="x"/>
     /// <param name="y"/>
     /// <returns/>
-    public bool Equals(RecordList<T> x, RecordList<T> y) =>
+    public bool Equals(EqualityList<T>? x, EqualityList<T>? y) =>
         Comparer.Equals(x, y);
 
     [DebuggerHidden]
-    bool IEqualityComparer.Equals(object x, object y) =>
-        x is RecordList<T> set && Comparer.Equals(set, y);
+    bool IEqualityComparer.Equals(object? x, object? y) =>
+        x is EqualityList<T> set && Comparer.Equals(set, y);
 
     /// <summary>
     /// Returns a hash code for the specified object.
     /// </summary>
     /// <param name="x"/>
     /// <returns/>
-    public int GetHashCode(RecordList<T> x) =>
+    public int GetHashCode(EqualityList<T> x) =>
         Comparer.GetHashCode(x);
 
     [DebuggerHidden]
     int IEqualityComparer.GetHashCode(object obj) =>
-        obj is RecordList<T> set ? Comparer.GetHashCode(set) : 0;
+        obj is EqualityList<T> set ? Comparer.GetHashCode(set) : 0;
 
     #endregion
 
     #region IStructuralEquatable
 
     [DebuggerHidden]
-    bool IStructuralEquatable.Equals(object other, IEqualityComparer comparer) =>
+    bool IStructuralEquatable.Equals(object? other, IEqualityComparer comparer) =>
         comparer.Equals(this, other);
 
     [DebuggerHidden]
@@ -157,16 +132,16 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     #region IComparable
 
     //[DebuggerHidden]
-    //int IComparable.CompareTo(object obj) => obj is RecordList<T> set ? CompareTo(set) : -1;
+    //int IComparable.CompareTo(object obj) => obj is EqualityList<T> set ? CompareTo(set) : -1;
 
-    //public int CompareTo(RecordList<T> other) =>
+    //public int CompareTo(EqualityList<T> other) =>
 
     #endregion
 
     #region IStructuralComparable
 
     [DebuggerHidden]
-    int IStructuralComparable.CompareTo(object other, IComparer comparer) =>
+    int IStructuralComparable.CompareTo(object? other, IComparer comparer) =>
         comparer.Compare(this, other);
 
     #endregion
@@ -191,11 +166,11 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
         Comparer.Equals(left, right);
 
     [DebuggerHidden]
-    bool IEquatable<IReadOnlyRecordCollection<T>>.Equals(IReadOnlyRecordCollection<T> other) =>
+    bool IEquatable<IReadOnlyRecordCollection<T>>.Equals(IReadOnlyRecordCollection<T>? other) =>
         Comparer.Equals(this, other);
 
     [DebuggerHidden]
-    bool IEqualityComparer<IReadOnlyRecordCollection<T>>.Equals(IReadOnlyRecordCollection<T> x, IReadOnlyRecordCollection<T> y) =>
+    bool IEqualityComparer<IReadOnlyRecordCollection<T>>.Equals(IReadOnlyRecordCollection<T>? x, IReadOnlyRecordCollection<T>? y) =>
         Comparer.Equals(x, y);
 
     [DebuggerHidden]
@@ -203,11 +178,11 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
         Comparer.GetHashCode(obj);
 
     [DebuggerHidden]
-    bool IEquatable<IRecordCollection<T>>.Equals(IRecordCollection<T> other) =>
+    bool IEquatable<IRecordCollection<T>>.Equals(IRecordCollection<T>? other) =>
         Comparer.Equals(this, other);
 
     [DebuggerHidden]
-    bool IEqualityComparer<IRecordCollection<T>>.Equals(IRecordCollection<T> x, IRecordCollection<T> y) =>
+    bool IEqualityComparer<IRecordCollection<T>>.Equals(IRecordCollection<T>? x, IRecordCollection<T>? y) =>
         Comparer.Equals(x, y);
 
     [DebuggerHidden]

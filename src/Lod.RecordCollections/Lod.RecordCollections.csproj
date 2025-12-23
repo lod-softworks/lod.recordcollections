@@ -3,12 +3,11 @@
   <PropertyGroup>
     <Product>Lod.RecordCollections</Product>
     <AssemblyName>Lod.RecordCollections</AssemblyName>
-    <RootNamespace>System.Collections</RootNamespace>
-    <Copyright>MIT License</Copyright>
+    <RootNamespace>System</RootNamespace>
+    <Copyright>Copyright © 2022-2025 Lod Softworks LLC</Copyright>
     <Description>A set of common, strongly typed, collection types which support record equality.</Description>
     <Authors>Lod Softworks LLC</Authors>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <!--<TargetFrameworks>net4.5;net461;net48;netstandard2.0;net6.0</TargetFrameworks>-->
+    <TargetFrameworks>netstandard2.0;net8.0;net10.0;net4.8</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>true</ImplicitUsings>

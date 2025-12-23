@@ -1,4 +1,6 @@
-﻿namespace System.Collections;
+﻿[assembly: Parallelize]
+
+namespace System.Collections.Tests;
 
 public static class Program
 {

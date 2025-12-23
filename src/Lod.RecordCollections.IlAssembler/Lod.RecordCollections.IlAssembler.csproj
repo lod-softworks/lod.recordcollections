@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Product>Lod.RecordCollections.IlAssembler</Product>
     <AssemblyName>Lod.RecordCollections.IlAssembler</AssemblyName>
-    <Copyright>MIT License</Copyright>
+    <Copyright>Copyright © 2022-2025 Lod Softworks LLC</Copyright>
     <Description>IL disembler and assembler to make record compliant classes.</Description>
     <Authors>Lod Softworks LLC</Authors>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <TargetType>exe</TargetType>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
@@ -16,8 +16,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="runtime.win-x64.Microsoft.NETCore.ILAsm" Version="6.0.0" />
-    <PackageReference Include="runtime.win-x64.Microsoft.NETCore.ILDasm" Version="6.0.0" />
+    <PackageReference Include="runtime.win-x64.Microsoft.NETCore.ILAsm" Version="10.0.1" />
+    <PackageReference Include="runtime.win-x64.Microsoft.NETCore.ILDasm" Version="10.0.1" />
   </ItemGroup>
 
   <ItemGroup>

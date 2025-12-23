@@ -18,6 +18,7 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
     , IEquatable<RecordDictionary<TKey, TValue>>, IEqualityComparer, IEqualityComparer<RecordDictionary<TKey, TValue>>
     //, IComparable, IComparable<RecordDictionary<TKey, TValue>>
     , IStructuralEquatable, IStructuralComparable
+    where TKey : notnull
     where TValue : IEquatable<TValue>
 {
     /// <summary>
@@ -72,7 +73,7 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
 
     /// <inheritdoc/>
     // [RecordImp!]: This needs to be overriden to meet the `record` spec.
-    public override bool Equals(object obj) => Comparer.Equals(this, obj);
+    public override bool Equals(object? obj) => Comparer.Equals(this, obj);
 
     /// <summary>
     /// Returns a value indicating whether the collection is equal to another <see cref="Dictionary{TKey, TValue}"/>.
@@ -88,7 +89,7 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
     /// <param name="other"/>
     /// <returns/>
     // [RecordImp!]: This needs to be public, non-virtual to meet the `record` spec.
-    public virtual bool Equals(RecordDictionary<TKey, TValue> other) => Comparer.Equals(this, other);
+    public virtual bool Equals(RecordDictionary<TKey, TValue>? other) => Comparer.Equals(this, other);
 
     /// <summary>
     /// Appends the specified <paramref name="builder"/> with value information for the collection.
@@ -124,11 +125,11 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
     /// <param name="x"/>
     /// <param name="y"/>
     /// <returns/>
-    public bool Equals(RecordDictionary<TKey, TValue> x, RecordDictionary<TKey, TValue> y) =>
+    public bool Equals(RecordDictionary<TKey, TValue>? x, RecordDictionary<TKey, TValue>? y) =>
         Comparer.Equals(x, y);
 
     [DebuggerHidden]
-    bool IEqualityComparer.Equals(object x, object y) =>
+    bool IEqualityComparer.Equals(object? x, object? y) =>
         x is RecordDictionary<TKey, TValue> set && Comparer.Equals(set, y);
 
     /// <summary>
@@ -148,7 +149,7 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
     #region IStructuralEquatable
 
     [DebuggerHidden]
-    bool IStructuralEquatable.Equals(object other, IEqualityComparer comparer) =>
+    bool IStructuralEquatable.Equals(object? other, IEqualityComparer comparer) =>
         comparer.Equals(this, other);
 
     [DebuggerHidden]
@@ -169,7 +170,7 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
     #region IStructuralComparable
 
     [DebuggerHidden]
-    int IStructuralComparable.CompareTo(object other, IComparer comparer) =>
+    int IStructuralComparable.CompareTo(object? other, IComparer comparer) =>
         comparer.Compare(this, other);
 
     #endregion
@@ -194,11 +195,11 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
         Comparer.Equals(left, right);
 
     [DebuggerHidden]
-    bool IEquatable<IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>> other) =>
+    bool IEquatable<IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>? other) =>
         Comparer.Equals(this, other);
 
     [DebuggerHidden]
-    bool IEqualityComparer<IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>> x, IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>> y) =>
+    bool IEqualityComparer<IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>? x, IReadOnlyRecordCollection<KeyValuePair<TKey, TValue>>? y) =>
         Comparer.Equals(x, y);
 
     [DebuggerHidden]
@@ -206,11 +207,11 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
         Comparer.GetHashCode(obj);
 
     [DebuggerHidden]
-    bool IEquatable<IRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IRecordCollection<KeyValuePair<TKey, TValue>> other) =>
+    bool IEquatable<IRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IRecordCollection<KeyValuePair<TKey, TValue>>? other) =>
         Comparer.Equals(this, other);
 
     [DebuggerHidden]
-    bool IEqualityComparer<IRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IRecordCollection<KeyValuePair<TKey, TValue>> x, IRecordCollection<KeyValuePair<TKey, TValue>> y) =>
+    bool IEqualityComparer<IRecordCollection<KeyValuePair<TKey, TValue>>>.Equals(IRecordCollection<KeyValuePair<TKey, TValue>>? x, IRecordCollection<KeyValuePair<TKey, TValue>>? y) =>
         Comparer.Equals(x, y);
 
     [DebuggerHidden]
