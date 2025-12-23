@@ -3,7 +3,8 @@
 /// <summary>
 /// Provides a base class for implementations of <see cref="IRecordCollectionComparer"/> which exposes methods to support the comparison of record collections.
 /// </summary>
-public class RecordCollectionComparer : IRecordCollectionComparer
+public class RecordCollectionComparer
+    : IRecordCollectionComparer
 {
     /// <summary>
     /// Gets the default comparer for record collections.
