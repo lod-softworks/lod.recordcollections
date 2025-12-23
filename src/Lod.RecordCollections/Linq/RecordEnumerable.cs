@@ -36,7 +36,7 @@ public static class RecordEnumerable
     }
 
     /// <summary>
-    /// Creates a <see cref="RecordDictionary{TKey, TValue}"/> according to a specified key selector delegate.
+    /// Creates a <see cref="RecordDictionary{TKey, TValue}"/> according to a specified key and element selector delegate.
     /// </summary>
     /// <typeparam name="TSource">The record element type.</typeparam>
     /// <typeparam name="TKey">The dictionary key type.</typeparam>

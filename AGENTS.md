@@ -45,6 +45,13 @@ This document defines how automated agents (such as Cursor, GitHub Copilot, or o
   - Magic numbers or strings
   - Inconsistent naming
 
+## Record Collection File Layout
+
+- Implement `RecordDictionary`, `RecordList`, `RecordSet`, and any future record collections as `partial` types.
+- Keep constructors and core state in `<Type>.cs`, record-specific overrides in `<Type>.Record.cs`, and isolate each interface contract into its own `<Type>.<Interface>.cs` file (for example: `RecordList.IEqualityComparer.cs`).
+- When adding a new interface to a collection, introduce or update the corresponding partial file instead of expanding the base class.
+- Use the existing `RecordDictionary` split as the authoritative reference for how the files should nest and be named.
+
 ## Git Committing
 
 - Prefer **small, focused commits** that are easy to understand, review, and diff.

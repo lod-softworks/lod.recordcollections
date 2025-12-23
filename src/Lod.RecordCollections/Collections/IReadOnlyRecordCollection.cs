@@ -4,8 +4,11 @@
 /// A read-only collection of strongly typed, record-like values.
 /// Record collections support value based comparison.
 /// </summary>
-public interface IReadOnlyRecordCollection : IEnumerable //, IComparable
-    , IStructuralEquatable, IStructuralComparable
+public interface IReadOnlyRecordCollection
+    : IEnumerable
+    //, IComparable
+    , IStructuralEquatable
+    , IStructuralComparable
 {
 #if NET6_0_OR_GREATER
     /// <summary>

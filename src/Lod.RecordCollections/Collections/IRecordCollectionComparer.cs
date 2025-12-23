@@ -3,7 +3,9 @@
 /// <summary>
 /// Defines methods to support the comparison of record collections.
 /// </summary>
-public interface IRecordCollectionComparer : IEqualityComparer, IEqualityComparer<IReadOnlyRecordCollection>
+public interface IRecordCollectionComparer
+    : IEqualityComparer
+    , IEqualityComparer<IReadOnlyRecordCollection>
 {
     /// <summary>
     /// Indicates whether a collection is equal to another object of the same type.
