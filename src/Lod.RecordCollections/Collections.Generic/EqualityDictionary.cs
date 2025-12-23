@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace System.Collections.Generic;
 
@@ -22,31 +22,75 @@ public class EqualityDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecor
     /// <summary>
     /// Gets the comparer used to compare elements and collections.
     /// </summary>
-    protected virtual new IRecordCollectionComparer Comparer { get; } = new RecordCollectionComparer();
+    public virtual new IRecordCollectionComparer Comparer { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EqualityDictionary{TKey, TValue}"/> class that is empty and has the default initial capacity.
     /// </summary>
-    public EqualityDictionary() : base() { }
+    public EqualityDictionary() : this(comparer: null) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EqualityDictionary{TKey, TValue}"/> class that is empty,
+    /// has the default initial capacity, and uses the specified comparer.
+    /// </summary>
+    /// <param name="comparer">The comparer used for record equality.</param>
+    public EqualityDictionary(IRecordCollectionComparer? comparer) : base()
+    {
+        Comparer = comparer ?? RecordCollectionComparer.Default;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EqualityDictionary{TKey, TValue}"/> class that uses the specified underlying dictionary.
     /// </summary>
     /// <param name="dictionary">An existing <see cref="EqualityDictionary{TKey, TValue}"/> to use as the underlying collection.</param>
-    public EqualityDictionary(Dictionary<TKey, TValue> dictionary) : base(dictionary) { }
+    public EqualityDictionary(Dictionary<TKey, TValue> dictionary) : this(dictionary, comparer: null) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EqualityDictionary{TKey, TValue}"/> class that uses the specified underlying dictionary
+    /// and comparer.
+    /// </summary>
+    /// <param name="dictionary">An existing <see cref="EqualityDictionary{TKey, TValue}"/> to use as the underlying collection.</param>
+    /// <param name="comparer">The comparer used for record equality.</param>
+    public EqualityDictionary(Dictionary<TKey, TValue> dictionary, IRecordCollectionComparer? comparer) : base(dictionary)
+    {
+        Comparer = comparer ?? RecordCollectionComparer.Default;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EqualityDictionary{TKey, TValue}"/> class that
     /// contains elements copied from the specified collection and has sufficient capacity to accommodate the number of elements copied.
     /// </summary>
     /// <param name="collection">The collection whose elements are copied to the new dictionary.</param>
-    public EqualityDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection) : base(collection?.ToDictionary(kv => kv.Key, kv => kv.Value)!) { }
+    public EqualityDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection) : this(collection, comparer: null) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EqualityDictionary{TKey, TValue}"/> class that
+    /// contains elements copied from the specified collection and uses the specified comparer.
+    /// </summary>
+    /// <param name="collection">The collection whose elements are copied to the new dictionary.</param>
+    /// <param name="comparer">The comparer used for record equality.</param>
+    public EqualityDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IRecordCollectionComparer? comparer)
+        : base(collection?.ToDictionary(kv => kv.Key, kv => kv.Value)!)
+    {
+        Comparer = comparer ?? RecordCollectionComparer.Default;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EqualityDictionary{TKey, TValue}"/> class that is empty and has the specified initial capacity.
     /// </summary>
     /// <param name="capacity">The number of elements that the new dictionary can initially store.</param>
-    public EqualityDictionary(int capacity) : base(new Dictionary<TKey, TValue>(capacity)) { }
+    public EqualityDictionary(int capacity) : this(capacity, comparer: null) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EqualityDictionary{TKey, TValue}"/> class that is empty, has the specified initial capacity,
+    /// and uses the specified comparer.
+    /// </summary>
+    /// <param name="capacity">The number of elements that the new dictionary can initially store.</param>
+    /// <param name="comparer">The comparer used for record equality.</param>
+    public EqualityDictionary(int capacity, IRecordCollectionComparer? comparer) : base(new Dictionary<TKey, TValue>(capacity))
+    {
+        Comparer = comparer ?? RecordCollectionComparer.Default;
+    }
 
     #region Record-like Specification
 
@@ -56,7 +100,9 @@ public class EqualityDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecor
     /// <param name="original">An existing <see cref="EqualityDictionary{TKey, TValue}"/> to clone into the new record.</param>
     protected EqualityDictionary(EqualityDictionary<TKey, TValue> original)
         : base(original.Select(o => new KeyValuePair<TKey, TValue>(o.Key, RecordCloner.TryClone(o.Value)!)).ToDictionary(kv => kv.Key, kv => kv.Value))
-    { }
+    {
+        Comparer = original?.Comparer ?? RecordCollectionComparer.Default;
+    }
 
     /// <inheritdoc/>
     public override int GetHashCode() => Comparer.GetHashCode(this);
@@ -78,13 +124,13 @@ public class EqualityDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecor
     /// Returns a value indicating whether two <see cref="EqualityDictionary{TKey, TValue}"/> represent the same collection of records.
     /// </summary>
     public static bool operator ==(EqualityDictionary<TKey, TValue> left, EqualityDictionary<TKey, TValue> right) =>
-        RecordCollectionComparer.Default.Equals(left, right);
+        left.Equals(right);
 
     /// <summary>
     /// Returns a value indicating whether two <see cref="EqualityDictionary{TKey, TValue}"/> represent a different collection of records.
     /// </summary>
     public static bool operator !=(EqualityDictionary<TKey, TValue> left, EqualityDictionary<TKey, TValue> right) =>
-        !RecordCollectionComparer.Default.Equals(left, right);
+        !left.Equals(right);
 
     #endregion
 

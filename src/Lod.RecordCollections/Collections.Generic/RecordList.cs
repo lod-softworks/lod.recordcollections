@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -21,18 +21,39 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// <summary>
     /// Gets the comparer used to compare elements and collections.
     /// </summary>
-    protected virtual IRecordCollectionComparer Comparer { get; } = new RecordCollectionComparer();
+    public virtual IRecordCollectionComparer Comparer { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordList{T}"/> class that is empty and has the default initial capacity.
     /// </summary>
-    public RecordList() : base() { }
+    public RecordList() : this(comparer: null) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RecordList{T}"/> class that is empty,
+    /// has the default initial capacity, and uses the specified comparer.
+    /// </summary>
+    /// <param name="comparer">The comparer used for record equality.</param>
+    public RecordList(IRecordCollectionComparer? comparer) : base()
+    {
+        Comparer = comparer ?? RecordCollectionComparer.Default;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordList{T}"/> class that uses the specified underlying list.
     /// </summary>
     /// <param name="list">An existing <see cref="List{T}"/> to use as the underlying collection.</param>
-    public RecordList(List<T> list) : base(list) { }
+    public RecordList(List<T> list) : this(list, comparer: null) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RecordList{T}"/> class that uses the specified underlying list
+    /// and comparer.
+    /// </summary>
+    /// <param name="list">An existing <see cref="List{T}"/> to use as the underlying collection.</param>
+    /// <param name="comparer">The comparer used for record equality.</param>
+    public RecordList(List<T> list, IRecordCollectionComparer? comparer) : base(list)
+    {
+        Comparer = comparer ?? RecordCollectionComparer.Default;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordList{T}"/> class that
@@ -40,13 +61,36 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// to accommodate the number of elements copied.
     /// </summary>
     /// <param name="collection">The collection whose elements are copied to the new list.</param>
-    public RecordList(IEnumerable<T> collection) : base(collection) { }
+    public RecordList(IEnumerable<T> collection) : this(collection, comparer: null) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RecordList{T}"/> class that
+    /// contains elements copied from the specified collection, has sufficient capacity
+    /// to accommodate the number of elements copied, and uses the specified comparer.
+    /// </summary>
+    /// <param name="collection">The collection whose elements are copied to the new list.</param>
+    /// <param name="comparer">The comparer used for record equality.</param>
+    public RecordList(IEnumerable<T> collection, IRecordCollectionComparer? comparer) : base(collection)
+    {
+        Comparer = comparer ?? RecordCollectionComparer.Default;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordList{T}"/> class that is empty and has the specified initial capacity.
     /// </summary>
     /// <param name="capacity">The number of elements that the new list can initially store.</param>
-    public RecordList(int capacity) : base(capacity) { }
+    public RecordList(int capacity) : this(capacity, comparer: null) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RecordList{T}"/> class that is empty, has the specified initial capacity,
+    /// and uses the specified comparer.
+    /// </summary>
+    /// <param name="capacity">The number of elements that the new list can initially store.</param>
+    /// <param name="comparer">The comparer used for record equality.</param>
+    public RecordList(int capacity, IRecordCollectionComparer? comparer) : base(capacity)
+    {
+        Comparer = comparer ?? RecordCollectionComparer.Default;
+    }
 
     #region Record Specification
 
@@ -61,7 +105,10 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// </summary>
     /// <param name="original">An existing <see cref="RecordList{T}"/> to clone into the new record.</param>
     // [RecordImp!]: This needs to be protected, non-null with no null checks to meet the `record` spec.
-    protected RecordList(RecordList<T> original) : base(original.Select(o => RecordCloner.TryClone(o)!)) { }
+    protected RecordList(RecordList<T> original) : base(original.Select(o => RecordCloner.TryClone(o)!))
+    {
+        Comparer = original?.Comparer ?? RecordCollectionComparer.Default;
+    }
 
     /// <inheritdoc/>
     // [RecordImp!]: This needs to be overriden to meet the `record` spec.
@@ -103,13 +150,15 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// Returns a value indicating whether two <see cref="RecordList{T}"/> represent the same collection of records.
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
-    public static bool operator ==(RecordList<T> left, RecordList<T> right) => RecordCollectionComparer.Default.Equals(left, right);
+    public static bool operator ==(RecordList<T> left, RecordList<T> right) =>
+        left.Equals(right);
 
     /// <summary>
     /// Returns a value indicating whether two <see cref="RecordList{T}"/> represent a different collection of records.
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
-    public static bool operator !=(RecordList<T> left, RecordList<T> right) => !RecordCollectionComparer.Default.Equals(left, right);
+    public static bool operator !=(RecordList<T> left, RecordList<T> right) =>
+        !left.Equals(right);
 
     #endregion
 
@@ -118,9 +167,6 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// <summary>
     /// Determines whether the specified objects are equal.
     /// </summary>
-    /// <param name="x"/>
-    /// <param name="y"/>
-    /// <returns/>
     public bool Equals(RecordList<T>? x, RecordList<T>? y) =>
         Comparer.Equals(x, y);
 
@@ -131,8 +177,6 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// <summary>
     /// Returns a hash code for the specified object.
     /// </summary>
-    /// <param name="x"/>
-    /// <returns/>
     public int GetHashCode(RecordList<T> x) =>
         Comparer.GetHashCode(x);
 

@@ -1,10 +1,16 @@
-﻿using System.Reflection;
-
-namespace System.Collections.Tests.Generic;
+namespace Lod.RecordCollections.Tests.Collections.Generic;
 
 [TestClass]
 public class RecordSetTests
 {
+    [TestInitialize]
+    public void SetUp()
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        RecordCollectionComparer.Default = new RecordCollectionComparer();
+#pragma warning restore CS0618 // Type or member is obsolete
+    }
+
     // sanity check test
     [TestMethod]
     public void Set_SameInts_NotEqualsMatchingSet()
@@ -18,6 +24,53 @@ public class RecordSetTests
 
         // assert
         Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    [RepeatTestMethod(3)]
+    public void RecordSet_DefaultConstructor_UsesDefaultComparer()
+    {
+        // Arrange
+        TestRecordCollectionComparer comparer = new();
+#pragma warning disable CS0618 // Type or member is obsolete
+        RecordCollectionComparer.Default = comparer;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        // Act
+        RecordSet<int> set = [];
+
+        // Assert
+        Assert.AreSame(comparer, set.Comparer);
+    }
+
+    [TestMethod]
+    public void RecordSet_CustomComparerConstructor_UsesProvidedComparer()
+    {
+        // arrange
+        TestRecordCollectionComparer comparer = new();
+
+        // act
+        RecordSet<int> set = new(comparer);
+
+        // assert
+        Assert.AreSame(comparer, set.Comparer);
+    }
+
+    [TestMethod]
+    public void RecordSet_Operators_UseTypedEquals()
+    {
+        OperatorAwareRecordSet left = new([92, 117]);
+        OperatorAwareRecordSet right = new([92, 117]);
+
+        left.Reset();
+        _ = left == right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
+
+        left.Reset();
+        _ = left != right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
     }
 
     [TestMethod]
@@ -110,6 +163,7 @@ public class RecordSetTests
         Assert.IsTrue(set.IsSupersetOf(hashSet), "Deserialized set is not a subset of the original set.");
     }
 
+#if !NETFRAMEWORK
     [TestMethod]
     public void RecordSet_DeserializedSystemTextJson_EqualsReserialized()
     {
@@ -127,10 +181,35 @@ public class RecordSetTests
         Assert.IsTrue(set.Equals(recordSet), "Deserialized set is not equal to the original set.");
         Assert.IsTrue(set.IsSupersetOf(hashSet), "Deserialized set is not a subset of the original set.");
     }
+#endif
 
     #region Support Types
 
-    sealed record Number(int Value);
+    private sealed class OperatorAwareRecordSet(IEnumerable<int> values) : RecordSet<int>(values)
+    {
+        public bool TypedEqualsCalled { get; private set; }
+        public bool ObjectEqualsCalled { get; private set; }
+
+        public void Reset()
+        {
+            TypedEqualsCalled = false;
+            ObjectEqualsCalled = false;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            ObjectEqualsCalled = true;
+            return base.Equals(obj);
+        }
+
+        public override bool Equals(RecordSet<int>? other)
+        {
+            TypedEqualsCalled = true;
+            return base.Equals(other);
+        }
+
+        public override int GetHashCode() => base.GetHashCode();
+    }
 
     #endregion
 }

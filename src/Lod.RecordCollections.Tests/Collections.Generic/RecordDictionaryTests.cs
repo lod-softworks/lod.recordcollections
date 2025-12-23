@@ -1,10 +1,16 @@
-﻿using System.Reflection;
-
-namespace System.Collections.Tests.Generic;
+namespace Lod.RecordCollections.Tests.Collections.Generic;
 
 [TestClass]
 public class RecordDictionaryTests
 {
+    [TestInitialize]
+    public void SetUp()
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        RecordCollectionComparer.Default = new RecordCollectionComparer();
+#pragma warning restore CS0618 // Type or member is obsolete
+    }
+
     // sanity check test
     [TestMethod]
     public void Dictionary_SameInts_NotEqualsMatchingDictionary()
@@ -18,6 +24,53 @@ public class RecordDictionaryTests
 
         // assert
         Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    [RepeatTestMethod(3)]
+    public void RecordDictionary_DefaultConstructor_UsesDefaultComparer()
+    {
+        // Arrange
+        TestRecordCollectionComparer comparer = new();
+#pragma warning disable CS0618 // Type or member is obsolete
+        RecordCollectionComparer.Default = comparer;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        // Act
+        RecordDictionary<int, string> dictionary = [];
+
+        // Assert
+        Assert.AreSame(comparer, dictionary.Comparer);
+    }
+
+    [TestMethod]
+    public void RecordDictionary_CustomComparerConstructor_UsesProvidedComparer()
+    {
+        // arrange
+        TestRecordCollectionComparer comparer = new();
+
+        // act
+        RecordDictionary<int, string> dictionary = new(comparer);
+
+        // assert
+        Assert.AreSame(comparer, dictionary.Comparer);
+    }
+
+    [TestMethod]
+    public void RecordDictionary_Operators_UseTypedEquals()
+    {
+        OperatorAwareRecordDictionary left = OperatorAwareRecordDictionary.Create();
+        OperatorAwareRecordDictionary right = OperatorAwareRecordDictionary.Create();
+
+        left.Reset();
+        _ = left == right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
+
+        left.Reset();
+        _ = left != right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
     }
 
     [TestMethod]
@@ -113,6 +166,7 @@ public class RecordDictionaryTests
         }
     }
 
+#if !NETFRAMEWORK
     [TestMethod]
     public void RecordDictionary_DeserializedSystemTextJson_EqualsReserialized()
     {
@@ -133,10 +187,38 @@ public class RecordDictionaryTests
             Assert.IsTrue(dictionary[kv.Key] == recordDictionary[kv.Key], "Deserialized dictionary is not a subset of the original dictionary.");
         }
     }
+#endif
 
     #region Support Types
 
-    sealed record Number(int Value);
+    private sealed class OperatorAwareRecordDictionary(Dictionary<int, string> values) : RecordDictionary<int, string>(values)
+    {
+        public bool TypedEqualsCalled { get; private set; }
+        public bool ObjectEqualsCalled { get; private set; }
+
+        public static OperatorAwareRecordDictionary Create() =>
+            new(new Dictionary<int, string> { { 1, "1" }, { 2, "2" } });
+
+        public void Reset()
+        {
+            TypedEqualsCalled = false;
+            ObjectEqualsCalled = false;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            ObjectEqualsCalled = true;
+            return base.Equals(obj);
+        }
+
+        public override bool Equals(RecordDictionary<int, string>? other)
+        {
+            TypedEqualsCalled = true;
+            return base.Equals(other);
+        }
+
+        public override int GetHashCode() => base.GetHashCode();
+    }
 
     #endregion
 }

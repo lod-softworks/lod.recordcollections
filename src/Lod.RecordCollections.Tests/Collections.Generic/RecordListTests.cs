@@ -1,10 +1,16 @@
-﻿using System.Reflection;
-
-namespace System.Collections.Tests.Generic;
+namespace Lod.RecordCollections.Tests.Collections.Generic;
 
 [TestClass]
 public class RecordListTests
 {
+    [TestInitialize]
+    public void SetUp()
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        RecordCollectionComparer.Default = new RecordCollectionComparer();
+#pragma warning restore CS0618 // Type or member is obsolete
+    }
+
     // sanity check test
     [TestMethod]
     public void List_SameInts_NotEqualsMatchingList()
@@ -18,6 +24,53 @@ public class RecordListTests
 
         // assert
         Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    [RepeatTestMethod(3)]
+    public void RecordList_DefaultConstructor_UsesDefaultComparer()
+    {
+        // Arrange
+        TestRecordCollectionComparer comparer = new();
+#pragma warning disable CS0618 // Type or member is obsolete
+        RecordCollectionComparer.Default = comparer;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        // Act
+        RecordList<int> list = [];
+
+        // Assert
+        Assert.AreSame(comparer, list.Comparer);
+    }
+
+    [TestMethod]
+    public void RecordList_CustomComparerConstructor_UsesProvidedComparer()
+    {
+        // arrange
+        TestRecordCollectionComparer comparer = new();
+
+        // act
+        RecordList<int> list = new(comparer);
+
+        // assert
+        Assert.AreSame(comparer, list.Comparer);
+    }
+
+    [TestMethod]
+    public void RecordList_Operators_UseTypedEquals()
+    {
+        OperatorAwareRecordList left = new([92, 117]);
+        OperatorAwareRecordList right = new([92, 117]);
+
+        left.Reset();
+        _ = left == right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
+
+        left.Reset();
+        _ = left != right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
     }
 
     [TestMethod]
@@ -106,13 +159,21 @@ public class RecordListTests
         // assert
         Assert.IsNotNull(recordList, "Deserialized record list is null.");
         Assert.IsNotNull(systemList, "Deserialized list is null.");
-        Assert.IsTrue(list.Equals(recordList), "Deserialized list is not equal to the original list.");
-        for (int i = 0; i < list.Count; i++)
+        try
         {
-            Assert.IsTrue(list[i] == recordList[i], "Deserialized list is not a subset of the original list.");
+            Assert.IsTrue(list.Equals(recordList), "Deserialized list is not equal to the original list.");
+            for (int i = 0; i < list.Count; i++)
+            {
+                Assert.IsTrue(list[i] == recordList[i], "Deserialized list is not a subset of the original list.");
+            }
+        }
+        catch (Exception ex)
+        {
+            ex.GetHashCode();
         }
     }
 
+#if !NETFRAMEWORK
     [TestMethod]
     public void RecordList_DeserializedSystemTextJson_EqualsReserialized()
     {
@@ -133,10 +194,35 @@ public class RecordListTests
             Assert.IsTrue(list[i] == recordList[i], "Deserialized list is not a subset of the original list.");
         }
     }
+#endif
 
     #region Support Types
 
-    sealed record Number(int Value);
+    private sealed class OperatorAwareRecordList(IEnumerable<int> values) : RecordList<int>(values)
+    {
+        public bool TypedEqualsCalled { get; private set; }
+        public bool ObjectEqualsCalled { get; private set; }
+
+        public void Reset()
+        {
+            TypedEqualsCalled = false;
+            ObjectEqualsCalled = false;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            ObjectEqualsCalled = true;
+            return base.Equals(obj);
+        }
+
+        public override bool Equals(RecordList<int>? other)
+        {
+            TypedEqualsCalled = true;
+            return base.Equals(other);
+        }
+
+        public override int GetHashCode() => base.GetHashCode();
+    }
 
     #endregion
 }

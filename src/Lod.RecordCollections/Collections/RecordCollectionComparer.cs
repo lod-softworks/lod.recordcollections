@@ -1,11 +1,27 @@
 ﻿namespace System.Collections;
 
 /// <summary>
-/// The default implementation of <see cref="IRecordCollectionComparer"/>.
+/// Provides a base class for implementations of <see cref="IRecordCollectionComparer"/> which exposes methods to support the comparison of record collections.
 /// </summary>
 public class RecordCollectionComparer : IRecordCollectionComparer
 {
-    internal static IRecordCollectionComparer Default { get; } = new RecordCollectionComparer();
+    /// <summary>
+    /// Gets the default comparer for record collections.
+    /// </summary>
+    /// <remarks>
+    /// This comparer is used for record collections initialized without specifying a <see cref="IRecordCollectionComparer"/> in their constructor.
+    /// In .NET 6.0 or greater, this property proxies to the default comparer defined on <see cref="IReadOnlyRecordCollection"/>.
+    /// </remarks>
+    public static IRecordCollectionComparer Default
+#if NET6_0_OR_GREATER
+    {
+        get => IReadOnlyRecordCollection.DefaultComparer;
+        [Obsolete("Use IReadOnlyRecordCollection.DefaultComparer instead.")]
+        set => IReadOnlyRecordCollection.DefaultComparer = value;
+    }
+#else
+    { get; set; } = new RecordCollectionComparer();
+#endif
 
     #region GetHashCode
 
@@ -41,7 +57,7 @@ public class RecordCollectionComparer : IRecordCollectionComparer
     /// <param name="startingHash">The starting base hash to calculate the hash against.</param>
     /// <param name="rollovers">The number of times the hash has exceeded <see cref="int.MaxValue"/>.</param>
     /// <returns>The hash of the collection elements.</returns>
-    public virtual int GetHashCode(IReadOnlyRecordCollection? collection, int startingHash, out int rollovers)
+    protected virtual int GetHashCode(IReadOnlyRecordCollection? collection, int startingHash, out int rollovers)
     {
         rollovers = 0;
 
@@ -52,15 +68,15 @@ public class RecordCollectionComparer : IRecordCollectionComparer
         {
             if (collection is IList list)
             {
-                hash = GetListHashCode(startingHash, list, out rollovers);
+                hash = GetHashCode(startingHash, list, out rollovers);
             }
             else if (collection is IDictionary dictionary)
             {
-                hash = GetDictionaryHashCode(startingHash, dictionary, out rollovers);
+                hash = GetHashCode(startingHash, dictionary, out rollovers);
             }
             else
             {
-                hash = GetEnumerableHashCode(startingHash, collection, out rollovers);
+                hash = GetHashCode(startingHash, collection, out rollovers);
             }
         }
 
@@ -74,7 +90,7 @@ public class RecordCollectionComparer : IRecordCollectionComparer
     /// <param name="list">The list of elements whose hash will be calculated.</param>
     /// <param name="rollovers">The number of times the hash rolles over past <see cref="int.MaxValue"/>.</param>
     /// <returns>The hash of the collections elements.</returns>
-    protected virtual int GetListHashCode(int startingHash, IList list, out int rollovers)
+    protected virtual int GetHashCode(int startingHash, IList list, out int rollovers)
     {
         int hash = startingHash;
         rollovers = 0;
@@ -101,7 +117,7 @@ public class RecordCollectionComparer : IRecordCollectionComparer
     /// <param name="dictionary">The list of elements whose hash will be calculated.</param>
     /// <param name="rollovers">The number of times the hash rolles over past <see cref="int.MaxValue"/>.</param>
     /// <returns>The hash of the collections elements.</returns>
-    protected virtual int GetDictionaryHashCode(int startingHash, IDictionary dictionary, out int rollovers)
+    protected virtual int GetHashCode(int startingHash, IDictionary dictionary, out int rollovers)
     {
         int hash = startingHash;
         rollovers = 0;
@@ -130,7 +146,7 @@ public class RecordCollectionComparer : IRecordCollectionComparer
     /// <param name="collection">The list of elements whose hash will be calculated.</param>
     /// <param name="rollovers">The number of times the hash rolles over past <see cref="int.MaxValue"/>.</param>
     /// <returns>The hash of the collections elements.</returns>
-    protected virtual int GetEnumerableHashCode(int startingHash, IEnumerable collection, out int rollovers)
+    protected virtual int GetHashCode(int startingHash, IEnumerable collection, out int rollovers)
     {
         int hash = startingHash;
         rollovers = 0;
@@ -159,7 +175,7 @@ public class RecordCollectionComparer : IRecordCollectionComparer
     /// </summary>
     /// <param name="x">The first collection to compare.</param>
     /// <param name="y">The second collection to compare.</param>
-    public new bool Equals(object? x, object? y) =>
+    public virtual new bool Equals(object? x, object? y) =>
         x is IReadOnlyRecordCollection xCollection && y is IReadOnlyRecordCollection yCollection && Equals(xCollection, yCollection);
 
     /// <summary>
@@ -167,7 +183,7 @@ public class RecordCollectionComparer : IRecordCollectionComparer
     /// </summary>
     /// <param name="x">The first collection to compare.</param>
     /// <param name="y">The second collection to compare.</param>
-    public bool Equals(IReadOnlyRecordCollection? x, object? y) =>
+    public virtual bool Equals(IReadOnlyRecordCollection? x, object? y) =>
         y is IReadOnlyRecordCollection collection && Equals(x, collection);
 
     /// <summary>
@@ -175,12 +191,8 @@ public class RecordCollectionComparer : IRecordCollectionComparer
     /// </summary>
     /// <param name="x">The first collection to compare.</param>
     /// <param name="y">The second collection to compare.</param>
-    public virtual bool Equals(IReadOnlyRecordCollection? x, IReadOnlyRecordCollection? y)
-    {
-        bool areEqual = x?.Count == y?.Count && GetHashCode(x) == GetHashCode(y);
-
-        return areEqual;
-    }
+    public virtual bool Equals(IReadOnlyRecordCollection? x, IReadOnlyRecordCollection? y) =>
+        x?.Count == y?.Count && GetHashCode(x) == GetHashCode(y);
 
     #endregion
 }

@@ -59,4 +59,3 @@ internal static class RecordCloner
         return cloner;
     }
 }
-
