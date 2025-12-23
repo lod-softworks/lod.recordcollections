@@ -20,23 +20,20 @@ public class RecordDictionaryTests
         Assert.IsFalse(areEqual);
     }
 
-    [TestMethod]
+    [RepeatTestMethod(3)]
     public void RecordDictionary_DefaultConstructor_UsesDefaultComparer()
     {
-        for (int i = 0; i < 3; i++)
-        {
-            // arrange
-            TestRecordCollectionComparer overrideComparer = new();
+        // arrange
+        TestRecordCollectionComparer overrideComparer = new();
 #pragma warning disable CS0618
-            RecordCollectionComparer.Default = overrideComparer;
+        RecordCollectionComparer.Default = overrideComparer;
 #pragma warning restore CS0618
 
-            // act
-            RecordDictionary<int, string> dictionary = new();
+        // act
+        RecordDictionary<int, string> dictionary = new();
 
-            // assert
-            Assert.AreSame(overrideComparer, dictionary.Comparer);
-        }
+        // assert
+        Assert.AreSame(overrideComparer, dictionary.Comparer);
     }
 
     [TestMethod]
