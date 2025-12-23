@@ -20,21 +20,16 @@ public class RecordSetTests
         Assert.IsFalse(areEqual);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [RepeatTestMethod(3)]
     public void RecordSet_DefaultConstructor_UsesDefaultComparer()
     {
-        // arrange
         TestRecordCollectionComparer overrideComparer = new();
-#pragma warning disable CS0618
-        RecordCollectionComparer.Default = overrideComparer;
-#pragma warning restore CS0618
-
-        // act
-        RecordSet<int> set = [];
-
-        // assert
-        Assert.AreSame(overrideComparer, set.Comparer);
+        using (ComparerTestUtilities.OverrideDefaultComparer(overrideComparer))
+        {
+            RecordSet<int> set = [];
+            Assert.AreSame(overrideComparer, set.Comparer);
+        }
     }
 
     [TestMethod]

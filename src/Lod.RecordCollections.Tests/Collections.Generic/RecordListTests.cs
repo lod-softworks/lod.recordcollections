@@ -20,21 +20,16 @@ public class RecordListTests
         Assert.IsFalse(areEqual);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [RepeatTestMethod(3)]
     public void RecordList_DefaultConstructor_UsesDefaultComparer()
     {
-        // arrange
         TestRecordCollectionComparer overrideComparer = new();
-#pragma warning disable CS0618
-        RecordCollectionComparer.Default = overrideComparer;
-#pragma warning restore CS0618
-
-        // act
-        RecordList<int> list = [];
-
-        // assert
-        Assert.AreSame(overrideComparer, list.Comparer);
+        using (ComparerTestUtilities.OverrideDefaultComparer(overrideComparer))
+        {
+            RecordList<int> list = [];
+            Assert.AreSame(overrideComparer, list.Comparer);
+        }
     }
 
     [TestMethod]

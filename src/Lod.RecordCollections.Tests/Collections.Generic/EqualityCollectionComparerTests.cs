@@ -3,21 +3,16 @@ namespace System.Collections.Tests.Generic;
 [TestClass]
 public class EqualityCollectionComparerTests
 {
-    [DataTestMethod]
+    [TestMethod]
     [RepeatTestMethod(3)]
     public void EqualityList_DefaultConstructor_UsesDefaultComparer()
     {
-        // arrange
         TestRecordCollectionComparer overrideComparer = new();
-#pragma warning disable CS0618
-        RecordCollectionComparer.Default = overrideComparer;
-#pragma warning restore CS0618
-
-        // act
-        EqualityList<int> list = [];
-
-        // assert
-        Assert.AreSame(overrideComparer, list.Comparer);
+        using (ComparerTestUtilities.OverrideDefaultComparer(overrideComparer))
+        {
+            EqualityList<int> list = [];
+            Assert.AreSame(overrideComparer, list.Comparer);
+        }
     }
 
     [TestMethod]
@@ -50,21 +45,16 @@ public class EqualityCollectionComparerTests
         Assert.IsFalse(left.ObjectEqualsCalled);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [RepeatTestMethod(3)]
     public void EqualityDictionary_DefaultConstructor_UsesDefaultComparer()
     {
-        // arrange
         TestRecordCollectionComparer overrideComparer = new();
-#pragma warning disable CS0618
-        RecordCollectionComparer.Default = overrideComparer;
-#pragma warning restore CS0618
-
-        // act
-        EqualityDictionary<int, string> dictionary = new();
-
-        // assert
-        Assert.AreSame(overrideComparer, dictionary.Comparer);
+        using (ComparerTestUtilities.OverrideDefaultComparer(overrideComparer))
+        {
+            EqualityDictionary<int, string> dictionary = new();
+            Assert.AreSame(overrideComparer, dictionary.Comparer);
+        }
     }
 
     [TestMethod]
