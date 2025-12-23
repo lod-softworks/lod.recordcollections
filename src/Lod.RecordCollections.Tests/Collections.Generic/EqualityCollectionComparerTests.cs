@@ -3,6 +3,7 @@ namespace System.Collections.Tests.Generic;
 [TestClass]
 public class EqualityCollectionComparerTests
 {
+    [DataTestMethod]
     [RepeatTestMethod(3)]
     public void EqualityList_DefaultConstructor_UsesDefaultComparer()
     {
@@ -49,6 +50,7 @@ public class EqualityCollectionComparerTests
         Assert.IsFalse(left.ObjectEqualsCalled);
     }
 
+    [DataTestMethod]
     [RepeatTestMethod(3)]
     public void EqualityDictionary_DefaultConstructor_UsesDefaultComparer()
     {

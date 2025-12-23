@@ -20,6 +20,7 @@ public class RecordListTests
         Assert.IsFalse(areEqual);
     }
 
+    [DataTestMethod]
     [RepeatTestMethod(3)]
     public void RecordList_DefaultConstructor_UsesDefaultComparer()
     {

@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace System.Collections.Tests;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-public sealed class RepeatTestMethodAttribute : TestMethodAttribute
+public sealed class RepeatTestMethodAttribute : Attribute, ITestDataSource
 {
     public RepeatTestMethodAttribute(int count)
     {
@@ -15,21 +16,14 @@ public sealed class RepeatTestMethodAttribute : TestMethodAttribute
 
     public int Count { get; }
 
-    public override TestResult[] Execute(ITestMethod testMethod)
+    public IEnumerable<object?[]> GetData(MethodInfo methodInfo)
     {
-        List<TestResult> results = new(Count);
-
         for (int i = 0; i < Count; i++)
         {
-            TestResult result = testMethod.Invoke(null);
-            results.Add(result);
-
-            if (result.Outcome != UnitTestOutcome.Passed)
-            {
-                break;
-            }
+            yield return Array.Empty<object?>();
         }
-
-        return results.ToArray();
     }
+
+    public string GetDisplayName(MethodInfo methodInfo, object?[]? data)
+        => $"{methodInfo.Name} (Repeated)";
 }
