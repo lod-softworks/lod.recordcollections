@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -24,31 +24,75 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
     /// <summary>
     /// Gets the comparer used to compare elements and collections.
     /// </summary>
-    public virtual new IRecordCollectionComparer Comparer { get; } = RecordCollectionComparer.Default;
+    public virtual new IRecordCollectionComparer Comparer { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordDictionary{TKey, TValue}"/> class that is empty and has the default initial capacity.
     /// </summary>
-    public RecordDictionary() : base() { }
+    public RecordDictionary() : this(comparer: null) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RecordDictionary{TKey, TValue}"/> class that is empty,
+    /// has the default initial capacity, and uses the specified comparer.
+    /// </summary>
+    /// <param name="comparer">The comparer used for record equality.</param>
+    public RecordDictionary(IRecordCollectionComparer? comparer) : base()
+    {
+        Comparer = comparer ?? RecordCollectionComparer.Default;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordDictionary{TKey, TValue}"/> class that uses the specified underlying dictionary.
     /// </summary>
     /// <param name="dictionary">An existing <see cref="RecordDictionary{TKey, TValue}"/> to use as the underlying collection.</param>
-    public RecordDictionary(Dictionary<TKey, TValue> dictionary) : base(dictionary) { }
+    public RecordDictionary(Dictionary<TKey, TValue> dictionary) : this(dictionary, comparer: null) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RecordDictionary{TKey, TValue}"/> class that uses the specified underlying dictionary
+    /// and comparer.
+    /// </summary>
+    /// <param name="dictionary">An existing <see cref="RecordDictionary{TKey, TValue}"/> to use as the underlying collection.</param>
+    /// <param name="comparer">The comparer used for record equality.</param>
+    public RecordDictionary(Dictionary<TKey, TValue> dictionary, IRecordCollectionComparer? comparer) : base(dictionary)
+    {
+        Comparer = comparer ?? RecordCollectionComparer.Default;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordDictionary{TKey, TValue}"/> class that
     /// contains elements copied from the specified collection and has sufficient capacity to accommodate the number of elements copied.
     /// </summary>
     /// <param name="collection">The collection whose elements are copied to the new dictionary.</param>
-    public RecordDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection) : base(collection?.ToDictionary(kv => kv.Key, kv => kv.Value)!) { }
+    public RecordDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection) : this(collection, comparer: null) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RecordDictionary{TKey, TValue}"/> class that
+    /// contains elements copied from the specified collection and uses the specified comparer.
+    /// </summary>
+    /// <param name="collection">The collection whose elements are copied to the new dictionary.</param>
+    /// <param name="comparer">The comparer used for record equality.</param>
+    public RecordDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IRecordCollectionComparer? comparer)
+        : base(collection?.ToDictionary(kv => kv.Key, kv => kv.Value)!)
+    {
+        Comparer = comparer ?? RecordCollectionComparer.Default;
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordDictionary{TKey, TValue}"/> class that is empty and has the specified initial capacity.
     /// </summary>
     /// <param name="capacity">The number of elements that the new dictionary can initially store.</param>
-    public RecordDictionary(int capacity) : base(new Dictionary<TKey, TValue>(capacity)) { }
+    public RecordDictionary(int capacity) : this(capacity, comparer: null) { }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RecordDictionary{TKey, TValue}"/> class that is empty, has the specified initial capacity,
+    /// and uses the specified comparer.
+    /// </summary>
+    /// <param name="capacity">The number of elements that the new dictionary can initially store.</param>
+    /// <param name="comparer">The comparer used for record equality.</param>
+    public RecordDictionary(int capacity, IRecordCollectionComparer? comparer) : base(new Dictionary<TKey, TValue>(capacity))
+    {
+        Comparer = comparer ?? RecordCollectionComparer.Default;
+    }
 
     #region Record Specification
 
@@ -65,7 +109,9 @@ public class RecordDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecordC
     // [RecordImp!]: This needs to be protected, non-null with no null checks to meet the `record` spec.
     protected RecordDictionary(RecordDictionary<TKey, TValue> original)
         : base(original.Select(o => new KeyValuePair<TKey, TValue>(o.Key, RecordCloner.TryClone(o.Value)!)).ToDictionary(kv => kv.Key, kv => kv.Value))
-    { }
+    {
+        Comparer = original?.Comparer ?? RecordCollectionComparer.Default;
+    }
 
     /// <inheritdoc/>
     // [RecordImp!]: This needs to be overriden to meet the `record` spec.

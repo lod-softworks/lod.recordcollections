@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace System.Collections.Tests.Generic;
 
@@ -18,6 +18,32 @@ public class RecordDictionaryTests
 
         // assert
         Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    public void RecordDictionary_DefaultConstructor_UsesDefaultComparer()
+    {
+        // arrange
+        global::System.Collections.IRecordCollectionComparer defaultComparer = RecordCollectionComparer.Default;
+
+        // act
+        RecordDictionary<int, string> dictionary = new();
+
+        // assert
+        Assert.AreSame(defaultComparer, dictionary.Comparer);
+    }
+
+    [TestMethod]
+    public void RecordDictionary_CustomComparerConstructor_UsesProvidedComparer()
+    {
+        // arrange
+        TestRecordCollectionComparer comparer = new();
+
+        // act
+        RecordDictionary<int, string> dictionary = new(comparer);
+
+        // assert
+        Assert.AreSame(comparer, dictionary.Comparer);
     }
 
     [TestMethod]

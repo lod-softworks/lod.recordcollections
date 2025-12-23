@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace System.Collections.Tests.Generic;
 
@@ -18,6 +18,32 @@ public class RecordListTests
 
         // assert
         Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    public void RecordList_DefaultConstructor_UsesDefaultComparer()
+    {
+        // arrange
+        global::System.Collections.IRecordCollectionComparer defaultComparer = RecordCollectionComparer.Default;
+
+        // act
+        RecordList<int> list = [];
+
+        // assert
+        Assert.AreSame(defaultComparer, list.Comparer);
+    }
+
+    [TestMethod]
+    public void RecordList_CustomComparerConstructor_UsesProvidedComparer()
+    {
+        // arrange
+        TestRecordCollectionComparer comparer = new();
+
+        // act
+        RecordList<int> list = new(comparer);
+
+        // assert
+        Assert.AreSame(comparer, list.Comparer);
     }
 
     [TestMethod]
