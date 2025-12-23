@@ -36,7 +36,6 @@ public interface IReadOnlyRecordCollection : IEnumerable //, IComparable
 #endif
         ;
 
-
     /// <summary>
     /// Returns a value indicating whether the <paramref name="left"/> collection is equal to the <paramref name="right"/> collection.
     /// </summary>
@@ -59,23 +58,3 @@ public interface IReadOnlyRecordCollection : IEnumerable //, IComparable
 #endif
         ;
 }
-
-/// <summary>
-/// A read-only collection of strongly typed, record-like values.
-/// Record collections support value based comparison.
-/// </summary>
-/// <typeparam name="T">The type of the elements in the colllection.</typeparam>
-public interface IReadOnlyRecordCollection<T> : IReadOnlyRecordCollection
-    , IReadOnlyCollection<T> //, IComparable<ICollection<T>>
-    , IEquatable<IReadOnlyRecordCollection<T>>, IEqualityComparer<IReadOnlyRecordCollection<T>>
-{ }
-
-/// <summary>
-/// A collection of strongly typed, record-like values.
-/// Record collections support value based comparison.
-/// </summary>
-/// <typeparam name="T">The type of the elements in the colllection.</typeparam>
-public interface IRecordCollection<T> : IReadOnlyRecordCollection<T>
-    , ICollection, ICollection<T>
-    , IEquatable<IRecordCollection<T>>, IEqualityComparer<IRecordCollection<T>>
-{ }
