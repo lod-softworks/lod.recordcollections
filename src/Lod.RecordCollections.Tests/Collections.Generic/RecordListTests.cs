@@ -24,9 +24,11 @@ public class RecordListTests
     public void RecordList_DefaultConstructor_UsesDefaultComparer()
     {
         // arrange
-        global::System.Collections.IRecordCollectionComparer original = RecordCollectionComparer.Default;
+        IRecordCollectionComparer original = RecordCollectionComparer.Default;
         TestRecordCollectionComparer overrideComparer = new();
+#pragma warning disable CS0618
         RecordCollectionComparer.Default = overrideComparer;
+#pragma warning restore CS0618
 
         try
         {
@@ -38,7 +40,9 @@ public class RecordListTests
         }
         finally
         {
+#pragma warning disable CS0618
             RecordCollectionComparer.Default = original;
+#pragma warning restore CS0618
         }
     }
 
@@ -224,6 +228,8 @@ public class RecordListTests
             TypedEqualsCalled = true;
             return base.Equals(other);
         }
+
+        public override int GetHashCode() => base.GetHashCode();
     }
 
     #endregion

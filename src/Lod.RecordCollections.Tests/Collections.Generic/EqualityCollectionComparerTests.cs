@@ -7,9 +7,11 @@ public class EqualityCollectionComparerTests
     public void EqualityList_DefaultConstructor_UsesDefaultComparer()
     {
         // arrange
-        global::System.Collections.IRecordCollectionComparer original = RecordCollectionComparer.Default;
+        IRecordCollectionComparer original = RecordCollectionComparer.Default;
         TestRecordCollectionComparer overrideComparer = new();
+#pragma warning disable CS0618
         RecordCollectionComparer.Default = overrideComparer;
+#pragma warning restore CS0618
 
         try
         {
@@ -21,7 +23,9 @@ public class EqualityCollectionComparerTests
         }
         finally
         {
+#pragma warning disable CS0618
             RecordCollectionComparer.Default = original;
+#pragma warning restore CS0618
         }
     }
 
@@ -59,9 +63,11 @@ public class EqualityCollectionComparerTests
     public void EqualityDictionary_DefaultConstructor_UsesDefaultComparer()
     {
         // arrange
-        global::System.Collections.IRecordCollectionComparer original = RecordCollectionComparer.Default;
+        IRecordCollectionComparer original = RecordCollectionComparer.Default;
         TestRecordCollectionComparer overrideComparer = new();
+#pragma warning disable CS0618
         RecordCollectionComparer.Default = overrideComparer;
+#pragma warning restore CS0618
 
         try
         {
@@ -73,7 +79,9 @@ public class EqualityCollectionComparerTests
         }
         finally
         {
+#pragma warning disable CS0618
             RecordCollectionComparer.Default = original;
+#pragma warning restore CS0618
         }
     }
 
@@ -131,6 +139,8 @@ public class EqualityCollectionComparerTests
             TypedEqualsCalled = true;
             return base.Equals(other);
         }
+
+        public override int GetHashCode() => base.GetHashCode();
     }
 
     private sealed class OperatorAwareEqualityDictionary : EqualityDictionary<int, string>
@@ -160,5 +170,7 @@ public class EqualityCollectionComparerTests
             TypedEqualsCalled = true;
             return base.Equals(other);
         }
+
+        public override int GetHashCode() => base.GetHashCode();
     }
 }
