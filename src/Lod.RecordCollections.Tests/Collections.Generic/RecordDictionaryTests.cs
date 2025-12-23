@@ -56,6 +56,23 @@ public class RecordDictionaryTests
     }
 
     [TestMethod]
+    public void RecordDictionary_Operators_UseTypedEquals()
+    {
+        OperatorAwareRecordDictionary left = OperatorAwareRecordDictionary.Create();
+        OperatorAwareRecordDictionary right = OperatorAwareRecordDictionary.Create();
+
+        left.Reset();
+        _ = left == right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
+
+        left.Reset();
+        _ = left != right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
+    }
+
+    [TestMethod]
     public void RecordDictionary_SameInts_EqualsMatchingDictionary()
     {
         // arrange
@@ -180,6 +197,35 @@ public class RecordDictionaryTests
         public Number(int value)
         {
             Value = value;
+        }
+    }
+
+    private sealed class OperatorAwareRecordDictionary : RecordDictionary<int, string>
+    {
+        private OperatorAwareRecordDictionary(Dictionary<int, string> values) : base(values) { }
+
+        public bool TypedEqualsCalled { get; private set; }
+        public bool ObjectEqualsCalled { get; private set; }
+
+        public static OperatorAwareRecordDictionary Create() =>
+            new(new Dictionary<int, string> { { 1, "1" }, { 2, "2" } });
+
+        public void Reset()
+        {
+            TypedEqualsCalled = false;
+            ObjectEqualsCalled = false;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            ObjectEqualsCalled = true;
+            return base.Equals(obj);
+        }
+
+        public override bool Equals(RecordDictionary<int, string>? other)
+        {
+            TypedEqualsCalled = true;
+            return base.Equals(other);
         }
     }
 

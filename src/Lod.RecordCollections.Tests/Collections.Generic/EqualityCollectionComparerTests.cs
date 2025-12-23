@@ -39,6 +39,23 @@ public class EqualityCollectionComparerTests
     }
 
     [TestMethod]
+    public void EqualityList_Operators_UseTypedEquals()
+    {
+        OperatorAwareEqualityList left = new([92, 117]);
+        OperatorAwareEqualityList right = new([92, 117]);
+
+        left.Reset();
+        _ = left == right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
+
+        left.Reset();
+        _ = left != right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
+    }
+
+    [TestMethod]
     public void EqualityDictionary_DefaultConstructor_UsesDefaultComparer()
     {
         // arrange
@@ -71,5 +88,77 @@ public class EqualityCollectionComparerTests
 
         // assert
         Assert.AreSame(comparer, dictionary.Comparer);
+    }
+
+    [TestMethod]
+    public void EqualityDictionary_Operators_UseTypedEquals()
+    {
+        OperatorAwareEqualityDictionary left = OperatorAwareEqualityDictionary.Create();
+        OperatorAwareEqualityDictionary right = OperatorAwareEqualityDictionary.Create();
+
+        left.Reset();
+        _ = left == right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
+
+        left.Reset();
+        _ = left != right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
+    }
+
+    private sealed class OperatorAwareEqualityList : EqualityList<int>
+    {
+        public OperatorAwareEqualityList(IEnumerable<int> values) : base(values) { }
+
+        public bool TypedEqualsCalled { get; private set; }
+        public bool ObjectEqualsCalled { get; private set; }
+
+        public void Reset()
+        {
+            TypedEqualsCalled = false;
+            ObjectEqualsCalled = false;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            ObjectEqualsCalled = true;
+            return base.Equals(obj);
+        }
+
+        public override bool Equals(EqualityList<int>? other)
+        {
+            TypedEqualsCalled = true;
+            return base.Equals(other);
+        }
+    }
+
+    private sealed class OperatorAwareEqualityDictionary : EqualityDictionary<int, string>
+    {
+        private OperatorAwareEqualityDictionary(Dictionary<int, string> values) : base(values) { }
+
+        public bool TypedEqualsCalled { get; private set; }
+        public bool ObjectEqualsCalled { get;private set; }
+
+        public static OperatorAwareEqualityDictionary Create() =>
+            new(new Dictionary<int, string> { { 1, "1" }, { 2, "2" } });
+
+        public void Reset()
+        {
+            TypedEqualsCalled = false;
+            ObjectEqualsCalled = false;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            ObjectEqualsCalled = true;
+            return base.Equals(obj);
+        }
+
+        public override bool Equals(EqualityDictionary<int, string>? other)
+        {
+            TypedEqualsCalled = true;
+            return base.Equals(other);
+        }
     }
 }

@@ -56,6 +56,23 @@ public class RecordListTests
     }
 
     [TestMethod]
+    public void RecordList_Operators_UseTypedEquals()
+    {
+        OperatorAwareRecordList left = new([92, 117]);
+        OperatorAwareRecordList right = new([92, 117]);
+
+        left.Reset();
+        _ = left == right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
+
+        left.Reset();
+        _ = left != right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
+    }
+
+    [TestMethod]
     public void RecordList_SameInts_EqualsMatchingList()
     {
         // arrange
@@ -180,6 +197,32 @@ public class RecordListTests
         public Number(int value)
         {
             Value = value;
+        }
+    }
+
+    private sealed class OperatorAwareRecordList : RecordList<int>
+    {
+        public OperatorAwareRecordList(IEnumerable<int> values) : base(values) { }
+
+        public bool TypedEqualsCalled { get; private set; }
+        public bool ObjectEqualsCalled { get; private set; }
+
+        public void Reset()
+        {
+            TypedEqualsCalled = false;
+            ObjectEqualsCalled = false;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            ObjectEqualsCalled = true;
+            return base.Equals(obj);
+        }
+
+        public override bool Equals(RecordList<int>? other)
+        {
+            TypedEqualsCalled = true;
+            return base.Equals(other);
         }
     }
 

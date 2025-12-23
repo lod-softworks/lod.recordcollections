@@ -56,6 +56,23 @@ public class RecordSetTests
     }
 
     [TestMethod]
+    public void RecordSet_Operators_UseTypedEquals()
+    {
+        OperatorAwareRecordSet left = new([92, 117]);
+        OperatorAwareRecordSet right = new([92, 117]);
+
+        left.Reset();
+        _ = left == right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
+
+        left.Reset();
+        _ = left != right;
+        Assert.IsTrue(left.TypedEqualsCalled);
+        Assert.IsFalse(left.ObjectEqualsCalled);
+    }
+
+    [TestMethod]
     public void RecordSet_SameInts_EqualsMatchingSet()
     {
         // arrange
@@ -174,6 +191,32 @@ public class RecordSetTests
         public Number(int value)
         {
             Value = value;
+        }
+    }
+
+    private sealed class OperatorAwareRecordSet : RecordSet<int>
+    {
+        public OperatorAwareRecordSet(IEnumerable<int> values) : base(values) { }
+
+        public bool TypedEqualsCalled { get; private set; }
+        public bool ObjectEqualsCalled { get; private set; }
+
+        public void Reset()
+        {
+            TypedEqualsCalled = false;
+            ObjectEqualsCalled = false;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            ObjectEqualsCalled = true;
+            return base.Equals(obj);
+        }
+
+        public override bool Equals(RecordSet<int>? other)
+        {
+            TypedEqualsCalled = true;
+            return base.Equals(other);
         }
     }
 
