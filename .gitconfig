@@ -1,0 +1,19 @@
+# Repo-local Git settings (checked in).
+#
+# Git does NOT automatically load ./.gitconfig.
+# To enable it for this repo, run:
+#   git config --local include.path ../.gitconfig
+#
+# Goal:
+# - Keep LF in the repository (paired with .gitattributes: * text=auto)
+# - On Windows, check out with CRLF but commit as LF
+#
+# Notes:
+# - Windows should use:   core.autocrlf=true
+# - macOS/Linux should use: core.autocrlf=input  (recommended)
+#
+
+[core]
+	autocrlf = true
+	safecrlf = warn
+

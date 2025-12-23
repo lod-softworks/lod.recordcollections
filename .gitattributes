@@ -1,0 +1,14 @@
+# Normalize line endings for all text files:
+# - Stored in the repo as LF
+# - Windows can check out as CRLF when core.autocrlf=true
+* text=auto
+
+# Treat common binary formats as binary to avoid accidental transformations
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+
