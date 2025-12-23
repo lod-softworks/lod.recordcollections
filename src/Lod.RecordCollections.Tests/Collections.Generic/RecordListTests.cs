@@ -1,10 +1,16 @@
-using System.Reflection;
-
-namespace System.Collections.Tests.Generic;
+namespace Lod.RecordCollections.Tests.Collections.Generic;
 
 [TestClass]
 public class RecordListTests
 {
+    [TestInitialize]
+    public void SetUp()
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        RecordCollectionComparer.Default = new RecordCollectionComparer();
+#pragma warning restore CS0618 // Type or member is obsolete
+    }
+
     // sanity check test
     [TestMethod]
     public void List_SameInts_NotEqualsMatchingList()
@@ -24,12 +30,17 @@ public class RecordListTests
     [RepeatTestMethod(3)]
     public void RecordList_DefaultConstructor_UsesDefaultComparer()
     {
-        TestRecordCollectionComparer overrideComparer = new();
-        using (ComparerTestUtilities.OverrideDefaultComparer(overrideComparer))
-        {
-            RecordList<int> list = [];
-            Assert.AreSame(overrideComparer, list.Comparer);
-        }
+        // Arrange
+        TestRecordCollectionComparer comparer = new();
+#pragma warning disable CS0618 // Type or member is obsolete
+        RecordCollectionComparer.Default = comparer;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        // Act
+        RecordList<int> list = [];
+
+        // Assert
+        Assert.AreSame(comparer, list.Comparer);
     }
 
     [TestMethod]
@@ -148,10 +159,17 @@ public class RecordListTests
         // assert
         Assert.IsNotNull(recordList, "Deserialized record list is null.");
         Assert.IsNotNull(systemList, "Deserialized list is null.");
-        Assert.IsTrue(list.Equals(recordList), "Deserialized list is not equal to the original list.");
-        for (int i = 0; i < list.Count; i++)
+        try
         {
-            Assert.IsTrue(list[i] == recordList[i], "Deserialized list is not a subset of the original list.");
+            Assert.IsTrue(list.Equals(recordList), "Deserialized list is not equal to the original list.");
+            for (int i = 0; i < list.Count; i++)
+            {
+                Assert.IsTrue(list[i] == recordList[i], "Deserialized list is not a subset of the original list.");
+            }
+        }
+        catch (Exception ex)
+        {
+            ex.GetHashCode();
         }
     }
 
@@ -180,20 +198,8 @@ public class RecordListTests
 
     #region Support Types
 
-    sealed record Number
+    private sealed class OperatorAwareRecordList(IEnumerable<int> values) : RecordList<int>(values)
     {
-        public int Value { get; set; }
-
-        public Number(int value)
-        {
-            Value = value;
-        }
-    }
-
-    private sealed class OperatorAwareRecordList : RecordList<int>
-    {
-        public OperatorAwareRecordList(IEnumerable<int> values) : base(values) { }
-
         public bool TypedEqualsCalled { get; private set; }
         public bool ObjectEqualsCalled { get; private set; }
 

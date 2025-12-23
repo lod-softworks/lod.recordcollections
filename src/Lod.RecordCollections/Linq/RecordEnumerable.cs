@@ -30,7 +30,7 @@ public static class RecordEnumerable
         where TSource : IEquatable<TSource>
     {
         if (enumerable == null) throw new ArgumentNullException(nameof(enumerable));
-        if (keySelector == null) throw new ArgumentNullException(nameof(keySelector) );
+        if (keySelector == null) throw new ArgumentNullException(nameof(keySelector));
 
         return new RecordDictionary<TKey, TSource>(enumerable.Select(e => new KeyValuePair<TKey, TSource>(keySelector(e), e)));
     }

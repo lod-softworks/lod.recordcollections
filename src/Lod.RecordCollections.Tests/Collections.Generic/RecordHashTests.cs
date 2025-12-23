@@ -1,10 +1,16 @@
-using System.Reflection;
-
-namespace System.Collections.Tests.Generic;
+namespace Lod.RecordCollections.Tests.Collections.Generic;
 
 [TestClass]
 public class RecordSetTests
 {
+    [TestInitialize]
+    public void SetUp()
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        RecordCollectionComparer.Default = new RecordCollectionComparer();
+#pragma warning restore CS0618 // Type or member is obsolete
+    }
+
     // sanity check test
     [TestMethod]
     public void Set_SameInts_NotEqualsMatchingSet()
@@ -24,12 +30,17 @@ public class RecordSetTests
     [RepeatTestMethod(3)]
     public void RecordSet_DefaultConstructor_UsesDefaultComparer()
     {
-        TestRecordCollectionComparer overrideComparer = new();
-        using (ComparerTestUtilities.OverrideDefaultComparer(overrideComparer))
-        {
-            RecordSet<int> set = [];
-            Assert.AreSame(overrideComparer, set.Comparer);
-        }
+        // Arrange
+        TestRecordCollectionComparer comparer = new();
+#pragma warning disable CS0618 // Type or member is obsolete
+        RecordCollectionComparer.Default = comparer;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        // Act
+        RecordSet<int> set = [];
+
+        // Assert
+        Assert.AreSame(comparer, set.Comparer);
     }
 
     [TestMethod]
@@ -174,20 +185,8 @@ public class RecordSetTests
 
     #region Support Types
 
-    sealed record Number
+    private sealed class OperatorAwareRecordSet(IEnumerable<int> values) : RecordSet<int>(values)
     {
-        public int Value { get; set; }
-
-        public Number(int value)
-        {
-            Value = value;
-        }
-    }
-
-    private sealed class OperatorAwareRecordSet : RecordSet<int>
-    {
-        public OperatorAwareRecordSet(IEnumerable<int> values) : base(values) { }
-
         public bool TypedEqualsCalled { get; private set; }
         public bool ObjectEqualsCalled { get; private set; }
 

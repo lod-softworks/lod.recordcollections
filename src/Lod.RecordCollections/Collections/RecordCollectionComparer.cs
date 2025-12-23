@@ -1,7 +1,7 @@
 ﻿namespace System.Collections;
 
 /// <summary>
-/// The default implementation of <see cref="IRecordCollectionComparer"/> which exposes methods to support the comparison of record collections.
+/// Provides a base class for implementations of <see cref="IRecordCollectionComparer"/> which exposes methods to support the comparison of record collections.
 /// </summary>
 public class RecordCollectionComparer : IRecordCollectionComparer
 {
@@ -68,15 +68,15 @@ public class RecordCollectionComparer : IRecordCollectionComparer
         {
             if (collection is IList list)
             {
-                hash = GetListHashCode(startingHash, list, out rollovers);
+                hash = GetHashCode(startingHash, list, out rollovers);
             }
             else if (collection is IDictionary dictionary)
             {
-                hash = GetDictionaryHashCode(startingHash, dictionary, out rollovers);
+                hash = GetHashCode(startingHash, dictionary, out rollovers);
             }
             else
             {
-                hash = GetEnumerableHashCode(startingHash, collection, out rollovers);
+                hash = GetHashCode(startingHash, collection, out rollovers);
             }
         }
 
@@ -90,7 +90,7 @@ public class RecordCollectionComparer : IRecordCollectionComparer
     /// <param name="list">The list of elements whose hash will be calculated.</param>
     /// <param name="rollovers">The number of times the hash rolles over past <see cref="int.MaxValue"/>.</param>
     /// <returns>The hash of the collections elements.</returns>
-    protected virtual int GetListHashCode(int startingHash, IList list, out int rollovers)
+    protected virtual int GetHashCode(int startingHash, IList list, out int rollovers)
     {
         int hash = startingHash;
         rollovers = 0;
@@ -117,7 +117,7 @@ public class RecordCollectionComparer : IRecordCollectionComparer
     /// <param name="dictionary">The list of elements whose hash will be calculated.</param>
     /// <param name="rollovers">The number of times the hash rolles over past <see cref="int.MaxValue"/>.</param>
     /// <returns>The hash of the collections elements.</returns>
-    protected virtual int GetDictionaryHashCode(int startingHash, IDictionary dictionary, out int rollovers)
+    protected virtual int GetHashCode(int startingHash, IDictionary dictionary, out int rollovers)
     {
         int hash = startingHash;
         rollovers = 0;
@@ -146,7 +146,7 @@ public class RecordCollectionComparer : IRecordCollectionComparer
     /// <param name="collection">The list of elements whose hash will be calculated.</param>
     /// <param name="rollovers">The number of times the hash rolles over past <see cref="int.MaxValue"/>.</param>
     /// <returns>The hash of the collections elements.</returns>
-    protected virtual int GetEnumerableHashCode(int startingHash, IEnumerable collection, out int rollovers)
+    protected virtual int GetHashCode(int startingHash, IEnumerable collection, out int rollovers)
     {
         int hash = startingHash;
         rollovers = 0;
@@ -175,7 +175,7 @@ public class RecordCollectionComparer : IRecordCollectionComparer
     /// </summary>
     /// <param name="x">The first collection to compare.</param>
     /// <param name="y">The second collection to compare.</param>
-    public new bool Equals(object? x, object? y) =>
+    public virtual new bool Equals(object? x, object? y) =>
         x is IReadOnlyRecordCollection xCollection && y is IReadOnlyRecordCollection yCollection && Equals(xCollection, yCollection);
 
     /// <summary>
@@ -183,7 +183,7 @@ public class RecordCollectionComparer : IRecordCollectionComparer
     /// </summary>
     /// <param name="x">The first collection to compare.</param>
     /// <param name="y">The second collection to compare.</param>
-    public bool Equals(IReadOnlyRecordCollection? x, object? y) =>
+    public virtual bool Equals(IReadOnlyRecordCollection? x, object? y) =>
         y is IReadOnlyRecordCollection collection && Equals(x, collection);
 
     /// <summary>
@@ -191,12 +191,8 @@ public class RecordCollectionComparer : IRecordCollectionComparer
     /// </summary>
     /// <param name="x">The first collection to compare.</param>
     /// <param name="y">The second collection to compare.</param>
-    public virtual bool Equals(IReadOnlyRecordCollection? x, IReadOnlyRecordCollection? y)
-    {
-        bool areEqual = x?.Count == y?.Count && GetHashCode(x) == GetHashCode(y);
-
-        return areEqual;
-    }
+    public virtual bool Equals(IReadOnlyRecordCollection? x, IReadOnlyRecordCollection? y) =>
+        x?.Count == y?.Count && GetHashCode(x) == GetHashCode(y);
 
     #endregion
 }

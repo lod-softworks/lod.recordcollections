@@ -1,7 +1,9 @@
-namespace System.Collections.Tests;
+namespace Lod.RecordCollections.Tests;
 
 internal sealed class TestRecordCollectionComparer : IRecordCollectionComparer
 {
+    public int InstanceId { get; } = new Random().Next();
+
     public new bool Equals(object? x, object? y) => ReferenceEquals(x, y);
 
     public int GetHashCode(object obj) => obj?.GetHashCode() ?? 0;

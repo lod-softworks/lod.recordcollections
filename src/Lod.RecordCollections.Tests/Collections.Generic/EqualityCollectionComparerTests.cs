@@ -1,18 +1,31 @@
-namespace System.Collections.Tests.Generic;
+namespace Lod.RecordCollections.Tests.Collections.Generic;
 
 [TestClass]
 public class EqualityCollectionComparerTests
 {
+    [TestInitialize]
+    public void SetUp()
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        RecordCollectionComparer.Default = new RecordCollectionComparer();
+#pragma warning restore CS0618 // Type or member is obsolete
+    }
+
     [TestMethod]
     [RepeatTestMethod(3)]
     public void EqualityList_DefaultConstructor_UsesDefaultComparer()
     {
-        TestRecordCollectionComparer overrideComparer = new();
-        using (ComparerTestUtilities.OverrideDefaultComparer(overrideComparer))
-        {
-            EqualityList<int> list = [];
-            Assert.AreSame(overrideComparer, list.Comparer);
-        }
+        // Arrange
+        TestRecordCollectionComparer comparer = new();
+#pragma warning disable CS0618 // Type or member is obsolete
+        RecordCollectionComparer.Default = comparer;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        // Act
+        EqualityList<int> list = [];
+
+        // Assert
+        Assert.AreSame(comparer, list.Comparer);
     }
 
     [TestMethod]
@@ -49,12 +62,17 @@ public class EqualityCollectionComparerTests
     [RepeatTestMethod(3)]
     public void EqualityDictionary_DefaultConstructor_UsesDefaultComparer()
     {
-        TestRecordCollectionComparer overrideComparer = new();
-        using (ComparerTestUtilities.OverrideDefaultComparer(overrideComparer))
-        {
-            EqualityDictionary<int, string> dictionary = new();
-            Assert.AreSame(overrideComparer, dictionary.Comparer);
-        }
+        // Arrange
+        TestRecordCollectionComparer comparer = new();
+#pragma warning disable CS0618 // Type or member is obsolete
+        RecordCollectionComparer.Default = comparer;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        // Act
+        EqualityDictionary<int, string> dictionary = [];
+
+        // Assert
+        Assert.AreSame(comparer, dictionary.Comparer);
     }
 
     [TestMethod]
@@ -87,10 +105,8 @@ public class EqualityCollectionComparerTests
         Assert.IsFalse(left.ObjectEqualsCalled);
     }
 
-    private sealed class OperatorAwareEqualityList : EqualityList<int>
+    private sealed class OperatorAwareEqualityList(IEnumerable<int> values) : EqualityList<int>(values)
     {
-        public OperatorAwareEqualityList(IEnumerable<int> values) : base(values) { }
-
         public bool TypedEqualsCalled { get; private set; }
         public bool ObjectEqualsCalled { get; private set; }
 

@@ -1,6 +1,6 @@
-﻿[assembly: Parallelize]
+﻿[assembly: DoNotParallelize]
 
-namespace System.Collections.Tests;
+namespace Lod.RecordCollections.Tests;
 
 public static class Program
 {

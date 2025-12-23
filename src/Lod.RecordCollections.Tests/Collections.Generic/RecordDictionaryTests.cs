@@ -1,10 +1,16 @@
-using System.Reflection;
-
-namespace System.Collections.Tests.Generic;
+namespace Lod.RecordCollections.Tests.Collections.Generic;
 
 [TestClass]
 public class RecordDictionaryTests
 {
+    [TestInitialize]
+    public void SetUp()
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        RecordCollectionComparer.Default = new RecordCollectionComparer();
+#pragma warning restore CS0618 // Type or member is obsolete
+    }
+
     // sanity check test
     [TestMethod]
     public void Dictionary_SameInts_NotEqualsMatchingDictionary()
@@ -24,12 +30,17 @@ public class RecordDictionaryTests
     [RepeatTestMethod(3)]
     public void RecordDictionary_DefaultConstructor_UsesDefaultComparer()
     {
-        TestRecordCollectionComparer overrideComparer = new();
-        using (ComparerTestUtilities.OverrideDefaultComparer(overrideComparer))
-        {
-            RecordDictionary<int, string> dictionary = new();
-            Assert.AreSame(overrideComparer, dictionary.Comparer);
-        }
+        // Arrange
+        TestRecordCollectionComparer comparer = new();
+#pragma warning disable CS0618 // Type or member is obsolete
+        RecordCollectionComparer.Default = comparer;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        // Act
+        RecordDictionary<int, string> dictionary = [];
+
+        // Assert
+        Assert.AreSame(comparer, dictionary.Comparer);
     }
 
     [TestMethod]
@@ -180,20 +191,8 @@ public class RecordDictionaryTests
 
     #region Support Types
 
-    sealed record Number
+    private sealed class OperatorAwareRecordDictionary(Dictionary<int, string> values) : RecordDictionary<int, string>(values)
     {
-        public int Value { get; set; }
-
-        public Number(int value)
-        {
-            Value = value;
-        }
-    }
-
-    private sealed class OperatorAwareRecordDictionary : RecordDictionary<int, string>
-    {
-        private OperatorAwareRecordDictionary(Dictionary<int, string> values) : base(values) { }
-
         public bool TypedEqualsCalled { get; private set; }
         public bool ObjectEqualsCalled { get; private set; }
 
