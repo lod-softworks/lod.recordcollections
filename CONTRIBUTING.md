@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve Lod.RecordCollections! Before opening a pull request, please review `AGENTS.md` for repository-wide expectations and keep the following collection-specific guidelines in mind.
+Thanks for helping improve Lod.RecordCollections! Keep contributions tightly scoped to the problem at hand, favor small focused diffs, and explain the intent behind every change. When in doubt, ask clarifying questions before refactoring, avoid drive-by cleanups, and prefer descriptive naming, consistent formatting, and exception-based error handling.
 
 ## Record Collection File Structure
 
