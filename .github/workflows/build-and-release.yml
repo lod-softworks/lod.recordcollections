@@ -31,11 +31,11 @@ jobs:
       run: dotnet test ./src/Lod.RecordCollections.sln -c Release --no-restore --no-build
 
     - name: IL Class/Record Conversion
-      run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net6.0/Lod.RecordCollections.IlAssembler.dll D:\a\lod.recordcollections\lod.recordcollections\src\Lod.RecordCollections\bin\Release\netstandard2.0\Lod.RecordCollections.dll
+      run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net10.0/Lod.RecordCollections.IlAssembler.dll D:\a\lod.recordcollections\lod.recordcollections\src\Lod.RecordCollections\bin\Release\netstandard2.0\Lod.RecordCollections.dll
 
     # This step shouldn't be required but cannot get pdb to build into netstandard2.0 directory and nuget pack won't pack without it
     - name: Copy Debug Files
-      run: Copy-Item ./src/Lod.RecordCollections.IlAssembler/bin/Release/net6.0/Lod.RecordCollections.pdb -Destination ./src/Lod.RecordCollections/bin/Release/netstandard2.0
+      run: Copy-Item ./src/Lod.RecordCollections.IlAssembler/bin/Release/net10.0/Lod.RecordCollections.pdb -Destination ./src/Lod.RecordCollections/bin/Release/netstandard2.0
 
     - name: NuGet Pack (Tag)
       if: ${{ github.event.release.tag_name != null }}
