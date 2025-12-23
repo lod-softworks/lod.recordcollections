@@ -24,13 +24,22 @@ public class RecordSetTests
     public void RecordSet_DefaultConstructor_UsesDefaultComparer()
     {
         // arrange
-        global::System.Collections.IRecordCollectionComparer defaultComparer = RecordCollectionComparer.Default;
+        global::System.Collections.IRecordCollectionComparer original = RecordCollectionComparer.Default;
+        TestRecordCollectionComparer overrideComparer = new();
+        RecordCollectionComparer.Default = overrideComparer;
 
-        // act
-        RecordSet<int> set = [];
+        try
+        {
+            // act
+            RecordSet<int> set = [];
 
-        // assert
-        Assert.AreSame(defaultComparer, set.Comparer);
+            // assert
+            Assert.AreSame(overrideComparer, set.Comparer);
+        }
+        finally
+        {
+            RecordCollectionComparer.Default = original;
+        }
     }
 
     [TestMethod]

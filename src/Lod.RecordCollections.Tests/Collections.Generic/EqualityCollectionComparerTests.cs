@@ -7,13 +7,22 @@ public class EqualityCollectionComparerTests
     public void EqualityList_DefaultConstructor_UsesDefaultComparer()
     {
         // arrange
-        global::System.Collections.IRecordCollectionComparer defaultComparer = RecordCollectionComparer.Default;
+        global::System.Collections.IRecordCollectionComparer original = RecordCollectionComparer.Default;
+        TestRecordCollectionComparer overrideComparer = new();
+        RecordCollectionComparer.Default = overrideComparer;
 
-        // act
-        EqualityList<int> list = [];
+        try
+        {
+            // act
+            EqualityList<int> list = [];
 
-        // assert
-        Assert.AreSame(defaultComparer, list.Comparer);
+            // assert
+            Assert.AreSame(overrideComparer, list.Comparer);
+        }
+        finally
+        {
+            RecordCollectionComparer.Default = original;
+        }
     }
 
     [TestMethod]
@@ -33,13 +42,22 @@ public class EqualityCollectionComparerTests
     public void EqualityDictionary_DefaultConstructor_UsesDefaultComparer()
     {
         // arrange
-        global::System.Collections.IRecordCollectionComparer defaultComparer = RecordCollectionComparer.Default;
+        global::System.Collections.IRecordCollectionComparer original = RecordCollectionComparer.Default;
+        TestRecordCollectionComparer overrideComparer = new();
+        RecordCollectionComparer.Default = overrideComparer;
 
-        // act
-        EqualityDictionary<int, string> dictionary = new();
+        try
+        {
+            // act
+            EqualityDictionary<int, string> dictionary = new();
 
-        // assert
-        Assert.AreSame(defaultComparer, dictionary.Comparer);
+            // assert
+            Assert.AreSame(overrideComparer, dictionary.Comparer);
+        }
+        finally
+        {
+            RecordCollectionComparer.Default = original;
+        }
     }
 
     [TestMethod]

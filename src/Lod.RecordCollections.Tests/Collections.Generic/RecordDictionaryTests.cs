@@ -24,13 +24,22 @@ public class RecordDictionaryTests
     public void RecordDictionary_DefaultConstructor_UsesDefaultComparer()
     {
         // arrange
-        global::System.Collections.IRecordCollectionComparer defaultComparer = RecordCollectionComparer.Default;
+        global::System.Collections.IRecordCollectionComparer original = RecordCollectionComparer.Default;
+        TestRecordCollectionComparer overrideComparer = new();
+        RecordCollectionComparer.Default = overrideComparer;
 
-        // act
-        RecordDictionary<int, string> dictionary = new();
+        try
+        {
+            // act
+            RecordDictionary<int, string> dictionary = new();
 
-        // assert
-        Assert.AreSame(defaultComparer, dictionary.Comparer);
+            // assert
+            Assert.AreSame(overrideComparer, dictionary.Comparer);
+        }
+        finally
+        {
+            RecordCollectionComparer.Default = original;
+        }
     }
 
     [TestMethod]
