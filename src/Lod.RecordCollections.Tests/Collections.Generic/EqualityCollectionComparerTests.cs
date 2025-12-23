@@ -6,26 +6,19 @@ public class EqualityCollectionComparerTests
     [TestMethod]
     public void EqualityList_DefaultConstructor_UsesDefaultComparer()
     {
-        // arrange
-        IRecordCollectionComparer original = RecordCollectionComparer.Default;
-        TestRecordCollectionComparer overrideComparer = new();
+        for (int i = 0; i < 3; i++)
+        {
+            // arrange
+            TestRecordCollectionComparer overrideComparer = new();
 #pragma warning disable CS0618
-        RecordCollectionComparer.Default = overrideComparer;
+            RecordCollectionComparer.Default = overrideComparer;
 #pragma warning restore CS0618
 
-        try
-        {
             // act
             EqualityList<int> list = [];
 
             // assert
             Assert.AreSame(overrideComparer, list.Comparer);
-        }
-        finally
-        {
-#pragma warning disable CS0618
-            RecordCollectionComparer.Default = original;
-#pragma warning restore CS0618
         }
     }
 
@@ -62,26 +55,19 @@ public class EqualityCollectionComparerTests
     [TestMethod]
     public void EqualityDictionary_DefaultConstructor_UsesDefaultComparer()
     {
-        // arrange
-        IRecordCollectionComparer original = RecordCollectionComparer.Default;
-        TestRecordCollectionComparer overrideComparer = new();
+        for (int i = 0; i < 3; i++)
+        {
+            // arrange
+            TestRecordCollectionComparer overrideComparer = new();
 #pragma warning disable CS0618
-        RecordCollectionComparer.Default = overrideComparer;
+            RecordCollectionComparer.Default = overrideComparer;
 #pragma warning restore CS0618
 
-        try
-        {
             // act
             EqualityDictionary<int, string> dictionary = new();
 
             // assert
             Assert.AreSame(overrideComparer, dictionary.Comparer);
-        }
-        finally
-        {
-#pragma warning disable CS0618
-            RecordCollectionComparer.Default = original;
-#pragma warning restore CS0618
         }
     }
 
