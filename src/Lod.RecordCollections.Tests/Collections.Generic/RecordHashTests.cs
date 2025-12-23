@@ -110,6 +110,7 @@ public class RecordSetTests
         Assert.IsTrue(set.IsSupersetOf(hashSet), "Deserialized set is not a subset of the original set.");
     }
 
+#if !NETFRAMEWORK
     [TestMethod]
     public void RecordSet_DeserializedSystemTextJson_EqualsReserialized()
     {
@@ -127,10 +128,19 @@ public class RecordSetTests
         Assert.IsTrue(set.Equals(recordSet), "Deserialized set is not equal to the original set.");
         Assert.IsTrue(set.IsSupersetOf(hashSet), "Deserialized set is not a subset of the original set.");
     }
+#endif
 
     #region Support Types
 
-    sealed record Number(int Value);
+    sealed record Number
+    {
+        public int Value { get; set; }
+
+        public Number(int value)
+        {
+            Value = value;
+        }
+    }
 
     #endregion
 }

@@ -237,7 +237,15 @@ public class RecordEnumerableTests
 
     #region Support Types
 
-    internal record class RecordInt(int Number);
+    record class RecordInt
+    {
+        public int Number { get; set; }
+
+        public RecordInt(int number)
+        {
+            Number = number;
+        }
+    }
 
     #endregion
 }

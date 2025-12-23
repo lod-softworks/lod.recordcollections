@@ -113,6 +113,7 @@ public class RecordDictionaryTests
         }
     }
 
+#if !NETFRAMEWORK
     [TestMethod]
     public void RecordDictionary_DeserializedSystemTextJson_EqualsReserialized()
     {
@@ -133,10 +134,19 @@ public class RecordDictionaryTests
             Assert.IsTrue(dictionary[kv.Key] == recordDictionary[kv.Key], "Deserialized dictionary is not a subset of the original dictionary.");
         }
     }
+#endif
 
     #region Support Types
 
-    sealed record Number(int Value);
+    sealed record Number
+    {
+        public int Value { get; set; }
+
+        public Number(int value)
+        {
+            Value = value;
+        }
+    }
 
     #endregion
 }

@@ -19,7 +19,7 @@ public class EqualityList<T> : List<T>, IRecordCollection<T>
     /// <summary>
     /// Gets the comparer used to compare elements and collections.
     /// </summary>
-    protected virtual IRecordCollectionComparer Comparer { get; } = new RecordCollectionComparer();
+    public virtual IRecordCollectionComparer Comparer { get; } = RecordCollectionComparer.Default;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EqualityList{T}"/> class that is empty and has the default initial capacity.
@@ -78,13 +78,13 @@ public class EqualityList<T> : List<T>, IRecordCollection<T>
     /// Returns a value indicating whether two <see cref="EqualityList{T}"/> represent the same collection of records.
     /// </summary>
     public static bool operator ==(EqualityList<T> left, EqualityList<T> right) =>
-        RecordCollectionComparer.Default.Equals(left, right);
+        left.Equals(right);
 
     /// <summary>
     /// Returns a value indicating whether two <see cref="EqualityList{T}"/> represent a different collection of records.
     /// </summary>
     public static bool operator !=(EqualityList<T> left, EqualityList<T> right) =>
-        !RecordCollectionComparer.Default.Equals(left, right);
+        !left.Equals(right);
 
     #endregion
 
@@ -93,9 +93,6 @@ public class EqualityList<T> : List<T>, IRecordCollection<T>
     /// <summary>
     /// Determines whether the specified objects are equal.
     /// </summary>
-    /// <param name="x"/>
-    /// <param name="y"/>
-    /// <returns/>
     public bool Equals(EqualityList<T>? x, EqualityList<T>? y) =>
         Comparer.Equals(x, y);
 
@@ -106,8 +103,6 @@ public class EqualityList<T> : List<T>, IRecordCollection<T>
     /// <summary>
     /// Returns a hash code for the specified object.
     /// </summary>
-    /// <param name="x"/>
-    /// <returns/>
     public int GetHashCode(EqualityList<T> x) =>
         Comparer.GetHashCode(x);
 

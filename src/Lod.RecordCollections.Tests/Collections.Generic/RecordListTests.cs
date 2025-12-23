@@ -113,6 +113,7 @@ public class RecordListTests
         }
     }
 
+#if !NETFRAMEWORK
     [TestMethod]
     public void RecordList_DeserializedSystemTextJson_EqualsReserialized()
     {
@@ -133,10 +134,19 @@ public class RecordListTests
             Assert.IsTrue(list[i] == recordList[i], "Deserialized list is not a subset of the original list.");
         }
     }
+#endif
 
     #region Support Types
 
-    sealed record Number(int Value);
+    sealed record Number
+    {
+        public int Value { get; set; }
+
+        public Number(int value)
+        {
+            Value = value;
+        }
+    }
 
     #endregion
 }

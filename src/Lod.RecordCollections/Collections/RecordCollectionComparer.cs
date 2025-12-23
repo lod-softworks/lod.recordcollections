@@ -1,11 +1,27 @@
 ﻿namespace System.Collections;
 
 /// <summary>
-/// The default implementation of <see cref="IRecordCollectionComparer"/>.
+/// The default implementation of <see cref="IRecordCollectionComparer"/> which exposes methods to support the comparison of record collections.
 /// </summary>
 public class RecordCollectionComparer : IRecordCollectionComparer
 {
-    internal static IRecordCollectionComparer Default { get; } = new RecordCollectionComparer();
+    /// <summary>
+    /// Gets the default comparer for record collections.
+    /// </summary>
+    /// <remarks>
+    /// This comparer is used for record collections initialized without specifying a <see cref="IRecordCollectionComparer"/> in their constructor.
+    /// In .NET 6.0 or greater, this property proxies to the default comparer defined on <see cref="IReadOnlyRecordCollection"/>.
+    /// </remarks>
+    public static IRecordCollectionComparer Default
+#if NET6_0_OR_GREATER
+    {
+        get => IReadOnlyRecordCollection.DefaultComparer;
+        [Obsolete("Use IReadOnlyRecordCollection.DefaultComparer instead.")]
+        set => IReadOnlyRecordCollection.DefaultComparer = value;
+    }
+#else
+    { get; set; } = new RecordCollectionComparer();
+#endif
 
     #region GetHashCode
 
@@ -41,7 +57,7 @@ public class RecordCollectionComparer : IRecordCollectionComparer
     /// <param name="startingHash">The starting base hash to calculate the hash against.</param>
     /// <param name="rollovers">The number of times the hash has exceeded <see cref="int.MaxValue"/>.</param>
     /// <returns>The hash of the collection elements.</returns>
-    public virtual int GetHashCode(IReadOnlyRecordCollection? collection, int startingHash, out int rollovers)
+    protected virtual int GetHashCode(IReadOnlyRecordCollection? collection, int startingHash, out int rollovers)
     {
         rollovers = 0;
 

@@ -21,7 +21,7 @@ public class RecordSet<T> : HashSet<T>, IRecordCollection<T>
     /// <summary>
     /// Gets the comparer used to compare elements and collections.
     /// </summary>
-    protected virtual new IRecordCollectionComparer Comparer { get; } = new RecordCollectionComparer();
+    public virtual new IRecordCollectionComparer Comparer { get; } = RecordCollectionComparer.Default;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordSet{T}"/> class that is empty and has the default initial capacity.
@@ -109,14 +109,14 @@ public class RecordSet<T> : HashSet<T>, IRecordCollection<T>
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
     public static bool operator ==(RecordSet<T> left, RecordSet<T> right) =>
-        RecordCollectionComparer.Default.Equals(left, right);
+        left.Equals(right);
 
     /// <summary>
     /// Returns a value indicating whether two <see cref="RecordSet{T}"/> represent a different collection of records.
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
     public static bool operator !=(RecordSet<T> left, RecordSet<T> right) =>
-        !RecordCollectionComparer.Default.Equals(left, right);
+        !left.Equals(right);
 
     #endregion
 
@@ -144,9 +144,6 @@ public class RecordSet<T> : HashSet<T>, IRecordCollection<T>
     /// <summary>
     /// Determines whether the specified objects are equal.
     /// </summary>
-    /// <param name="x"/>
-    /// <param name="y"/>
-    /// <returns/>
     public bool Equals(RecordSet<T>? x, RecordSet<T>? y) =>
         Comparer.Equals(x, y);
 
@@ -157,8 +154,6 @@ public class RecordSet<T> : HashSet<T>, IRecordCollection<T>
     /// <summary>
     /// Returns a hash code for the specified object.
     /// </summary>
-    /// <param name="x"/>
-    /// <returns/>
     public int GetHashCode(RecordSet<T> x) =>
         Comparer.GetHashCode(x);
 

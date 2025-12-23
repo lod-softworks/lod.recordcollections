@@ -21,7 +21,7 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// <summary>
     /// Gets the comparer used to compare elements and collections.
     /// </summary>
-    protected virtual IRecordCollectionComparer Comparer { get; } = new RecordCollectionComparer();
+    public virtual IRecordCollectionComparer Comparer { get; } = RecordCollectionComparer.Default;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordList{T}"/> class that is empty and has the default initial capacity.
@@ -103,13 +103,15 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// Returns a value indicating whether two <see cref="RecordList{T}"/> represent the same collection of records.
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
-    public static bool operator ==(RecordList<T> left, RecordList<T> right) => RecordCollectionComparer.Default.Equals(left, right);
+    public static bool operator ==(RecordList<T> left, RecordList<T> right) =>
+        left.Equals(right);
 
     /// <summary>
     /// Returns a value indicating whether two <see cref="RecordList{T}"/> represent a different collection of records.
     /// </summary>
     // [RecordImp!]: This operator is required to meet the `record` spec.
-    public static bool operator !=(RecordList<T> left, RecordList<T> right) => !RecordCollectionComparer.Default.Equals(left, right);
+    public static bool operator !=(RecordList<T> left, RecordList<T> right) =>
+        !left.Equals(right);
 
     #endregion
 
@@ -118,9 +120,6 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// <summary>
     /// Determines whether the specified objects are equal.
     /// </summary>
-    /// <param name="x"/>
-    /// <param name="y"/>
-    /// <returns/>
     public bool Equals(RecordList<T>? x, RecordList<T>? y) =>
         Comparer.Equals(x, y);
 
@@ -131,8 +130,6 @@ public class RecordList<T> : List<T>, IRecordCollection<T>
     /// <summary>
     /// Returns a hash code for the specified object.
     /// </summary>
-    /// <param name="x"/>
-    /// <returns/>
     public int GetHashCode(RecordList<T> x) =>
         Comparer.GetHashCode(x);
 

@@ -22,7 +22,7 @@ public class EqualityDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecor
     /// <summary>
     /// Gets the comparer used to compare elements and collections.
     /// </summary>
-    protected virtual new IRecordCollectionComparer Comparer { get; } = new RecordCollectionComparer();
+    public virtual new IRecordCollectionComparer Comparer { get; } = RecordCollectionComparer.Default;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EqualityDictionary{TKey, TValue}"/> class that is empty and has the default initial capacity.
@@ -78,13 +78,13 @@ public class EqualityDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IRecor
     /// Returns a value indicating whether two <see cref="EqualityDictionary{TKey, TValue}"/> represent the same collection of records.
     /// </summary>
     public static bool operator ==(EqualityDictionary<TKey, TValue> left, EqualityDictionary<TKey, TValue> right) =>
-        RecordCollectionComparer.Default.Equals(left, right);
+        left.Equals(right);
 
     /// <summary>
     /// Returns a value indicating whether two <see cref="EqualityDictionary{TKey, TValue}"/> represent a different collection of records.
     /// </summary>
     public static bool operator !=(EqualityDictionary<TKey, TValue> left, EqualityDictionary<TKey, TValue> right) =>
-        !RecordCollectionComparer.Default.Equals(left, right);
+        !left.Equals(right);
 
     #endregion
 
