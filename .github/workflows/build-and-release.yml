@@ -13,6 +13,7 @@ on:
 jobs:
   build-and-release:
     runs-on: windows-latest
+    environment: production
 
     steps:
     - uses: actions/checkout@v6
@@ -21,6 +22,18 @@ jobs:
       uses: actions/setup-dotnet@v5
       with:
         dotnet-version: 10.0.x
+
+    - name: Set Version
+      id: set-version
+      shell: pwsh
+      run: |
+        if ("${{ github.event_name }}" -eq "push") {
+          $version = "${{ github.ref_name }}"
+        } else {
+          $version = "${{ inputs.tag }}"
+        }
+        Write-Host "Set version to: $version"
+        echo "version=$version" >> $env:GITHUB_OUTPUT
 
     - name: Restore Dependencies
       run: dotnet restore ./src/Lod.RecordCollections.sln
@@ -43,16 +56,8 @@ jobs:
     - name: IL Class/Record Conversion (net10.0))
       run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net10.0/Lod.RecordCollections.IlAssembler.dll D:\a\lod.recordcollections\lod.recordcollections\src\Lod.RecordCollections\bin\Release\net10.0\Lod.RecordCollections.dll
 
-    - name: NuGet Pack (Tag)
-      if: ${{ github.event.release.tag_name != null }}
-      run: dotnet pack ./src/Lod.RecordCollections/Lod.RecordCollections.csproj -c Release --no-restore --include-symbols --no-build -p:Version=${{ github.event.release.tag_name }} -p:PackageVersion=${{ github.event.release.tag_name }}
-    - name: NuGet Pack (Manual)
-      if: ${{ inputs.tag != null }}
-      run: dotnet pack ./src/Lod.RecordCollections/Lod.RecordCollections.csproj -c Release --no-restore --include-symbols --no-build -p:Version=${{ inputs.tag }} -p:PackageVersion=${{ inputs.tag }}
+    - name: NuGet Pack
+      run: dotnet pack ./src/Lod.RecordCollections/Lod.RecordCollections.csproj -c Release --no-restore --include-symbols --no-build -p:Version=${{ steps.set-version.outputs.version }} -p:PackageVersion=${{ steps.set-version.outputs.version }}
 
-    - name: NuGet Push (Tag)
-      if: ${{ github.event.release.tag_name != null }}
-      run: dotnet nuget push ./src/Lod.RecordCollections/bin/Release/Lod.RecordCollections.${{ github.event.release.tag_name }}.nupkg --api-key ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json
-    - name: NuGet Push (Manual)
-      if: ${{ inputs.tag != null }}
-      run: dotnet nuget push ./src/Lod.RecordCollections/bin/Release/Lod.RecordCollections.${{ inputs.tag }}.nupkg --api-key ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json
+    - name: NuGet Push
+      run: dotnet nuget push ./src/Lod.RecordCollections/bin/Release/Lod.RecordCollections.${{ steps.set-version.outputs.version }}.nupkg --api-key ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json
