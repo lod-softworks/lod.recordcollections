@@ -1,21 +1,10 @@
 # Record Collections
-This library provides a simple implementation of generic collections which implement equality comparison for record types.
 
-## Records
-Beginning with C# 9, you use the record keyword to define a reference type that provides built-in functionality for encapsulating data.
-C# 10 allows the record class syntax as a synonym to clarify a reference type, and record struct to define a value type with similar functionality.
-You can create record types with immutable properties by using positional parameters or standard property syntax.
-Read more about records at https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/record
+Generic collections that implement value-based equality for use with C# records. Drop-in replacements for standard collections that work correctly with record equality comparison.
 
-## Record Collections
-C# records provide value type equality comparison of reference types.
-The default implementation of records looks at the HashCode of each property in the object.
-This works great for structural data types; however, collections in .NET are all reference types which provide a unique instance hash code.
-In order to include collections on records, you need a collection type which provides value based equity for the collection hash rather than the instance hash code.
-Many immutable (and mutable) records may contain arrays, lists, or other collections of sub-records; however, there is no record friendly implimentation of any collection type in .NET Framework or .NET Core.
+## Available Collections
 
-## Usage
-The library places a Record\* collection type in the same namespace as it's underlying implementation. All collection types reside in the System.Collections.Generic namespace:
+All collection types reside in the `System.Collections.Generic` namespace:
 
   - **RecordList\<T\>** - inherits from `List<T>`
   - **RecordDictionary\<TKey, TValue\>** - inherits from `Dictionary<TKey, TValue>`
@@ -23,7 +12,99 @@ The library places a Record\* collection type in the same namespace as it's unde
   - **RecordStack\<T\>** - inherits from `Stack<T>`
   - **RecordQueue\<T\>** - inherits from `Queue<T>`
 
-The collections should behave the same as their parent classes as well. Updating a `RecordList<T>` while enumerating will still throw an `InvalidOperationException`, while a RecordArray will not.
+## Quick Example
+
+```csharp
+record NumberInfo(IList<int> Numbers);
+
+// Standard collections fail equality checks
+var nums1 = new NumberInfo() { Numbers = new List<int>() { 1, 2, 3 } };
+var nums2 = new NumberInfo() { Numbers = new List<int>() { 1, 2, 3 } };
+Console.WriteLine(nums1 == nums2); // False - uses instance hash code
+
+// Record collections pass equality checks
+var nums3 = new NumberInfo() { Numbers = new RecordList<int>() { 1, 2, 3 } };
+var nums4 = new NumberInfo() { Numbers = new RecordList<int>() { 1, 2, 3 } };
+Console.WriteLine(nums3 == nums4); // True - uses value-based hash code
+```
+
+## Why Record Collections?
+
+C# [records](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/record) provide value-based equality comparison for reference types by examining the hash code of each property. This works great for structural data types, but collections in .NET are reference types that use instance-based hash codes. When you include a standard collection in a record, equality comparisons fail because the collection's hash code is based on the instance, not its contents.
+
+Record Collections solve this by providing value-based equality for collections, allowing records containing collections to correctly compare based on their contents rather than instance identity. The collections behave identically to their parent classes (e.g., updating a `RecordList<T>` while enumerating still throws `InvalidOperationException`).
+
+## Drop-in Replacements
+
+Each Record Collection inherits directly from its corresponding standard collection type, making them true drop-in replacements. You can use them anywhere you would use the standard collection:
+
+```csharp
+// Works with existing interfaces and base types
+IList<int> standardList = new RecordList<int>();
+List<int> list = new RecordList<int>();
+ICollection<int> collection = new RecordSet<int>();
+
+// All standard methods and properties work identically
+var recordList = new RecordList<int> { 1, 2, 3 };
+recordList.Add(4);
+recordList.Remove(2);
+var count = recordList.Count;
+var first = recordList[0];
+```
+
+This allows you to utilized Record Collections without changing existing data models, interface contracts, or other other cascading code while also allowing you to do so without impact as the methods, properties, and behaviors of the collections are identical to their base types.
+
+## Cloning
+
+Record Collections are implemented as `record class` types, which means they support cloning via the `with` expression. When a collection is cloned, it attempts to clone each underlying element to create an entirely new collection:
+
+- If an element is a record or value type, it will be cloned
+- If an element does not support cloning (e.g., a regular class), the original element reference is retained
+- This ensures that collections of records create deep copies, while collections of regular classes maintain reference semantics
+
+```csharp
+var original = new RecordList<Person> 
+{ 
+    new Person("Alice"), 
+    new Person("Bob") 
+};
+
+var cloned = original with { }; // Creates new collection with cloned elements
+
+// If Person is a record, cloned contains new Person instances
+// If Person is a regular class, cloned retains the original Person instances
+```
+
+## LINQ Extension Methods
+
+The `RecordEnumerable` class (in the `System.Linq` namespace) provides extension methods similar to `Enumerable`, but for creating Record Collections from any `IEnumerable<T>`. These methods mirror the standard LINQ `ToList()`, `ToDictionary()`, etc., but return Record Collections instead:
+
+- **ToRecordList()** - Creates a new `RecordList<T>` from an `IEnumerable<T>`
+- **ToRecordList()** - Creates a new `RecordDictionary<TKey, TValue>` from an `IEnumerable<T> `and key/value delegate selectors.
+- **ToRecordSet()** - Creates a new `RecordSet<T>` from an `IEnumerable<T>`
+- **ToRecordStack()** - Creates a new `RecordStack<T>` from an `IEnumerable<T>`
+- **ToRecordQueue()** - Creates a new `RecordQueue<T>` from an `IEnumerable<T>`
+
+```csharp
+var numbers = Enumerable.Range(1, 10).Select(i => new Number(i));
+
+// Convert to Record Collections
+var recordList = numbers.ToRecordList();
+var recordSet = numbers.ToRecordSet();
+var recordStack = numbers.ToRecordStack();
+var recordQueue = numbers.ToRecordQueue();
+
+// Create RecordDictionary with key selector
+var recordDict = numbers.ToRecordDictionary(n => n.Value);
+
+// Create RecordDictionary with key and element selectors
+var recordDict2 = numbers.ToRecordDictionary(
+    keySelector: n => n.Value,
+    elementSelector: n => n with { Value = n.Value * 2 }
+);
+```
+
+All methods require elements to implement `IEquatable<T>` (value or record-like types) and follow the same null-handling and exception behavior as their standard LINQ counterparts.
 
 ## Custom Comparers
 
@@ -61,38 +142,10 @@ var queue = new RecordQueue<int>(capacity: 100, customComparer);
 When a comparer is not provided, collections will use the default comparer (either the global default or `RecordCollectionComparer.Default`).
 
 ## ⚠ Drawbacks & Warnings
-The current implementation of this library loops through each record in the collection to determine the current hash code of the collection.
-This can become very expensive when doing equality comparisons with large collections.
 
-Record\* collections also attempt to clone the underlying collection elements every time the record is cloned.
-If an element is not value/record like the original element is retained and may be modified between seperate record collections.
+The current implementation of this library loops through each element in the collection to determine the hash code of the collection. This can become very expensive when doing equality comparisons with large collections.
 
-The library is intended to provide a default but extendable implementation of common collections. It works great for data models with small collections; however, when used with large data sets preformance will start to deteriorate.
+The library is intended to provide a default but extendable implementation of common collections. It works great for data models with small collections; however, when used with large data sets performance will start to deteriorate.
 
-## Examples
-```
-record NumberInfo
-{
-    public IList<int> Numbers { get; init; }
-}
+**Note:** See the [Cloning](#cloning) section for details on how collection cloning works.
 
-var nums1 = new NumberInfo()
-{
-    Numbers = new List<int>() { 1, 2, 3, },
-};
-var nums2 = new NumberInfo()
-{
-    Numbers = new List<int>() { 1, 2, 3, },
-};
-Console.WriteLine(nums1 == nums2); // Outputs "False" as the two lists return the instance hash code.
-
-var nums3 = new NumberInfo()
-{
-    Numbers = new RecordList<int>() { 1, 2, 3, },
-};
-var nums4 = new NumberInfo()
-{
-    Numbers = new RecordList<int>() { 1, 2, 3, },
-};
-Console.WriteLine(nums3 == nums4); // Outputs "True" as the two record lists return the aggregated hash of the underlying elements.
-```
