@@ -6,23 +6,21 @@ public class RecordQueueTests
     [TestInitialize]
     public void SetUp()
     {
-#pragma warning disable CS0618 // Type or member is obsolete
         RecordCollectionComparer.Default = new RecordCollectionComparer();
-#pragma warning restore CS0618 // Type or member is obsolete
     }
 
-    // sanity check test
+    /// <remarks>This test is a sanity check to ensure that the default Queue.Equals behavior is as expected.</remarks>
     [TestMethod]
     public void Queue_SameInts_NotEqualsMatchingQueue()
     {
-        // arrange
+        // Arrange
         Queue<int> queue1 = new([92, 117, 420]);
         Queue<int> queue2 = new([92, 117, 420]);
 
-        // act
+        // Act
         bool areEqual = queue1.Equals(queue2);
 
-        // assert
+        // Assert
         Assert.IsFalse(areEqual);
     }
 
@@ -32,9 +30,7 @@ public class RecordQueueTests
     {
         // Arrange
         TestRecordCollectionComparer comparer = new();
-#pragma warning disable CS0618 // Type or member is obsolete
         RecordCollectionComparer.Default = comparer;
-#pragma warning restore CS0618 // Type or member is obsolete
 
         // Act
         RecordQueue<int> queue = new();
@@ -46,13 +42,13 @@ public class RecordQueueTests
     [TestMethod]
     public void RecordQueue_CustomComparerConstructor_UsesProvidedComparer()
     {
-        // arrange
+        // Arrange
         TestRecordCollectionComparer comparer = new();
 
-        // act
+        // Act
         RecordQueue<int> queue = new(comparer);
 
-        // assert
+        // Assert
         Assert.AreSame(comparer, queue.Comparer);
     }
 
@@ -76,74 +72,74 @@ public class RecordQueueTests
     [TestMethod]
     public void RecordQueue_SameInts_EqualsMatchingQueue()
     {
-        // arrange
+        // Arrange
         RecordQueue<int> queue1 = new([92, 117, 420]);
         RecordQueue<int> queue2 = new([92, 117, 420]);
 
-        // act
+        // Act
         bool areEqual = queue1.Equals(queue2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     [TestMethod]
     public void RecordQueue_SameStrings_EqualsMatchingQueue()
     {
-        // arrange
+        // Arrange
         RecordQueue<string> queue1 = new(["92", "117", "420"]);
         RecordQueue<string> queue2 = new(["92", "117", "420"]);
 
-        // act
+        // Act
         bool areEqual = queue1.Equals(queue2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     [TestMethod]
     public void RecordQueue_SameRecords_EqualsMatchingQueue()
     {
-        // arrange
+        // Arrange
         RecordQueue<Number> queue1 = new([new Number(92), new Number(117), new Number(420)]);
         RecordQueue<Number> queue2 = new([new Number(92), new Number(117), new Number(420)]);
 
-        // act
+        // Act
         bool areEqual = queue1.Equals(queue2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     [TestMethod]
     public void RecordQueue_SameInts_DifferentOrder_NotEqualsSimilarQueue()
     {
-        // arrange
+        // Arrange
         RecordQueue<int> queue1 = new([92, 117, 420]);
         RecordQueue<int> queue2 = new([420, 117, 92]);
 
-        // act
+        // Act
         bool areEqual = queue1.Equals(queue2);
 
-        // assert
+        // Assert
         Assert.IsFalse(areEqual);
     }
 
     [TestMethod]
     public void RecordQueue_EnqueueDequeue_OrderPreserved()
     {
-        // arrange
+        // Arrange
         RecordQueue<int> queue = new();
         queue.Enqueue(92);
         queue.Enqueue(117);
         queue.Enqueue(420);
 
-        // act
+        // Act
         int first = queue.Dequeue();
         int second = queue.Dequeue();
         int third = queue.Dequeue();
 
-        // assert
+        // Assert
         Assert.AreEqual(92, first);
         Assert.AreEqual(117, second);
         Assert.AreEqual(420, third);
@@ -152,38 +148,38 @@ public class RecordQueueTests
     [TestMethod]
     public void RecordQueue_DeserializedNewtonsoft_EqualsReserialized()
     {
-        // arrange
+        // Arrange
         RecordQueue<Number> queue = new([new Number(92), new Number(117), new Number(420)]);
 
-        // act
+        // Act
         string json = Newtonsoft.Json.JsonConvert.SerializeObject(queue);
         RecordQueue<Number>? recordQueue = Newtonsoft.Json.JsonConvert.DeserializeObject<RecordQueue<Number>>(json);
         Queue<Number>? systemQueue = Newtonsoft.Json.JsonConvert.DeserializeObject<Queue<Number>>(json);
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordQueue, "Deserialized record queue is null.");
         Assert.IsNotNull(systemQueue, "Deserialized queue is null.");
         Assert.IsTrue(queue.Equals(recordQueue), "Deserialized queue is not equal to the original queue.");
-        Assert.AreEqual(queue.Count, recordQueue.Count, "Deserialized queue count does not match.");
+        Assert.HasCount(queue.Count, recordQueue, "Deserialized queue count does not match.");
     }
 
 #if !NETFRAMEWORK
     [TestMethod]
     public void RecordQueue_DeserializedSystemTextJson_EqualsReserialized()
     {
-        // arrange
+        // Arrange
         RecordQueue<Number> queue = new([new Number(92), new Number(117), new Number(420)]);
 
-        // act
+        // Act
         string json = System.Text.Json.JsonSerializer.Serialize(queue);
         RecordQueue<Number>? recordQueue = System.Text.Json.JsonSerializer.Deserialize<RecordQueue<Number>>(json);
         Queue<Number>? systemQueue = System.Text.Json.JsonSerializer.Deserialize<Queue<Number>>(json);
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordQueue, "Deserialized record queue is null.");
         Assert.IsNotNull(systemQueue, "Deserialized queue is null.");
         Assert.IsTrue(queue.Equals(recordQueue), "Deserialized queue is not equal to the original queue.");
-        Assert.AreEqual(queue.Count, recordQueue.Count, "Deserialized queue count does not match.");
+        Assert.HasCount(queue.Count, recordQueue, "Deserialized queue count does not match.");
     }
 #endif
 

@@ -33,9 +33,11 @@ Console.WriteLine("Modifying IL");
 string fileContent = await File.ReadAllTextAsync(ilPath);
 Type[] collectionNames =
 [
-    typeof(RecordList<byte>).GetGenericTypeDefinition(),
-    typeof(RecordSet<byte>).GetGenericTypeDefinition(),
-    typeof(RecordDictionary<byte, byte>).GetGenericTypeDefinition(),
+    typeof(RecordDictionary<,>),
+    typeof(RecordList<>),
+    typeof(RecordQueue<>),
+    typeof(RecordSet<>),
+    typeof(RecordStack<>),
 ];
 string cloneTemplate = @"
     .method public hidebysig newslot virtual 
@@ -74,7 +76,14 @@ await File.WriteAllTextAsync(ilPath, fileContent);
 // recompile
 Console.WriteLine("Compile IL");
 
-Process asmProcess = Process.Start(ilasmPath, $"/dll \"{ilPath}\" /output:\"{dllPath}\"");
+string pdbPath = Path.ChangeExtension(dllPath, ".pdb");
+string ilasmArgs = $"/dll \"{ilPath}\" /output:\"{dllPath}\"";
+if (File.Exists(pdbPath))
+{
+    ilasmArgs += $" /pdb:\"{pdbPath}\"";
+}
+
+Process asmProcess = Process.Start(ilasmPath, ilasmArgs);
 #if DEBUG
 asmProcess.OutputDataReceived += (s, e) => Console.WriteLine(e?.Data);
 #endif

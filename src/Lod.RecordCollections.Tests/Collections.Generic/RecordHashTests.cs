@@ -6,23 +6,21 @@ public class RecordSetTests
     [TestInitialize]
     public void SetUp()
     {
-#pragma warning disable CS0618 // Type or member is obsolete
         RecordCollectionComparer.Default = new RecordCollectionComparer();
-#pragma warning restore CS0618 // Type or member is obsolete
     }
 
-    // sanity check test
+    /// <remarks>This test is a sanity check to ensure that the default HashSet.Equals behavior is as expected.</remarks>
     [TestMethod]
     public void Set_SameInts_NotEqualsMatchingSet()
     {
-        // arrange
+        // Arrange
         HashSet<int> set1 = [92, 117, 420,];
         HashSet<int> set2 = [92, 117, 420,];
 
-        // act
+        // Act
         bool areEqual = set1.Equals(set2);
 
-        // assert
+        // Assert
         Assert.IsFalse(areEqual);
     }
 
@@ -32,9 +30,7 @@ public class RecordSetTests
     {
         // Arrange
         TestRecordCollectionComparer comparer = new();
-#pragma warning disable CS0618 // Type or member is obsolete
         RecordCollectionComparer.Default = comparer;
-#pragma warning restore CS0618 // Type or member is obsolete
 
         // Act
         RecordSet<int> set = [];
@@ -46,13 +42,13 @@ public class RecordSetTests
     [TestMethod]
     public void RecordSet_CustomComparerConstructor_UsesProvidedComparer()
     {
-        // arrange
+        // Arrange
         TestRecordCollectionComparer comparer = new();
 
-        // act
+        // Act
         RecordSet<int> set = new(comparer);
 
-        // assert
+        // Assert
         Assert.AreSame(comparer, set.Comparer);
     }
 
@@ -76,69 +72,69 @@ public class RecordSetTests
     [TestMethod]
     public void RecordSet_SameInts_EqualsMatchingSet()
     {
-        // arrange
+        // Arrange
         RecordSet<int> set1 = [92, 117, 420,];
         RecordSet<int> set2 = [92, 117, 420,];
 
-        // act
+        // Act
         bool areEqual = set1.Equals(set2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     [TestMethod]
     public void RecordSet_SameStrings_EqualsMatchingSet()
     {
-        // arrange
+        // Arrange
         RecordSet<string> set1 = ["92", "117", "420",];
         RecordSet<string> set2 = ["92", "117", "420",];
 
-        // act
+        // Act
         bool areEqual = set1.Equals(set2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     [TestMethod]
     public void RecordSet_SameRecords_EqualsMatchingSet()
     {
-        // arrange
+        // Arrange
         RecordSet<Number> set1 = [new Number(92), new Number(117), new Number(420),];
         RecordSet<Number> set2 = [new Number(92), new Number(117), new Number(420),];
 
-        // act
+        // Act
         bool areEqual = set1.Equals(set2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     [TestMethod]
     public void RecordSet_SameInts_DifferentOrder_EqualsSimilarSet()
     {
-        // arrange
+        // Arrange
         RecordSet<int> set1 = [92, 117, 420,];
         RecordSet<int> set2 = [117, 420, 92,];
 
-        // act
+        // Act
         bool areEqual = set1.Equals(set2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     //[TestMethod]
     //public void RecordSet_ClonedRecord_NewUnderlyingElements()
     //{
-    //    // arrange
+    //    // Arrange
     //    RecordSet<Number> set1 = new() { new Number(92), new Number(117), new Number(420), };
 
-    //    // act
+    //    // Act
     //    RecordSet<Number> set2 = (RecordSet<Number>)typeof(RecordSet<Number>).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)[0].Invoke(new[] { set1, });
 
-    //    // assert
+    //    // Assert
     //    foreach (Number number in set1)
     //    {
     //        Assert.IsFalse(!set2.Contains(number), $"Reference of items are equivielent.");
@@ -148,15 +144,15 @@ public class RecordSetTests
     [TestMethod]
     public void RecordSet_DeserializedNewtonsoft_EqualsReserialized()
     {
-        // arrange
+        // Arrange
         RecordSet<Number> set = [new Number(92), new Number(117), new Number(420),];
 
-        // act
+        // Act
         string json = Newtonsoft.Json.JsonConvert.SerializeObject(set);
         RecordSet<Number>? recordSet = Newtonsoft.Json.JsonConvert.DeserializeObject<RecordSet<Number>>(json);
         HashSet<Number>? hashSet = Newtonsoft.Json.JsonConvert.DeserializeObject<HashSet<Number>>(json);
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordSet, "Deserialized record set is null.");
         Assert.IsNotNull(hashSet, "Deserialized hash set is null.");
         Assert.IsTrue(set.Equals(recordSet), "Deserialized set is not equal to the original set.");
@@ -167,15 +163,15 @@ public class RecordSetTests
     [TestMethod]
     public void RecordSet_DeserializedSystemTextJson_EqualsReserialized()
     {
-        // arrange
+        // Arrange
         RecordSet<Number> set = [new Number(92), new Number(117), new Number(420),];
 
-        // act
+        // Act
         string json = System.Text.Json.JsonSerializer.Serialize(set);
         RecordSet<Number>? recordSet = System.Text.Json.JsonSerializer.Deserialize<RecordSet<Number>>(json);
         HashSet<Number>? hashSet = System.Text.Json.JsonSerializer.Deserialize<HashSet<Number>>(json);
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordSet, "Deserialized record set is null.");
         Assert.IsNotNull(hashSet, "Deserialized hash set is null.");
         Assert.IsTrue(set.Equals(recordSet), "Deserialized set is not equal to the original set.");

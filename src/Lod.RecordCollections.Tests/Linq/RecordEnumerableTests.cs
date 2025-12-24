@@ -8,13 +8,13 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordList_ValidEnumerable_ReturnsRecordList()
     {
-        // arrange
+        // Arrange
         IEnumerable<Number> enumerable = Enumerable.Range(1, 10).Select(i => new Number(i));
 
-        // act
+        // Act
         RecordList<Number> recordList = enumerable.ToRecordList();
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordList);
         Assert.HasCount(enumerable.Count(), recordList);
     }
@@ -22,12 +22,12 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordList_NullEnumerable_ThrowArgumentNullException()
     {
-        // arrange
+        // Arrange
         IEnumerable<Number> enumerable = null!;
         RecordList<Number>? recordList = null;
         Exception? exception = null;
 
-        // act
+        // Act
         try
         {
             recordList = enumerable.ToRecordList();
@@ -37,7 +37,7 @@ public class RecordEnumerableTests
             exception = ex;
         }
 
-        // assert
+        // Assert
         Assert.IsNull(recordList);
         Assert.IsNotNull(exception);
         Assert.IsInstanceOfType<ArgumentNullException>(exception);
@@ -51,13 +51,13 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordDictionary_ValidParams_ReturnsRecordDictionary()
     {
-        // arrange
+        // Arrange
         IEnumerable<Number> enumerable = Enumerable.Range(1, 10).Select(i => new Number(i));
 
-        // act
+        // Act
         RecordDictionary<int, Number> recordDictionary = enumerable.ToRecordDictionary(kv => kv.Value);
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordDictionary);
         Assert.HasCount(enumerable.Count(), recordDictionary);
     }
@@ -65,13 +65,13 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordDictionary_NullEnumerableAndValidKeySelector_ThrowArgumentNullException()
     {
-        // arrange
+        // Arrange
         IEnumerable<Number> enumerable = null!;
         RecordDictionary<int, Number>? recordDictionary = null;
         Func<Number, int> keySelector = r => r.Value;
         Exception? exception = null;
 
-        // act
+        // Act
         try
         {
             recordDictionary = enumerable.ToRecordDictionary(keySelector);
@@ -81,7 +81,7 @@ public class RecordEnumerableTests
             exception = ex;
         }
 
-        // assert
+        // Assert
         Assert.IsNull(recordDictionary);
         Assert.IsNotNull(exception);
         Assert.IsInstanceOfType<ArgumentNullException>(exception);
@@ -90,13 +90,13 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordDictionary_ValidEnumerableAndNullKeySelector_ThrowArgumentNullException()
     {
-        // arrange
+        // Arrange
         IEnumerable<Number> enumerable = Enumerable.Range(1, 10).Select(i => new Number(i));
         RecordDictionary<int, Number>? recordDictionary = null;
         Func<Number, int> keySelector = null!;
         Exception? exception = null;
 
-        // act
+        // Act
         try
         {
             recordDictionary = enumerable.ToRecordDictionary(keySelector);
@@ -106,7 +106,7 @@ public class RecordEnumerableTests
             exception = ex;
         }
 
-        // assert
+        // Assert
         Assert.IsNull(recordDictionary);
         Assert.IsNotNull(exception);
         Assert.IsInstanceOfType<ArgumentNullException>(exception);
@@ -115,14 +115,14 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordDictionary_NullEnumerableAndValidKeySelectorAndValidElementSelector_ThrowArgumentNullException()
     {
-        // arrange
+        // Arrange
         IEnumerable<Number> enumerable = null!;
         RecordDictionary<int, Number>? recordDictionary = null;
         Func<Number, int> keySelector = r => r.Value;
         Func<Number, Number> elementSelector = r => r with { };
         Exception? exception = null;
 
-        // act
+        // Act
         try
         {
             recordDictionary = enumerable.ToRecordDictionary(keySelector, elementSelector);
@@ -132,7 +132,7 @@ public class RecordEnumerableTests
             exception = ex;
         }
 
-        // assert
+        // Assert
         Assert.IsNull(recordDictionary);
         Assert.IsNotNull(exception);
         Assert.IsInstanceOfType<ArgumentNullException>(exception);
@@ -141,14 +141,14 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordDictionary_ValidEnumerableAndNullKeySelectorAndValidElementSelector_ThrowArgumentNullException()
     {
-        // arrange
+        // Arrange
         IEnumerable<Number> enumerable = Enumerable.Range(0, 10).Select(i => new Number(i));
         RecordDictionary<int, Number>? recordDictionary = null;
         Func<Number, int> keySelector = null!;
         Func<Number, Number> elementSelector = r => r with { };
         Exception? exception = null;
 
-        // act
+        // Act
         try
         {
             recordDictionary = enumerable.ToRecordDictionary(keySelector, elementSelector);
@@ -158,7 +158,7 @@ public class RecordEnumerableTests
             exception = ex;
         }
 
-        // assert
+        // Assert
         Assert.IsNull(recordDictionary);
         Assert.IsNotNull(exception);
         Assert.IsInstanceOfType<ArgumentNullException>(exception);
@@ -167,14 +167,14 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordDictionary_NullEnumerableValidKeySelectorAndValidElementSelector_ThrowArgumentNullException()
     {
-        // arrange
+        // Arrange
         IEnumerable<Number> enumerable = Enumerable.Range(0, 10).Select(i => new Number(i));
         RecordDictionary<int, Number>? recordDictionary = null;
         Func<Number, int> keySelector = r => r.Value;
         Func<Number, Number> elementSelector = null!;
         Exception? exception = null;
 
-        // act
+        // Act
         try
         {
             recordDictionary = enumerable.ToRecordDictionary(keySelector, elementSelector);
@@ -184,7 +184,7 @@ public class RecordEnumerableTests
             exception = ex;
         }
 
-        // assert
+        // Assert
         Assert.IsNull(recordDictionary);
         Assert.IsNotNull(exception);
         Assert.IsInstanceOfType<ArgumentNullException>(exception);
@@ -198,13 +198,13 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordSet_ValidEnumerable_ReturnsRecordSet()
     {
-        // arrange
+        // Arrange
         IEnumerable<Number> enumerable = Enumerable.Range(1, 10).Select(i => new Number(i));
 
-        // act
+        // Act
         RecordSet<Number> recordSet = enumerable.ToRecordSet();
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordSet);
         Assert.HasCount(enumerable.Count(), recordSet);
     }
@@ -212,12 +212,12 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordSet_NullEnumerable_ThrowArgumentNullException()
     {
-        // arrange
+        // Arrange
         IEnumerable<Number> enumerable = null!;
         RecordSet<Number>? recordSet = null;
         Exception? exception = null;
 
-        // act
+        // Act
         try
         {
             recordSet = enumerable.ToRecordSet();
@@ -227,7 +227,7 @@ public class RecordEnumerableTests
             exception = ex;
         }
 
-        // assert
+        // Assert
         Assert.IsNull(recordSet);
         Assert.IsNotNull(exception);
         Assert.IsInstanceOfType<ArgumentNullException>(exception);
@@ -240,13 +240,13 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordStack_ValidEnumerable_ReturnsRecordStack()
     {
-        // arrange
+        // Arrange
         IEnumerable<Number> enumerable = Enumerable.Range(1, 10).Select(i => new Number(i));
 
-        // act
+        // Act
         RecordStack<Number> recordStack = enumerable.ToRecordStack();
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordStack);
         Assert.HasCount(enumerable.Count(), recordStack);
     }
@@ -254,12 +254,12 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordStack_NullEnumerable_ThrowArgumentNullException()
     {
-        // arrange
+        // Arrange
         IEnumerable<Number> enumerable = null!;
         RecordStack<Number>? recordStack = null;
         Exception? exception = null;
 
-        // act
+        // Act
         try
         {
             recordStack = enumerable.ToRecordStack();
@@ -269,7 +269,7 @@ public class RecordEnumerableTests
             exception = ex;
         }
 
-        // assert
+        // Assert
         Assert.IsNull(recordStack);
         Assert.IsNotNull(exception);
         Assert.IsInstanceOfType<ArgumentNullException>(exception);
@@ -278,15 +278,15 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordStack_ValidEnumerable_PreservesOrder()
     {
-        // arrange
+        // Arrange
         IEnumerable<int> enumerable = [1, 2, 3, 4, 5];
 
-        // act
+        // Act
         RecordStack<int> recordStack = enumerable.ToRecordStack();
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordStack);
-        Assert.AreEqual(5, recordStack.Count);
+        Assert.HasCount(5, recordStack);
         // Stack is LIFO, so last element should be on top
         Assert.AreEqual(5, recordStack.Peek());
     }
@@ -298,13 +298,13 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordQueue_ValidEnumerable_ReturnsRecordQueue()
     {
-        // arrange
+        // Arrange
         IEnumerable<Number> enumerable = Enumerable.Range(1, 10).Select(i => new Number(i));
 
-        // act
+        // Act
         RecordQueue<Number> recordQueue = enumerable.ToRecordQueue();
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordQueue);
         Assert.HasCount(enumerable.Count(), recordQueue);
     }
@@ -312,12 +312,12 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordQueue_NullEnumerable_ThrowArgumentNullException()
     {
-        // arrange
+        // Arrange
         IEnumerable<Number> enumerable = null!;
         RecordQueue<Number>? recordQueue = null;
         Exception? exception = null;
 
-        // act
+        // Act
         try
         {
             recordQueue = enumerable.ToRecordQueue();
@@ -327,7 +327,7 @@ public class RecordEnumerableTests
             exception = ex;
         }
 
-        // assert
+        // Assert
         Assert.IsNull(recordQueue);
         Assert.IsNotNull(exception);
         Assert.IsInstanceOfType<ArgumentNullException>(exception);
@@ -336,15 +336,15 @@ public class RecordEnumerableTests
     [TestMethod]
     public void ToRecordQueue_ValidEnumerable_PreservesOrder()
     {
-        // arrange
+        // Arrange
         IEnumerable<int> enumerable = [1, 2, 3, 4, 5];
 
-        // act
+        // Act
         RecordQueue<int> recordQueue = enumerable.ToRecordQueue();
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordQueue);
-        Assert.AreEqual(5, recordQueue.Count);
+        Assert.HasCount(5, recordQueue);
         // Queue is FIFO, so first element should be at front
         Assert.AreEqual(1, recordQueue.Peek());
     }

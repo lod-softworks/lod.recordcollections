@@ -6,23 +6,21 @@ public class RecordListTests
     [TestInitialize]
     public void SetUp()
     {
-#pragma warning disable CS0618 // Type or member is obsolete
         RecordCollectionComparer.Default = new RecordCollectionComparer();
-#pragma warning restore CS0618 // Type or member is obsolete
     }
 
-    // sanity check test
+    /// <remarks>This test is a sanity check to ensure that the default List.Equals behavior is as expected.</remarks>
     [TestMethod]
     public void List_SameInts_NotEqualsMatchingList()
     {
-        // arrange
+        // Arrange
         List<int> list1 = [92, 117, 420,];
         List<int> list2 = [92, 117, 420,];
 
-        // act
+        // Act
         bool areEqual = list1.Equals(list2);
 
-        // assert
+        // Assert
         Assert.IsFalse(areEqual);
     }
 
@@ -32,9 +30,7 @@ public class RecordListTests
     {
         // Arrange
         TestRecordCollectionComparer comparer = new();
-#pragma warning disable CS0618 // Type or member is obsolete
         RecordCollectionComparer.Default = comparer;
-#pragma warning restore CS0618 // Type or member is obsolete
 
         // Act
         RecordList<int> list = [];
@@ -46,13 +42,13 @@ public class RecordListTests
     [TestMethod]
     public void RecordList_CustomComparerConstructor_UsesProvidedComparer()
     {
-        // arrange
+        // Arrange
         TestRecordCollectionComparer comparer = new();
 
-        // act
+        // Act
         RecordList<int> list = new(comparer);
 
-        // assert
+        // Assert
         Assert.AreSame(comparer, list.Comparer);
     }
 
@@ -76,69 +72,69 @@ public class RecordListTests
     [TestMethod]
     public void RecordList_SameInts_EqualsMatchingList()
     {
-        // arrange
+        // Arrange
         RecordList<int> list1 = [92, 117, 420,];
         RecordList<int> list2 = [92, 117, 420,];
 
-        // act
+        // Act
         bool areEqual = list1.Equals(list2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     [TestMethod]
     public void RecordList_SameStrings_EqualsMatchingList()
     {
-        // arrange
+        // Arrange
         RecordList<string> list1 = ["92", "117", "420",];
         RecordList<string> list2 = ["92", "117", "420",];
 
-        // act
+        // Act
         bool areEqual = list1.Equals(list2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     [TestMethod]
     public void RecordList_SameRecords_EqualsMatchingList()
     {
-        // arrange
+        // Arrange
         RecordList<Number> list1 = [new Number(92), new Number(117), new Number(420),];
         RecordList<Number> list2 = [new Number(92), new Number(117), new Number(420),];
 
-        // act
+        // Act
         bool areEqual = list1.Equals(list2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     [TestMethod]
     public void RecordList_SameInts_DifferentOrder_NotEqualsSimilarList()
     {
-        // arrange
+        // Arrange
         RecordList<int> list1 = [92, 117, 420,];
         RecordList<int> list2 = [117, 420, 92,];
 
-        // act
+        // Act
         bool areEqual = list1.Equals(list2);
 
-        // assert
+        // Assert
         Assert.IsFalse(areEqual);
     }
 
     //[TestMethod]
     //public void RecordList_ClonedRecord_NewUnderlyingElements()
     //{
-    //    // arrange
+    //    // Arrange
     //    RecordList<Number> list1 = new() { new Number(92), new Number(117), new Number(420), };
 
-    //    // act
+    //    // Act
     //    RecordList<Number> list2 = (RecordList<Number>)typeof(RecordList<Number>).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)[0].Invoke(new[] { list1, });
 
-    //    // assert
+    //    // Assert
     //    for (int i = 0; i < list1.Count; i++)
     //    {
     //        Assert.IsFalse(ReferenceEquals(list1[i], list2[i]), $"Reference of item {i} are equivielent.");
@@ -148,28 +144,21 @@ public class RecordListTests
     [TestMethod]
     public void RecordList_DeserializedNewtonsoft_EqualsReserialized()
     {
-        // arrange
+        // Arrange
         RecordList<Number> list = [new Number(92), new Number(117), new Number(420),];
 
-        // act
+        // Act
         string json = Newtonsoft.Json.JsonConvert.SerializeObject(list);
         RecordList<Number>? recordList = Newtonsoft.Json.JsonConvert.DeserializeObject<RecordList<Number>>(json);
         Number[]? systemList = Newtonsoft.Json.JsonConvert.DeserializeObject<Number[]>(json);
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordList, "Deserialized record list is null.");
         Assert.IsNotNull(systemList, "Deserialized list is null.");
-        try
+        Assert.IsTrue(list.Equals(recordList), "Deserialized list is not equal to the original list.");
+        for (int i = 0; i < list.Count; i++)
         {
-            Assert.IsTrue(list.Equals(recordList), "Deserialized list is not equal to the original list.");
-            for (int i = 0; i < list.Count; i++)
-            {
-                Assert.IsTrue(list[i] == recordList[i], "Deserialized list is not a subset of the original list.");
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.GetHashCode();
+            Assert.IsTrue(list[i] == recordList[i], "Deserialized list is not a subset of the original list.");
         }
     }
 
@@ -177,15 +166,15 @@ public class RecordListTests
     [TestMethod]
     public void RecordList_DeserializedSystemTextJson_EqualsReserialized()
     {
-        // arrange
+        // Arrange
         RecordList<Number> list = [new Number(92), new Number(117), new Number(420),];
 
-        // act
+        // Act
         string json = System.Text.Json.JsonSerializer.Serialize(list);
         RecordList<Number>? recordList = System.Text.Json.JsonSerializer.Deserialize<RecordList<Number>>(json);
         Number[]? systemList = Newtonsoft.Json.JsonConvert.DeserializeObject<Number[]>(json);
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordList, "Deserialized record list is null.");
         Assert.IsNotNull(systemList, "Deserialized list is null.");
         Assert.IsTrue(list.Equals(recordList), "Deserialized list is not equal to the original list.");
