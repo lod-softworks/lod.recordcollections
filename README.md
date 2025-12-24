@@ -15,10 +15,50 @@ In order to include collections on records, you need a collection type which pro
 Many immutable (and mutable) records may contain arrays, lists, or other collections of sub-records; however, there is no record friendly implimentation of any collection type in .NET Framework or .NET Core.
 
 ## Usage
-The library places a Record\* collection type in the same namespace as it's underlying implementation.
-  - RecordList\<T\>, which inherits from List\<T\> both reside in the System.Collections.Generic namespace.
+The library places a Record\* collection type in the same namespace as it's underlying implementation. All collection types reside in the System.Collections.Generic namespace:
 
-The collections should behave the same as it's parent class as well. Updating a RecordList<T> while enumerating will still throw an `InvalidOperationException`, while the RecordArray will not.
+  - **RecordList\<T\>** - inherits from `List<T>`
+  - **RecordDictionary\<TKey, TValue\>** - inherits from `Dictionary<TKey, TValue>`
+  - **RecordSet\<T\>** - inherits from `HashSet<T>`
+  - **RecordStack\<T\>** - inherits from `Stack<T>`
+  - **RecordQueue\<T\>** - inherits from `Queue<T>`
+
+The collections should behave the same as their parent classes as well. Updating a `RecordList<T>` while enumerating will still throw an `InvalidOperationException`, while a RecordArray will not.
+
+## Custom Comparers
+
+You can customize how record collections compare equality by using a custom comparer. There are two ways to specify a comparer:
+
+### Overriding the Default Comparer
+
+You can set a default comparer that will be used by all record collections created without explicitly specifying a comparer:
+
+```csharp
+// .NET 6.0 or greater
+IReadOnlyRecordCollection.DefaultComparer = new MyCustomComparer();
+
+// .NET Framework 4.8 or .NET Standard 2.0 (obsolete in .NET 6.0+)
+RecordCollectionComparer.Default = new MyCustomComparer();
+```
+
+### Instance-Based Constructors
+
+All record collection types support constructors that accept an `IRecordCollectionComparer` parameter, allowing you to specify a comparer for individual instances:
+
+```csharp
+var customComparer = new MyCustomComparer();
+
+// Empty collection with custom comparer
+var list = new RecordList<int>(customComparer);
+
+// Collection from existing data with custom comparer
+var stack = new RecordStack<int>([1, 2, 3], customComparer);
+
+// Collection with capacity and custom comparer
+var queue = new RecordQueue<int>(capacity: 100, customComparer);
+```
+
+When a comparer is not provided, collections will use the default comparer (either the global default or `RecordCollectionComparer.Default`).
 
 ## ⚠ Drawbacks & Warnings
 The current implementation of this library loops through each record in the collection to determine the current hash code of the collection.
