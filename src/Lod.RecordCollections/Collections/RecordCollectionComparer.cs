@@ -75,9 +75,13 @@ public class RecordCollectionComparer
             {
                 hash = GetHashCode(startingHash, dictionary, out rollovers);
             }
+            else if (collection.GetType() is Type t && t.IsGenericType && t.GetGenericArguments()[0] is Type ta && (typeof(Stack<>).MakeGenericType(ta).IsAssignableFrom(t) || typeof(Queue<>).MakeGenericType(ta).IsAssignableFrom(t)))
+            {
+                hash = GetHashCode(startingHash, collection, false, out rollovers);
+            }
             else
             {
-                hash = GetHashCode(startingHash, collection, out rollovers);
+                hash = GetHashCode(startingHash, collection, true, out rollovers);
             }
         }
 
@@ -145,18 +149,19 @@ public class RecordCollectionComparer
     /// </summary>
     /// <param name="startingHash">The starting hash to calculate against.</param>
     /// <param name="collection">The list of elements whose hash will be calculated.</param>
+    /// <param name="ignoreOrder">Indicates whether element sequence order is important within the <paramref name="collection"/>.</param>
     /// <param name="rollovers">The number of times the hash rolles over past <see cref="int.MaxValue"/>.</param>
     /// <returns>The hash of the collections elements.</returns>
-    protected virtual int GetHashCode(int startingHash, IEnumerable collection, out int rollovers)
+    protected virtual int GetHashCode(int startingHash, IEnumerable collection, bool ignoreOrder, out int rollovers)
     {
         int hash = startingHash;
+        int i = 0;
         rollovers = 0;
 
-        // order is not important
         foreach (object item in collection)
         {
             int oldHash = hash;
-            hash += (item?.GetHashCode() ?? default) ^ 3;
+            hash += (int)Math.Pow(item?.GetHashCode() ?? default, ignoreOrder ? 3 : i++);
 
             if (oldHash > hash)
             {
@@ -177,7 +182,7 @@ public class RecordCollectionComparer
     /// <param name="x">The first collection to compare.</param>
     /// <param name="y">The second collection to compare.</param>
     public virtual new bool Equals(object? x, object? y) =>
-        x is IReadOnlyRecordCollection xCollection && y is IReadOnlyRecordCollection yCollection && Equals(xCollection, yCollection);
+        Equals(x as IReadOnlyRecordCollection, y as IReadOnlyRecordCollection);
 
     /// <summary>
     /// Indicates whether a collection is equal to another object of the same type.
@@ -185,7 +190,7 @@ public class RecordCollectionComparer
     /// <param name="x">The first collection to compare.</param>
     /// <param name="y">The second collection to compare.</param>
     public virtual bool Equals(IReadOnlyRecordCollection? x, object? y) =>
-        y is IReadOnlyRecordCollection collection && Equals(x, collection);
+        Equals(x, y as IReadOnlyRecordCollection);
 
     /// <summary>
     /// Indicates whether a collection is equal to another object of the same type.
