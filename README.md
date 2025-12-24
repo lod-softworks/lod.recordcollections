@@ -1,5 +1,7 @@
 # Record Collections
 
+![Build](https://github.com/lod-softworks/lod.recordcollections/actions/workflows/build-and-test.yml/badge.svg) ![Release](https://img.shields.io/github/v/release/lod-softworks/lod.recordcollections?sort=semver&display_name=release&logo=semanticrelease&label=Release)
+
 Generic collections that implement value-based equality for use with C# records. Drop-in replacements for standard collections that work correctly with record equality comparison.
 
 ## Available Collections
@@ -79,11 +81,11 @@ var cloned = original with { }; // Creates new collection with cloned elements
 
 The `RecordEnumerable` class (in the `System.Linq` namespace) provides extension methods similar to `Enumerable`, but for creating Record Collections from any `IEnumerable<T>`. These methods mirror the standard LINQ `ToList()`, `ToDictionary()`, etc., but return Record Collections instead:
 
-- **ToRecordList()** - Creates a new `RecordList<T>` from an `IEnumerable<T>`
-- **ToRecordList()** - Creates a new `RecordDictionary<TKey, TValue>` from an `IEnumerable<T> `and key/value delegate selectors.
-- **ToRecordSet()** - Creates a new `RecordSet<T>` from an `IEnumerable<T>`
-- **ToRecordStack()** - Creates a new `RecordStack<T>` from an `IEnumerable<T>`
-- **ToRecordQueue()** - Creates a new `RecordQueue<T>` from an `IEnumerable<T>`
+- **ToRecordList** - Creates a new `RecordList<T>` from an `IEnumerable<T>`
+- **ToRecordList** - Creates a new `RecordDictionary<TKey, TValue>` from an `IEnumerable<T> `and key/value delegate selectors.
+- **ToRecordSet** - Creates a new `RecordSet<T>` from an `IEnumerable<T>`
+- **ToRecordStack** - Creates a new `RecordStack<T>` from an `IEnumerable<T>`
+- **ToRecordQueue** - Creates a new `RecordQueue<T>` from an `IEnumerable<T>`
 
 ```csharp
 var numbers = Enumerable.Range(1, 10).Select(i => new Number(i));
@@ -148,4 +150,3 @@ The current implementation of this library loops through each element in the col
 The library is intended to provide a default but extendable implementation of common collections. It works great for data models with small collections; however, when used with large data sets performance will start to deteriorate.
 
 **Note:** See the [Cloning](#cloning) section for details on how collection cloning works.
-
