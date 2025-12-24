@@ -6,7 +6,7 @@
 public static class RecordEnumerable
 {
     /// <summary>
-    /// Creates a <see cref="RecordList{T}"/> from an <see cref="IEnumerable{T}"/>.
+    /// Creates a <see cref="RecordList{T}"/> from the elements of an <see cref="IEnumerable{T}"/>.
     /// </summary>
     /// <typeparam name="T">The record element type.</typeparam>
     /// <param name="enumerable">The enumerable sequence of records.</param>
@@ -59,7 +59,7 @@ public static class RecordEnumerable
     }
 
     /// <summary>
-    /// Creates a <see cref="RecordSet{T}"/> from an <see cref="IEnumerable{T}"/>.
+    /// Creates a <see cref="RecordSet{T}"/> from the elements of an <see cref="IEnumerable{T}"/>.
     /// </summary>
     /// <typeparam name="T">The record element type.</typeparam>
     /// <param name="enumerable">The enumerable sequence of records.</param>

@@ -69,7 +69,7 @@ public partial class RecordSet<T> : HashSet<T>
     /// <param name="collection">The collection whose elements are copied to the new set.</param>
     /// <param name="comparer">The comparer used for record equality.</param>
     public RecordSet(IEnumerable<T> collection, IRecordCollectionComparer? comparer)
-        : base(new HashSet<T>(collection))
+        : base(collection)
     {
         Comparer = comparer ?? RecordCollectionComparer.Default;
     }
@@ -91,7 +91,7 @@ public partial class RecordSet<T> : HashSet<T>
     /// <param name="capacity">The number of elements that the new set can initially store.</param>
     /// <param name="comparer">The comparer used for record equality.</param>
     public RecordSet(int capacity, IRecordCollectionComparer? comparer)
-        : base(new HashSet<T>(capacity))
+        : base(capacity)
     {
         Comparer = comparer ?? RecordCollectionComparer.Default;
     }
