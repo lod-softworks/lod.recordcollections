@@ -45,9 +45,7 @@ jobs:
 
     # This step shouldn't be required but cannot get pdb to build into netstandard2.0 directory and nuget pack won't pack without it
     - name: Copy Debug Files
-      run: |
-        Copy-Item ./src/Lod.RecordCollections.IlAssembler/bin/Release/net10.0/Lod.RecordCollections.pdb -Destination ./src/Lod.RecordCollections/bin/Release/netstandard2.0
-        Get-ChildItem -Recurse
+      run: Get-ChildItem -Recurse
 
     - name: NuGet Pack (Tag)
       if: ${{ github.event.release.tag_name != null }}
