@@ -15,12 +15,6 @@
     <DebugType>portable</DebugType>
   </PropertyGroup>
 
-  <!-- Explicitly enable symbols in Release configurations (they're ignored from the default PropertyGroup) -->
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
   <PropertyGroup>
     <PackageId>Lod.RecordCollections</PackageId>
     <Version>0.1.0</Version>
