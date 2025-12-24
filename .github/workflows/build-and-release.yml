@@ -26,7 +26,7 @@ jobs:
       run: dotnet restore ./src/Lod.RecordCollections.sln
 
     - name: Build
-      run: dotnet build ./src/Lod.RecordCollections.sln -c Release --no-restore -p:DebugType=portable -p:CopyOutputSymbolsToOutputDirectory=true
+      run: dotnet build ./src/Lod.RecordCollections.sln -c Release --no-restore -p:DebugType=portable -p:DebugSymbols=true
 
     - name: Test
       run: dotnet test ./src/Lod.RecordCollections.sln -c Release --no-restore --no-build
@@ -43,10 +43,6 @@ jobs:
     - name: IL Class/Record Conversion (net10.0))
       run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net10.0/Lod.RecordCollections.IlAssembler.dll D:\a\lod.recordcollections\lod.recordcollections\src\Lod.RecordCollections\bin\Release\net10.0\Lod.RecordCollections.dll
 
-    # This step shouldn't be required but cannot get pdb to build into netstandard2.0 directory and nuget pack won't pack without it
-    - name: Copy Debug Files
-      run: Get-ChildItem -Recurse
-
     - name: NuGet Pack (Tag)
       if: ${{ github.event.release.tag_name != null }}
       run: dotnet pack ./src/Lod.RecordCollections/Lod.RecordCollections.csproj -c Release --no-restore --include-symbols --no-build -p:Version=${{ github.event.release.tag_name }} -p:PackageVersion=${{ github.event.release.tag_name }}
@@ -56,7 +52,7 @@ jobs:
 
     - name: NuGet Push (Tag)
       if: ${{ github.event.release.tag_name != null }}
-      run: dotnet nuget push ./src/Lod.RecordCollections/bin/Release/Lod.RecordCollections.${{ github.event.release.tag_name }}.nupkg --api-key ${{ secrets.NUGET }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./src/Lod.RecordCollections/bin/Release/Lod.RecordCollections.${{ github.event.release.tag_name }}.nupkg --api-key ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json
     - name: NuGet Push (Manual)
       if: ${{ inputs.tag != null }}
-      run: dotnet nuget push ./src/Lod.RecordCollections/bin/Release/Lod.RecordCollections.${{ inputs.tag }}.nupkg --api-key ${{ secrets.NUGET }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./src/Lod.RecordCollections/bin/Release/Lod.RecordCollections.${{ inputs.tag }}.nupkg --api-key ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json
