@@ -39,7 +39,7 @@ jobs:
       run: dotnet restore ./src/Lod.RecordCollections.sln
 
     - name: Build
-      run: dotnet build ./src/Lod.RecordCollections.sln -c Release --no-restore -p:DebugType=portable -p:DebugSymbols=true
+      run: dotnet build ./src/Lod.RecordCollections.sln -c Release --no-restore -p:DebugType=portable -p:DebugSymbols=true -p:Version=${{ steps.set-version.outputs.version }} -p:AssemblyVersion=${{ steps.set-version.outputs.version }} -p:FileVersion=${{ steps.set-version.outputs.version }}
 
     - name: Test
       run: dotnet test ./src/Lod.RecordCollections.sln -c Release --no-restore --no-build
