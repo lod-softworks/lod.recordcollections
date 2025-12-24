@@ -6,23 +6,21 @@ public class RecordStackTests
     [TestInitialize]
     public void SetUp()
     {
-#pragma warning disable CS0618 // Type or member is obsolete
         RecordCollectionComparer.Default = new RecordCollectionComparer();
-#pragma warning restore CS0618 // Type or member is obsolete
     }
 
-    // sanity check test
+    /// <remarks>This test is a sanity check to ensure that the default Stack.Equals behavior is as expected.</remarks>
     [TestMethod]
     public void Stack_SameInts_NotEqualsMatchingStack()
     {
-        // arrange
+        // Arrange
         Stack<int> stack1 = new([92, 117, 420]);
         Stack<int> stack2 = new([92, 117, 420]);
 
-        // act
+        // Act
         bool areEqual = stack1.Equals(stack2);
 
-        // assert
+        // Assert
         Assert.IsFalse(areEqual);
     }
 
@@ -32,9 +30,7 @@ public class RecordStackTests
     {
         // Arrange
         TestRecordCollectionComparer comparer = new();
-#pragma warning disable CS0618 // Type or member is obsolete
         RecordCollectionComparer.Default = comparer;
-#pragma warning restore CS0618 // Type or member is obsolete
 
         // Act
         RecordStack<int> stack = new();
@@ -46,13 +42,13 @@ public class RecordStackTests
     [TestMethod]
     public void RecordStack_CustomComparerConstructor_UsesProvidedComparer()
     {
-        // arrange
+        // Arrange
         TestRecordCollectionComparer comparer = new();
 
-        // act
+        // Act
         RecordStack<int> stack = new(comparer);
 
-        // assert
+        // Assert
         Assert.AreSame(comparer, stack.Comparer);
     }
 
@@ -76,74 +72,74 @@ public class RecordStackTests
     [TestMethod]
     public void RecordStack_SameInts_EqualsMatchingStack()
     {
-        // arrange
+        // Arrange
         RecordStack<int> stack1 = new([92, 117, 420]);
         RecordStack<int> stack2 = new([92, 117, 420]);
 
-        // act
+        // Act
         bool areEqual = stack1.Equals(stack2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     [TestMethod]
     public void RecordStack_SameStrings_EqualsMatchingStack()
     {
-        // arrange
+        // Arrange
         RecordStack<string> stack1 = new(["92", "117", "420"]);
         RecordStack<string> stack2 = new(["92", "117", "420"]);
 
-        // act
+        // Act
         bool areEqual = stack1.Equals(stack2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     [TestMethod]
     public void RecordStack_SameRecords_EqualsMatchingStack()
     {
-        // arrange
+        // Arrange
         RecordStack<Number> stack1 = new([new Number(92), new Number(117), new Number(420)]);
         RecordStack<Number> stack2 = new([new Number(92), new Number(117), new Number(420)]);
 
-        // act
+        // Act
         bool areEqual = stack1.Equals(stack2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     [TestMethod]
     public void RecordStack_SameInts_DifferentOrder_NotEqualsSimilarStack()
     {
-        // arrange
+        // Arrange
         RecordStack<int> stack1 = new([92, 117, 420]);
         RecordStack<int> stack2 = new([420, 117, 92]);
 
-        // act
+        // Act
         bool areEqual = stack1.Equals(stack2);
 
-        // assert
+        // Assert
         Assert.IsFalse(areEqual);
     }
 
     [TestMethod]
     public void RecordStack_PushPop_OrderPreserved()
     {
-        // arrange
+        // Arrange
         RecordStack<int> stack = new();
         stack.Push(92);
         stack.Push(117);
         stack.Push(420);
 
-        // act
+        // Act
         int third = stack.Pop();
         int second = stack.Pop();
         int first = stack.Pop();
 
-        // assert
+        // Assert
         Assert.AreEqual(420, third);
         Assert.AreEqual(117, second);
         Assert.AreEqual(92, first);
@@ -152,38 +148,38 @@ public class RecordStackTests
     [TestMethod]
     public void RecordStack_DeserializedNewtonsoft_EqualsReserialized()
     {
-        // arrange
+        // Arrange
         RecordStack<Number> stack = new([new Number(92), new Number(117), new Number(420)]);
 
-        // act
+        // Act
         string json = Newtonsoft.Json.JsonConvert.SerializeObject(stack);
         RecordStack<Number>? recordStack = Newtonsoft.Json.JsonConvert.DeserializeObject<RecordStack<Number>>(json);
         Stack<Number>? systemStack = Newtonsoft.Json.JsonConvert.DeserializeObject<Stack<Number>>(json);
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordStack, "Deserialized record stack is null.");
         Assert.IsNotNull(systemStack, "Deserialized stack is null.");
         Assert.IsTrue(stack.Equals(recordStack), "Deserialized stack is not equal to the original stack.");
-        Assert.AreEqual(stack.Count, recordStack.Count, "Deserialized stack count does not match.");
+        Assert.HasCount(stack.Count, recordStack, "Deserialized stack count does not match.");
     }
 
 #if !NETFRAMEWORK
     [TestMethod]
     public void RecordStack_DeserializedSystemTextJson_EqualsReserialized()
     {
-        // arrange
+        // Arrange
         RecordStack<Number> stack = new([new Number(92), new Number(117), new Number(420)]);
 
-        // act
+        // Act
         string json = System.Text.Json.JsonSerializer.Serialize(stack);
         RecordStack<Number>? recordStack = System.Text.Json.JsonSerializer.Deserialize<RecordStack<Number>>(json);
         Stack<Number>? systemStack = System.Text.Json.JsonSerializer.Deserialize<Stack<Number>>(json);
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordStack, "Deserialized record stack is null.");
         Assert.IsNotNull(systemStack, "Deserialized stack is null.");
         Assert.IsTrue(stack.Equals(recordStack), "Deserialized stack is not equal to the original stack.");
-        Assert.AreEqual(stack.Count, recordStack.Count, "Deserialized stack count does not match.");
+        Assert.HasCount(stack.Count, recordStack, "Deserialized stack count does not match.");
     }
 #endif
 

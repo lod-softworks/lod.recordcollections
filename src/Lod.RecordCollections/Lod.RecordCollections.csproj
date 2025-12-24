@@ -19,7 +19,7 @@
     <PackageId>Lod.RecordCollections</PackageId>
     <Version>0.1.0</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>record collection recordcollection recordlist recordhset recordarray recorddictionary</PackageTags>
+    <PackageTags>record collection recordcollection recordlist recorddictionary recordset recordarray recordqueue recordstack valuecollection</PackageTags>
     <PackageProjectUrl>https://github.com/lod-softworks/lod.recordcollections</PackageProjectUrl>
     <PackageIcon>docs\icon.png</PackageIcon>
     <PackageReadmeFile>docs\README.md</PackageReadmeFile>
