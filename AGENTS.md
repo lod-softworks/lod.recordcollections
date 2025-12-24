@@ -52,6 +52,21 @@ This document defines how automated agents (such as Cursor, GitHub Copilot, or o
 - When adding a new interface to a collection, introduce or update the corresponding partial file instead of expanding the base class.
 - Use the existing `RecordDictionary` split as the authoritative reference for how the files should nest and be named.
 
+## Comparers and Interface Implementations
+
+- All equality, comparison, and interface implementations **must directly delegate to the collection’s `Comparer`** (the `IRecordCollectionComparer` instance) and **must not**:
+  - Call other helper methods on the same type,
+  - Contain additional in-class comparison logic,
+  - Or depend on inheritance/overrides to “fix up” behavior.
+- This rule applies to all equality/comparison-related interfaces, including (but not limited to): `IEquatable<T>`, `IComparable<T>`, `IEqualityComparer`, `IEqualityComparer<T>`, `IComparer`, `IComparer<T>`, `IStructuralEquatable`, and `IStructuralComparable`.
+
+## Framework Compatibility (Collections + Extension Methods)
+
+- All collections and extension methods should behave like their base/corelib counterparts for:
+  - **Null handling**: ignore nulls or throw exactly as the framework would for the analogous API.
+  - **Exception behavior**: throw the same exception types the framework throws for the analogous API. Prefer using the BCL-style exceptions (e.g., `ArgumentNullException`, `ArgumentOutOfRangeException`, `InvalidOperationException`) and avoid “custom” exception types for standard argument/state errors.
+  - **Enumerator invalidation**: behaviors such as mutating a list during enumeration must throw `InvalidOperationException` (like `List<T>`), even when a naive array-style implementation would not.
+
 ## Git Committing
 
 - Prefer **small, focused commits** that are easy to understand, review, and diff.
