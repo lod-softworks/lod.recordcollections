@@ -234,4 +234,63 @@ public class RecordEnumerableTests
     }
 
     #endregion
+
+    #region ToRecordStack
+
+    [TestMethod]
+    public void ToRecordStack_ValidEnumerable_ReturnsRecordStack()
+    {
+        // arrange
+        IEnumerable<Number> enumerable = Enumerable.Range(1, 10).Select(i => new Number(i));
+
+        // act
+        RecordStack<Number> recordStack = enumerable.ToRecordStack();
+
+        // assert
+        Assert.IsNotNull(recordStack);
+        Assert.HasCount(enumerable.Count(), recordStack);
+    }
+
+    [TestMethod]
+    public void ToRecordStack_NullEnumerable_ThrowArgumentNullException()
+    {
+        // arrange
+        IEnumerable<Number> enumerable = null!;
+        RecordStack<Number>? recordStack = null;
+        Exception? exception = null;
+
+        // act
+        try
+        {
+            recordStack = enumerable.ToRecordStack();
+        }
+        catch (Exception ex)
+        {
+            exception = ex;
+        }
+
+        // assert
+        Assert.IsNull(recordStack);
+        Assert.IsNotNull(exception);
+        Assert.IsInstanceOfType<ArgumentNullException>(exception);
+    }
+
+    [TestMethod]
+    public void ToRecordStack_ValidEnumerable_PreservesOrder()
+    {
+        // arrange
+        IEnumerable<int> enumerable = [1, 2, 3, 4, 5];
+
+        // act
+        RecordStack<int> recordStack = enumerable.ToRecordStack();
+
+        // assert
+        Assert.IsNotNull(recordStack);
+        Assert.AreEqual(5, recordStack.Count);
+        // Stack is LIFO, so last element should be on top
+        Assert.AreEqual(5, recordStack.Peek());
+    }
+
+    #endregion
+
 }

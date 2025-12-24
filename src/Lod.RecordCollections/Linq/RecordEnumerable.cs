@@ -67,4 +67,15 @@ public static class RecordEnumerable
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="enumerable"/> is null.</exception>
     public static RecordSet<T> ToRecordSet<T>(this IEnumerable<T> enumerable) where T : IEquatable<T> =>
         enumerable != null ? [.. enumerable] : throw new ArgumentNullException(nameof(enumerable));
+
+    /// <summary>
+    /// Creates a <see cref="RecordStack{T}"/> from the elements of an <see cref="IEnumerable{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The record element type.</typeparam>
+    /// <param name="enumerable">The enumerable sequence of records.</param>
+    /// <returns>A <see cref="RecordStack{T}"/> that contains the record elements from the input <paramref name="enumerable"/>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="enumerable"/> is null.</exception>
+    public static RecordStack<T> ToRecordStack<T>(this IEnumerable<T> enumerable) where T : IEquatable<T> =>
+        enumerable != null ? new RecordStack<T>(enumerable) : throw new ArgumentNullException(nameof(enumerable));
+
 }
