@@ -6,23 +6,21 @@ public class RecordDictionaryTests
     [TestInitialize]
     public void SetUp()
     {
-#pragma warning disable CS0618 // Type or member is obsolete
         RecordCollectionComparer.Default = new RecordCollectionComparer();
-#pragma warning restore CS0618 // Type or member is obsolete
     }
 
-    // sanity check test
+    /// <remarks>This test is a sanity check to ensure that the default Dictionary.Equals behavior is as expected.</remarks>
     [TestMethod]
     public void Dictionary_SameInts_NotEqualsMatchingDictionary()
     {
-        // arrange
+        // Arrange
         Dictionary<int, string> dictionary1 = new() { { 92, "92" }, { 117, "117" }, { 420, "420" }, };
         Dictionary<int, string> dictionary2 = new() { { 92, "92" }, { 117, "117" }, { 420, "420" }, };
 
-        // act
+        // Act
         bool areEqual = dictionary1.Equals(dictionary2);
 
-        // assert
+        // Assert
         Assert.IsFalse(areEqual);
     }
 
@@ -32,9 +30,7 @@ public class RecordDictionaryTests
     {
         // Arrange
         TestRecordCollectionComparer comparer = new();
-#pragma warning disable CS0618 // Type or member is obsolete
         RecordCollectionComparer.Default = comparer;
-#pragma warning restore CS0618 // Type or member is obsolete
 
         // Act
         RecordDictionary<int, string> dictionary = [];
@@ -46,13 +42,13 @@ public class RecordDictionaryTests
     [TestMethod]
     public void RecordDictionary_CustomComparerConstructor_UsesProvidedComparer()
     {
-        // arrange
+        // Arrange
         TestRecordCollectionComparer comparer = new();
 
-        // act
+        // Act
         RecordDictionary<int, string> dictionary = new(comparer);
 
-        // assert
+        // Assert
         Assert.AreSame(comparer, dictionary.Comparer);
     }
 
@@ -76,69 +72,69 @@ public class RecordDictionaryTests
     [TestMethod]
     public void RecordDictionary_SameInts_EqualsMatchingDictionary()
     {
-        // arrange
+        // Arrange
         RecordDictionary<int, string> dictionary1 = new() { { 92, "92" }, { 117, "117" }, { 420, "420" }, };
         RecordDictionary<int, string> dictionary2 = new() { { 92, "92" }, { 117, "117" }, { 420, "420" }, };
 
-        // act
+        // Act
         bool areEqual = dictionary1.Equals(dictionary2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     [TestMethod]
     public void RecordDictionary_SameStrings_EqualsMatchingDictionary()
     {
-        // arrange
+        // Arrange
         RecordDictionary<string, int> dictionary1 = new() { { "92", 92 }, { "117", 117 }, { "420", 420 }, };
         RecordDictionary<string, int> dictionary2 = new() { { "92", 92 }, { "117", 117 }, { "420", 420 }, };
 
-        // act
+        // Act
         bool areEqual = dictionary1.Equals(dictionary2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     [TestMethod]
     public void RecordDictionary_SameRecords_EqualsMatchingDictionary()
     {
-        // arrange
+        // Arrange
         RecordDictionary<string, Number> dictionary1 = new() { { "1", new Number(92) }, { "2", new Number(117) }, { "3", new Number(420) }, };
         RecordDictionary<string, Number> dictionary2 = new() { { "1", new Number(92) }, { "2", new Number(117) }, { "3", new Number(420) }, };
 
-        // act
+        // Act
         bool areEqual = dictionary1.Equals(dictionary2);
 
-        // assert
+        // Assert
         Assert.IsTrue(areEqual);
     }
 
     [TestMethod]
     public void RecordDictionary_SameInts_DifferentOrder_NotEqualsSimilarDictionary()
     {
-        // arrange
+        // Arrange
         Dictionary<int, string> dictionary1 = new() { { 92, "92" }, { 117, "117" }, { 420, "420" }, };
         Dictionary<int, string> dictionary2 = new() { { 117, "117" }, { 420, "420" }, { 92, "92" }, };
 
-        // act
+        // Act
         bool areEqual = dictionary1.Equals(dictionary2);
 
-        // assert
+        // Assert
         Assert.IsFalse(areEqual);
     }
 
     //[TestMethod]
     //public void RecordDictionary_ClonedRecords_NewUnderlyingElements()
     //{
-    //    // arrange
+    //    // Arrange
     //    RecordDictionary<Number> dictionary1 = new() { new Number(92), new Number(117), new Number(420), };
 
-    //    // act
+    //    // Act
     //    RecordDictionary<Number> dictionary2 = (RecordDictionary<Number>)typeof(RecordDictionary<Number>).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)[0].Invoke(new[] { dictionary1, });
 
-    //    // assert
+    //    // Assert
     //    for (int i = 0; i < dictionary1.Count; i++)
     //    {
     //        Assert.IsFalse(ReferenceEquals(dictionary1[i], dictionary2[i]), $"Reference of item {i} are equivielent.");
@@ -148,15 +144,15 @@ public class RecordDictionaryTests
     [TestMethod]
     public void RecordDictionary_DeserializedNewtonsoft_EqualsReserialized()
     {
-        // arrange
+        // Arrange
         RecordDictionary<string, Number> dictionary = new() { { "1", new Number(92) }, { "2", new Number(117) }, { "3", new Number(420) }, };
 
-        // act
+        // Act
         string json = Newtonsoft.Json.JsonConvert.SerializeObject(dictionary);
         RecordDictionary<string, Number>? recordDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<RecordDictionary<string, Number>>(json);
         Dictionary<string, Number>? systemDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Number>>(json);
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordDictionary, "Deserialized record dictionary is null.");
         Assert.IsNotNull(systemDictionary, "Deserialized dictionary is null.");
         Assert.IsTrue(dictionary.Equals(recordDictionary), "Deserialized dictionary is not equal to the original dictionary.");
@@ -170,15 +166,15 @@ public class RecordDictionaryTests
     [TestMethod]
     public void RecordDictionary_DeserializedSystemTextJson_EqualsReserialized()
     {
-        // arrange
+        // Arrange
         RecordDictionary<string, Number> dictionary = new() { { "1", new Number(92) }, { "2", new Number(117) }, { "3", new Number(420) }, };
 
-        // act
+        // Act
         string json = System.Text.Json.JsonSerializer.Serialize(dictionary);
         RecordDictionary<string, Number>? recordDictionary = System.Text.Json.JsonSerializer.Deserialize<RecordDictionary<string, Number>>(json);
         Dictionary<string, Number>? systemDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Number>>(json);
 
-        // assert
+        // Assert
         Assert.IsNotNull(recordDictionary, "Deserialized record dictionary is null.");
         Assert.IsNotNull(systemDictionary, "Deserialized dictionary is null.");
         Assert.IsTrue(dictionary.Equals(recordDictionary), "Deserialized dictionary is not equal to the original dictionary.");
