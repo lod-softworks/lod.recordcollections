@@ -1,12 +1,22 @@
+using System.Diagnostics;
+
 namespace Lod.RecordCollections.Tests.Collections.Generic;
 
 [TestClass]
 public class RecordStackTests
 {
+    public TestContext TestContext { get; set; } = null!;
+
     [TestInitialize]
     public void SetUp()
     {
         RecordCollectionComparer.Default = new RecordCollectionComparer();
+    }
+
+    private static int GetSizeOrDefault(int @default)
+    {
+        string? raw = Environment.GetEnvironmentVariable("RECORDCOLLECTION_STRESS_SIZE");
+        return int.TryParse(raw, out int size) && size > 0 ? size : @default;
     }
 
     /// <remarks>This test is a sanity check to ensure that the default Stack.Equals behavior is as expected.</remarks>
@@ -26,6 +36,7 @@ public class RecordStackTests
 
     [TestMethod]
     [RepeatTestMethod(3)]
+    [DoNotParallelize]
     public void RecordStack_DefaultConstructor_UsesDefaultComparer()
     {
         // Arrange
@@ -84,6 +95,17 @@ public class RecordStackTests
     }
 
     [TestMethod]
+    public void RecordStack_Equals_Matching_SystemStack()
+    {
+        // Arrange
+        RecordStack<int> record = new([1, 2, 3]);
+        Stack<int> system = new([1, 2, 3]);
+
+        // Act & Assert
+        Assert.IsTrue(record.Equals(system));
+    }
+
+    [TestMethod]
     public void RecordStack_SameStrings_EqualsMatchingStack()
     {
         // Arrange
@@ -117,6 +139,62 @@ public class RecordStackTests
         // Arrange
         RecordStack<int> stack1 = new([92, 117, 420]);
         RecordStack<int> stack2 = new([420, 117, 92]);
+
+        // Act
+        bool areEqual = stack1.Equals(stack2);
+
+        // Assert
+        Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    public void RecordStack_DifferentValues_NotEquals()
+    {
+        // Arrange
+        RecordStack<int> stack1 = new([92, 117, 420]);
+        RecordStack<int> stack2 = new([92, 117, 421]);
+
+        // Act
+        bool areEqual = stack1.Equals(stack2);
+
+        // Assert
+        Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    public void RecordStack_DifferentSizes_NotEquals()
+    {
+        // Arrange
+        RecordStack<int> stack1 = new([92, 117, 420]);
+        RecordStack<int> stack2 = new([92, 117]);
+
+        // Act
+        bool areEqual = stack1.Equals(stack2);
+
+        // Assert
+        Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    public void RecordStack_EmptyVsNonEmpty_NotEquals()
+    {
+        // Arrange
+        RecordStack<int> stack1 = new();
+        RecordStack<int> stack2 = new([92, 117, 420]);
+
+        // Act
+        bool areEqual = stack1.Equals(stack2);
+
+        // Assert
+        Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    public void RecordStack_OneValueDifferent_NotEquals()
+    {
+        // Arrange
+        RecordStack<int> stack1 = new([1, 2, 3, 4, 5]);
+        RecordStack<int> stack2 = new([1, 2, 99, 4, 5]);
 
         // Act
         bool areEqual = stack1.Equals(stack2);
@@ -196,6 +274,99 @@ public class RecordStackTests
         Assert.IsTrue(originalElements.SetEquals(deserializedElements), "Deserialized stack has different elements.");
     }
 #endif
+
+    [TestMethod]
+    public void Stress_RecordStack_Int32_Compare_And_Time()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+
+        RecordStack<int> left = new(capacity: n);
+        RecordStack<int> right = new(capacity: n);
+
+        for (int i = 0; i < n; i++)
+        {
+            left.Push(i);
+            right.Push(i);
+        }
+
+        Stopwatch sw = Stopwatch.StartNew();
+        Assert.IsTrue(left.Equals(right));
+        sw.Stop();
+        TestContext.WriteLine($"RecordStack<int>.Equals (n={n:n0}) = {sw.ElapsedMilliseconds:n0} ms");
+    }
+
+    [TestMethod]
+    [RepeatTestMethod(10)]
+    public void Stress_RecordStack_Int32_Random_Compare_And_Time()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+        Random random = new();
+
+        RecordStack<int> left = new(capacity: n);
+        RecordStack<int> right = new(capacity: n);
+
+        for (int i = 0; i < n; i++)
+        {
+            int value = random.Next();
+            left.Push(value);
+            right.Push(value);
+        }
+
+        Stopwatch sw = Stopwatch.StartNew();
+        Assert.IsTrue(left.Equals(right));
+        sw.Stop();
+        TestContext.WriteLine($"RecordStack<int>.Equals with random values (n={n:n0}) = {sw.ElapsedMilliseconds:n0} ms");
+    }
+
+    [TestMethod]
+    public void Stress_RecordStack_Int32_Random_OneDifference_NotEquals()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+        Random random = new();
+        List<int> values = new(capacity: n);
+
+        RecordStack<int> left = new(capacity: n);
+        RecordStack<int> right = new(capacity: n);
+
+        // Add same random values to both collections
+        for (int i = 0; i < n; i++)
+        {
+            int value = random.Next();
+            values.Add(value);
+            left.Push(value);
+            right.Push(value);
+        }
+
+        // Rebuild right stack with one difference at a random position
+        right = new RecordStack<int>(capacity: n);
+        int differenceIndex = random.Next(0, n);
+        int originalValue = values[differenceIndex];
+        int differentValue = random.Next();
+        // Ensure the different value is actually different
+        while (differentValue == originalValue)
+        {
+            differentValue = random.Next();
+        }
+
+        // Push values in reverse order (stack is LIFO)
+        for (int i = n - 1; i >= 0; i--)
+        {
+            if (i == differenceIndex)
+            {
+                right.Push(differentValue);
+            }
+            else
+            {
+                right.Push(values[i]);
+            }
+        }
+
+        // Act
+        bool areEqual = left.Equals(right);
+
+        // Assert
+        Assert.IsFalse(areEqual, $"Collections should not be equal with one difference at index {differenceIndex}");
+    }
 
     #region Support Types
 

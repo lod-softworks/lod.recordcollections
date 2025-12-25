@@ -1,15 +1,14 @@
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 namespace System.Collections;
 
 /// <summary>
 /// Provides a base class for implementations of <see cref="IRecordCollectionComparer"/> which exposes methods to support the comparison of record collections.
 /// </summary>
-public class RecordCollectionComparer
+public partial class RecordCollectionComparer
     : IRecordCollectionComparer
 {
-    private static readonly ConcurrentDictionary<Type, IComparisonStrategy> StrategyCache = new();
+    private static ConcurrentDictionary<Type, IComparisonStrategy> StrategyCache { get; } = [];
 
     /// <summary>
     /// Gets the default comparer for record collections.
@@ -245,32 +244,34 @@ public class RecordCollectionComparer
 
     private static IComparisonStrategy CreateStrategy(Type recordCollectionType)
     {
-        if (TryGetGenericBase(recordCollectionType, typeof(global::System.Collections.Generic.RecordList<>), out Type[]? listArgs))
+        IComparisonStrategy strategy;
+
+        if (TryGetGenericBase(recordCollectionType, typeof(RecordList<>), out Type[]? listArgs) && listArgs?.Length == 1)
         {
-            return (IComparisonStrategy)Activator.CreateInstance(typeof(ListStrategy<>).MakeGenericType(listArgs))!;
+            strategy = (IComparisonStrategy)Activator.CreateInstance(typeof(ListStrategy<>).MakeGenericType(listArgs))!;
+        }
+        else if (TryGetGenericBase(recordCollectionType, typeof(RecordDictionary<,>), out Type[]? dictArgs) && dictArgs?.Length == 2)
+        {
+            strategy = (IComparisonStrategy)Activator.CreateInstance(typeof(DictionaryStrategy<,>).MakeGenericType(dictArgs))!;
+        }
+        else if (TryGetGenericBase(recordCollectionType, typeof(RecordSet<>), out Type[]? setArgs) && setArgs?.Length == 1)
+        {
+            strategy = (IComparisonStrategy)Activator.CreateInstance(typeof(SetStrategy<>).MakeGenericType(setArgs))!;
+        }
+        else if (TryGetGenericBase(recordCollectionType, typeof(RecordQueue<>), out Type[]? queueArgs) && queueArgs?.Length == 1)
+        {
+            strategy = (IComparisonStrategy)Activator.CreateInstance(typeof(OrderedEnumerableStrategy<>).MakeGenericType(queueArgs))!;
+        }
+        else if (TryGetGenericBase(recordCollectionType, typeof(RecordStack<>), out Type[]? stackArgs) && stackArgs?.Length == 1)
+        {
+            strategy = (IComparisonStrategy)Activator.CreateInstance(typeof(OrderedEnumerableStrategy<>).MakeGenericType(stackArgs))!;
+        }
+        else
+        {
+            strategy = new DefaultStrategy();
         }
 
-        if (TryGetGenericBase(recordCollectionType, typeof(global::System.Collections.Generic.RecordQueue<>), out Type[]? queueArgs))
-        {
-            return (IComparisonStrategy)Activator.CreateInstance(typeof(QueueStrategy<>).MakeGenericType(queueArgs))!;
-        }
-
-        if (TryGetGenericBase(recordCollectionType, typeof(global::System.Collections.Generic.RecordStack<>), out Type[]? stackArgs))
-        {
-            return (IComparisonStrategy)Activator.CreateInstance(typeof(StackStrategy<>).MakeGenericType(stackArgs))!;
-        }
-
-        if (TryGetGenericBase(recordCollectionType, typeof(global::System.Collections.Generic.RecordSet<>), out Type[]? setArgs))
-        {
-            return (IComparisonStrategy)Activator.CreateInstance(typeof(SetStrategy<>).MakeGenericType(setArgs))!;
-        }
-
-        if (TryGetGenericBase(recordCollectionType, typeof(global::System.Collections.Generic.RecordDictionary<,>), out Type[]? dictArgs))
-        {
-            return (IComparisonStrategy)Activator.CreateInstance(typeof(DictionaryStrategy<,>).MakeGenericType(dictArgs))!;
-        }
-
-        return new FallbackStrategy();
+        return strategy;
     }
 
     private static bool TryGetGenericBase(Type candidate, Type openGenericBase, out Type[]? genericArguments)
@@ -290,332 +291,6 @@ public class RecordCollectionComparer
         return false;
     }
 
-    private interface IComparisonStrategy
-    {
-        bool Equals(IReadOnlyRecordCollection x, object y);
-        int GetHashCode(IReadOnlyRecordCollection x, int startingHash);
-    }
-
-    private sealed class ListStrategy<T> : IComparisonStrategy
-    {
-        public bool Equals(IReadOnlyRecordCollection x, object y)
-        {
-            if (ReferenceEquals(x, y)) return true;
-            if (y is null) return false;
-
-            if (x is not IList<T> listX) return false;
-            if (y is not IList<T> listY) return false;
-            if (listX.Count != listY.Count) return false;
-
-            EqualityComparer<T> eq = EqualityComparer<T>.Default;
-            for (int i = 0; i < listX.Count; i++)
-            {
-                if (!eq.Equals(listX[i], listY[i])) return false;
-            }
-
-            return true;
-        }
-
-        public int GetHashCode(IReadOnlyRecordCollection x, int startingHash)
-        {
-            if (x is not IList<T> listX) return startingHash;
-
-            unchecked
-            {
-                int hash = startingHash;
-                hash = Combine(hash, listX.Count);
-
-                EqualityComparer<T> eq = EqualityComparer<T>.Default;
-                for (int i = 0; i < listX.Count; i++)
-                {
-                    int itemHash = eq.GetHashCode(listX[i]!);
-                    hash = Combine(hash, Mix(itemHash ^ i));
-                }
-
-                return hash;
-            }
-        }
-    }
-
-    private sealed class QueueStrategy<T> : IComparisonStrategy
-    {
-        public bool Equals(IReadOnlyRecordCollection x, object y)
-        {
-            if (ReferenceEquals(x, y)) return true;
-            if (y is null) return false;
-
-            if (x is not IEnumerable<T> seqX) return false;
-            if (y is not IEnumerable<T> seqY) return false;
-
-            EqualityComparer<T> eq = EqualityComparer<T>.Default;
-
-            using (IEnumerator<T> e1 = seqX.GetEnumerator())
-            using (IEnumerator<T> e2 = seqY.GetEnumerator())
-            {
-                while (true)
-                {
-                    bool m1 = e1.MoveNext();
-                    bool m2 = e2.MoveNext();
-                    if (m1 != m2) return false;
-                    if (!m1) return true;
-                    if (!eq.Equals(e1.Current, e2.Current)) return false;
-                }
-            }
-        }
-
-        public int GetHashCode(IReadOnlyRecordCollection x, int startingHash)
-        {
-            if (x is not IEnumerable<T> seqX) return startingHash;
-
-            unchecked
-            {
-                int hash = startingHash;
-                int i = 0;
-                EqualityComparer<T> eq = EqualityComparer<T>.Default;
-
-                foreach (T item in seqX)
-                {
-                    int itemHash = eq.GetHashCode(item!);
-                    hash = Combine(hash, Mix(itemHash ^ i));
-                    i++;
-                }
-
-                hash = Combine(hash, i);
-                return hash;
-            }
-        }
-    }
-
-    private sealed class StackStrategy<T> : QueueStrategy<T>
-    {
-        // Same semantics as Queue: order is defined by the enumerator, and matters.
-    }
-
-    private sealed class SetStrategy<T> : IComparisonStrategy
-    {
-        public bool Equals(IReadOnlyRecordCollection x, object y)
-        {
-            if (ReferenceEquals(x, y)) return true;
-            if (y is null) return false;
-
-            if (x is not ISet<T> setX) return false;
-            if (y is not ISet<T> setY) return false;
-            if (setX.Count != setY.Count) return false;
-
-            return setX.SetEquals(setY);
-        }
-
-        public int GetHashCode(IReadOnlyRecordCollection x, int startingHash)
-        {
-            if (x is not IEnumerable<T> seqX) return startingHash;
-
-            unchecked
-            {
-                int sum = 0;
-                int xor = 0;
-                int count = 0;
-                EqualityComparer<T> eq = EqualityComparer<T>.Default;
-
-                foreach (T item in seqX)
-                {
-                    int itemHash = eq.GetHashCode(item!);
-                    int mixed = Mix(itemHash);
-                    sum += mixed;
-                    xor ^= mixed;
-                    count++;
-                }
-
-                int hash = startingHash;
-                hash = Combine(hash, count);
-                hash = Combine(hash, Mix(sum));
-                hash = Combine(hash, Mix(xor));
-                return hash;
-            }
-        }
-    }
-
-    private sealed class DictionaryStrategy<TKey, TValue> : IComparisonStrategy
-        where TKey : notnull
-    {
-        public bool Equals(IReadOnlyRecordCollection x, object y)
-        {
-            if (ReferenceEquals(x, y)) return true;
-            if (y is null) return false;
-
-            if (x is not IDictionary<TKey, TValue> dictX) return false;
-            if (y is not IDictionary<TKey, TValue> dictY) return false;
-            if (dictX.Count != dictY.Count) return false;
-
-            EqualityComparer<TValue> eq = EqualityComparer<TValue>.Default;
-
-            if (dictY is Dictionary<TKey, TValue> concreteY)
-            {
-                foreach (KeyValuePair<TKey, TValue> kv in dictX)
-                {
-                    if (!concreteY.TryGetValue(kv.Key, out TValue? otherValue)) return false;
-                    if (!eq.Equals(kv.Value, otherValue)) return false;
-                }
-
-                return true;
-            }
-
-            foreach (KeyValuePair<TKey, TValue> kv in dictX)
-            {
-                if (!dictY.ContainsKey(kv.Key)) return false;
-                if (!eq.Equals(kv.Value, dictY[kv.Key])) return false;
-            }
-
-            return true;
-        }
-
-        public int GetHashCode(IReadOnlyRecordCollection x, int startingHash)
-        {
-            if (x is not IEnumerable<KeyValuePair<TKey, TValue>> seqX) return startingHash;
-
-            unchecked
-            {
-                int sum = 0;
-                int xor = 0;
-                int count = 0;
-
-                EqualityComparer<TKey> keyEq = EqualityComparer<TKey>.Default;
-                EqualityComparer<TValue> valueEq = EqualityComparer<TValue>.Default;
-
-                foreach (KeyValuePair<TKey, TValue> kv in seqX)
-                {
-                    int keyHash = keyEq.GetHashCode(kv.Key);
-                    int valueHash = valueEq.GetHashCode(kv.Value!);
-                    int entryHash = Combine(Mix(keyHash), Mix(valueHash));
-
-                    sum += entryHash;
-                    xor ^= entryHash;
-                    count++;
-                }
-
-                int hash = startingHash;
-                hash = Combine(hash, count);
-                hash = Combine(hash, Mix(sum));
-                hash = Combine(hash, Mix(xor));
-                return hash;
-            }
-        }
-    }
-
-    private sealed class FallbackStrategy : IComparisonStrategy
-    {
-        public bool Equals(IReadOnlyRecordCollection x, object y)
-        {
-            if (ReferenceEquals(x, y)) return true;
-            if (y is null) return false;
-
-            if (x is IList listX && y is IList listY)
-            {
-                if (listX.Count != listY.Count) return false;
-                for (int i = 0; i < listX.Count; i++)
-                {
-                    if (!object.Equals(listX[i], listY[i])) return false;
-                }
-                return true;
-            }
-
-            if (x is IDictionary dictX && y is IDictionary dictY)
-            {
-                if (dictX.Count != dictY.Count) return false;
-
-                foreach (DictionaryEntry entry in dictX)
-                {
-                    if (!dictY.Contains(entry.Key)) return false;
-                    if (!object.Equals(dictY[entry.Key], entry.Value)) return false;
-                }
-
-                return true;
-            }
-
-            if (x is IEnumerable seqX && y is IEnumerable seqY)
-            {
-                IEnumerator e1 = seqX.GetEnumerator();
-                IEnumerator e2 = seqY.GetEnumerator();
-
-                while (true)
-                {
-                    bool m1 = e1.MoveNext();
-                    bool m2 = e2.MoveNext();
-                    if (m1 != m2) return false;
-                    if (!m1) return true;
-                    if (!object.Equals(e1.Current, e2.Current)) return false;
-                }
-            }
-
-            return false;
-        }
-
-        public int GetHashCode(IReadOnlyRecordCollection x, int startingHash)
-        {
-            if (x is IList list)
-            {
-                unchecked
-                {
-                    int hash = startingHash;
-                    hash = Combine(hash, list.Count);
-
-                    for (int i = 0; i < list.Count; i++)
-                    {
-                        int itemHash = list[i]?.GetHashCode() ?? default;
-                        hash = Combine(hash, Mix(itemHash ^ i));
-                    }
-
-                    return hash;
-                }
-            }
-
-            if (x is IDictionary dictionary)
-            {
-                unchecked
-                {
-                    int sum = 0;
-                    int xor = 0;
-
-                    foreach (DictionaryEntry entry in dictionary)
-                    {
-                        int keyHash = entry.Key?.GetHashCode() ?? default;
-                        int valueHash = entry.Value?.GetHashCode() ?? default;
-                        int entryHash = Combine(Mix(keyHash), Mix(valueHash));
-
-                        sum += entryHash;
-                        xor ^= entryHash;
-                    }
-
-                    int hash = startingHash;
-                    hash = Combine(hash, dictionary.Count);
-                    hash = Combine(hash, Mix(sum));
-                    hash = Combine(hash, Mix(xor));
-                    return hash;
-                }
-            }
-
-            if (x is IEnumerable enumerable)
-            {
-                unchecked
-                {
-                    int hash = startingHash;
-                    int i = 0;
-
-                    foreach (object? item in enumerable)
-                    {
-                        int itemHash = item?.GetHashCode() ?? default;
-                        hash = Combine(hash, Mix(itemHash ^ i));
-                        i++;
-                    }
-
-                    hash = Combine(hash, i);
-                    return hash;
-                }
-            }
-
-            return startingHash;
-        }
-    }
-
     private static int Combine(int hash, int value) =>
         unchecked((hash * 16777619) ^ value);
 
@@ -632,5 +307,12 @@ public class RecordCollectionComparer
             x ^= x >> 16;
             return (int)x;
         }
+    }
+
+    private interface IComparisonStrategy
+    {
+        public bool Equals(IReadOnlyRecordCollection x, object y);
+
+        public int GetHashCode(IReadOnlyRecordCollection x, int startingHash);
     }
 }
