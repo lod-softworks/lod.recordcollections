@@ -20,10 +20,10 @@
     <Version>0.1.0</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>record collection recordcollection recordlist recorddictionary recordset recordarray recordqueue recordstack valuecollection</PackageTags>
-    <PackageProjectUrl>https://github.com/lod-softworks/lod.recordcollections</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/lod-softworks/dotnet-record-collections</PackageProjectUrl>
     <PackageIcon>docs\icon.png</PackageIcon>
     <PackageReadmeFile>docs\README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/lod-softworks/lod.recordcollections</RepositoryUrl>
+    <RepositoryUrl>https://github.com/lod-softworks/dotnet-record-collections</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

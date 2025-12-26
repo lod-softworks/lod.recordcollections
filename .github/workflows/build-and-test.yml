@@ -29,13 +29,13 @@ jobs:
       run: dotnet test ./src/Lod.RecordCollections.sln -c Release --no-restore --no-build --verbosity normal
 
     - name: Convert classes to records (netstandard2.0)
-      run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net10.0/Lod.RecordCollections.IlAssembler.dll D:\a\lod.recordcollections\lod.recordcollections\src\Lod.RecordCollections\bin\Release\netstandard2.0\Lod.RecordCollections.dll
+      run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net10.0/Lod.RecordCollections.IlAssembler.dll D:\a\dotnet-record-collections\dotnet-record-collections\src\Lod.RecordCollections\bin\Release\netstandard2.0\Lod.RecordCollections.dll
 
     - name: Convert classes to records (net4.8)
-      run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net10.0/Lod.RecordCollections.IlAssembler.dll D:\a\lod.recordcollections\lod.recordcollections\src\Lod.RecordCollections\bin\Release\net4.8\Lod.RecordCollections.dll
+      run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net10.0/Lod.RecordCollections.IlAssembler.dll D:\a\dotnet-record-collections\dotnet-record-collections\src\Lod.RecordCollections\bin\Release\net4.8\Lod.RecordCollections.dll
 
     - name: Convert classes to records (net8.0)
-      run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net10.0/Lod.RecordCollections.IlAssembler.dll D:\a\lod.recordcollections\lod.recordcollections\src\Lod.RecordCollections\bin\Release\net8.0\Lod.RecordCollections.dll
+      run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net10.0/Lod.RecordCollections.IlAssembler.dll D:\a\dotnet-record-collections\dotnet-record-collections\src\Lod.RecordCollections\bin\Release\net8.0\Lod.RecordCollections.dll
 
     - name: Convert classes to records (net10.0)
-      run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net10.0/Lod.RecordCollections.IlAssembler.dll D:\a\lod.recordcollections\lod.recordcollections\src\Lod.RecordCollections\bin\Release\net10.0\Lod.RecordCollections.dll
+      run: dotnet ./src/Lod.RecordCollections.IlAssembler/bin/Release/net10.0/Lod.RecordCollections.IlAssembler.dll D:\a\dotnet-record-collections\dotnet-record-collections\src\Lod.RecordCollections\bin\Release\net10.0\Lod.RecordCollections.dll
