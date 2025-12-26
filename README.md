@@ -1,6 +1,6 @@
 # Record Collections
 
-![Build](https://github.com/lod-softworks/lod.recordcollections/actions/workflows/build-and-test.yml/badge.svg) ![Release](https://img.shields.io/github/v/release/lod-softworks/lod.recordcollections?sort=semver&display_name=release&logo=semanticrelease&label=Release)
+![Build](https://github.com/lod-softworks/dotnet-record-collections/actions/workflows/build-and-test.yml/badge.svg) ![Release](https://img.shields.io/github/v/release/lod-softworks/dotnet-record-collections?sort=semver&display_name=release&logo=semanticrelease&label=Release)
 
 Generic collections that implement value-based equality for use with C# records. Drop-in replacements for standard collections that work correctly with record equality comparison.
 
