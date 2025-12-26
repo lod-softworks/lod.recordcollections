@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
 
 namespace System.Collections;
 
@@ -7,7 +8,7 @@ namespace System.Collections;
 /// </summary>
 internal static class RecordCloner
 {
-    static Dictionary<Type, MethodBase?> Cloners { get; } = [];
+    private static ConcurrentDictionary<Type, MethodBase?> ClonerCache { get; } = [];
 
     /// <summary>
     /// Returns a cloned instance of <typeparamref name="T"/> if it's a record type.
@@ -22,7 +23,7 @@ internal static class RecordCloner
 
         if (obj != null)
         {
-            MethodBase? cloner = AddOrGetCloner<T>();
+            MethodBase? cloner = ClonerCache.GetOrAdd(typeof(T), GetCloneConstructor);
 
             if (cloner != null)
             {
@@ -39,23 +40,13 @@ internal static class RecordCloner
         return result;
     }
 
-    static MethodBase? AddOrGetCloner<T>()
-    {
-        Type type = typeof(T);
+    static MethodBase? GetCloneConstructor(Type type) =>
+        type.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)
+            .OrderByDescending(c => c.IsFamily) // Prefer the protected record constructor
+            .FirstOrDefault(c =>
+            {
+                ParameterInfo[] parameters = c.GetParameters();
 
-        if (!Cloners.TryGetValue(type, out MethodBase? cloner))
-        {
-            cloner = type.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)
-                .FirstOrDefault(c =>
-                {
-                    ParameterInfo[] parameters = c.GetParameters();
-
-                    return c.IsFamily && parameters.Length == 1 && parameters[0].ParameterType == type;
-                });
-
-            Cloners[type] = cloner;
-        }
-
-        return cloner;
-    }
+                return parameters.Length == 1 && parameters[0].ParameterType == type;
+            });
 }

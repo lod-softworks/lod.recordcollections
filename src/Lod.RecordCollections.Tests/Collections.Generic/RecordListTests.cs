@@ -1,12 +1,22 @@
+using System.Diagnostics;
+
 namespace Lod.RecordCollections.Tests.Collections.Generic;
 
 [TestClass]
 public class RecordListTests
 {
+    public TestContext TestContext { get; set; } = null!;
+
     [TestInitialize]
     public void SetUp()
     {
         RecordCollectionComparer.Default = new RecordCollectionComparer();
+    }
+
+    private static int GetSizeOrDefault(int @default)
+    {
+        string? raw = Environment.GetEnvironmentVariable("RECORDCOLLECTION_STRESS_SIZE");
+        return int.TryParse(raw, out int size) && size > 0 ? size : @default;
     }
 
     /// <remarks>This test is a sanity check to ensure that the default List.Equals behavior is as expected.</remarks>
@@ -26,6 +36,7 @@ public class RecordListTests
 
     [TestMethod]
     [RepeatTestMethod(3)]
+    [DoNotParallelize]
     public void RecordList_DefaultConstructor_UsesDefaultComparer()
     {
         // Arrange
@@ -84,6 +95,17 @@ public class RecordListTests
     }
 
     [TestMethod]
+    public void RecordList_Equals_Matching_SystemList()
+    {
+        // Arrange
+        RecordList<int> record = [1, 2, 3];
+        List<int> system = [1, 2, 3];
+
+        // Act & Assert
+        Assert.IsTrue(record.Equals(system));
+    }
+
+    [TestMethod]
     public void RecordList_SameStrings_EqualsMatchingList()
     {
         // Arrange
@@ -117,6 +139,62 @@ public class RecordListTests
         // Arrange
         RecordList<int> list1 = [92, 117, 420,];
         RecordList<int> list2 = [117, 420, 92,];
+
+        // Act
+        bool areEqual = list1.Equals(list2);
+
+        // Assert
+        Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    public void RecordList_DifferentValues_NotEquals()
+    {
+        // Arrange
+        RecordList<int> list1 = [92, 117, 420];
+        RecordList<int> list2 = [92, 117, 421];
+
+        // Act
+        bool areEqual = list1.Equals(list2);
+
+        // Assert
+        Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    public void RecordList_DifferentSizes_NotEquals()
+    {
+        // Arrange
+        RecordList<int> list1 = [92, 117, 420];
+        RecordList<int> list2 = [92, 117];
+
+        // Act
+        bool areEqual = list1.Equals(list2);
+
+        // Assert
+        Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    public void RecordList_EmptyVsNonEmpty_NotEquals()
+    {
+        // Arrange
+        RecordList<int> list1 = [];
+        RecordList<int> list2 = [92, 117, 420];
+
+        // Act
+        bool areEqual = list1.Equals(list2);
+
+        // Assert
+        Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    public void RecordList_OneValueDifferent_NotEquals()
+    {
+        // Arrange
+        RecordList<int> list1 = [1, 2, 3, 4, 5];
+        RecordList<int> list2 = [1, 2, 99, 4, 5];
 
         // Act
         bool areEqual = list1.Equals(list2);
@@ -184,6 +262,127 @@ public class RecordListTests
         }
     }
 #endif
+
+    [TestMethod]
+    public void Stress_RecordList_Int32_Compare_And_Time()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+
+        RecordList<int> left = new(n);
+        RecordList<int> right = new(n);
+
+        for (int i = 0; i < n; i++)
+        {
+            left.Add(i);
+            right.Add(i);
+        }
+
+        Stopwatch sw = Stopwatch.StartNew();
+        Assert.IsTrue(left.Equals(right));
+        sw.Stop();
+        TestContext.WriteLine($"RecordList<int>.Equals (n={n:n0}) = {sw.ElapsedMilliseconds:n0} ms");
+
+        sw.Restart();
+        _ = left.GetHashCode();
+        _ = right.GetHashCode();
+        sw.Stop();
+        TestContext.WriteLine($"RecordList<int>.GetHashCode x2 (n={n:n0}) = {sw.ElapsedMilliseconds:n0} ms");
+    }
+
+    [TestMethod]
+    [RepeatTestMethod(10)]
+    public void Stress_RecordList_Int32_Random_Compare_And_Time()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+        Random random = new();
+
+        RecordList<int> left = new(n);
+        RecordList<int> right = new(n);
+
+        for (int i = 0; i < n; i++)
+        {
+            int value = random.Next();
+            left.Add(value);
+            right.Add(value);
+        }
+
+        Stopwatch sw = Stopwatch.StartNew();
+        Assert.IsTrue(left.Equals(right));
+        sw.Stop();
+        TestContext.WriteLine($"RecordList<int>.Equals with random values (n={n:n0}) = {sw.ElapsedMilliseconds:n0} ms");
+    }
+
+    [TestMethod]
+    [RepeatTestMethod(10)]
+    public void Stress_RecordList_Int32_Random_OneDifference_NotEquals()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+        Random random = new();
+
+        RecordList<int> left = new(n);
+        RecordList<int> right = new(n);
+
+        // Add same random values to both collections
+        for (int i = 0; i < n; i++)
+        {
+            int value = random.Next();
+            left.Add(value);
+            right.Add(value);
+        }
+
+        // Introduce one difference at a random position
+        int differenceIndex = random.Next(0, n);
+        int originalValue = left[differenceIndex];
+        int differentValue = random.Next();
+        // Ensure the different value is actually different
+        while (differentValue == originalValue)
+        {
+            differentValue = random.Next();
+        }
+        right[differenceIndex] = differentValue;
+
+        // Act
+        bool areEqual = left.Equals(right);
+
+        // Assert
+        Assert.IsFalse(areEqual, $"Collections should not be equal with one difference at index {differenceIndex}");
+    }
+
+    [TestMethod]
+    [RepeatTestMethod(10)]
+    public void Stress_RecordList_String_Random_OneDifference_NotEquals()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+        Random random = new();
+
+        RecordList<string> left = new(n);
+        RecordList<string> right = new(n);
+
+        // Add same random values to both collections
+        for (int i = 0; i < n; i++)
+        {
+            string value = random.Next().ToString();
+            left.Add(value);
+            right.Add(value);
+        }
+
+        // Introduce one difference at a random position
+        int differenceIndex = random.Next(0, n);
+        string originalValue = left[differenceIndex];
+        string differentValue = random.Next().ToString();
+        // Ensure the different value is actually different
+        while (differentValue == originalValue)
+        {
+            differentValue = random.Next().ToString();
+        }
+        right[differenceIndex] = differentValue;
+
+        // Act
+        bool areEqual = left.Equals(right);
+
+        // Assert
+        Assert.IsFalse(areEqual, $"Collections should not be equal with one difference at index {differenceIndex}");
+    }
 
     #region Support Types
 

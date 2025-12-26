@@ -145,8 +145,25 @@ When a comparer is not provided, collections will use the default comparer (eith
 
 ## ⚠ Drawbacks & Warnings
 
-The current implementation of this library loops through each element in the collection to determine the hash code of the collection. This can become very expensive when doing equality comparisons with large collections.
+### Performance Considerations
 
-The library is intended to provide a default but extendable implementation of common collections. It works great for data models with small collections; however, when used with large data sets performance will start to deteriorate.
+**Hash Code Computation:**
+The library computes hash codes by iterating through all elements in the collection. For ordered collections (lists, queues, stacks), each element's hash is combined with its position index. For unordered collections (sets, dictionaries), element hashes are combined using sum and xor operations. This results in O(n) time complexity where n is the number of elements.
+
+**Equality Comparison:**
+Equality comparisons first check the collection count (O(1) fast path). If counts match, the implementation performs element-by-element comparison:
+- **Ordered collections** (lists, queues, stacks): Sequential comparison where order matters
+- **Sets**: Uses `SetEquals` which compares all elements regardless of order
+- **Dictionaries**: Iterates through all key-value pairs, checking each entry
+
+Both hash code computation and equality comparison are O(n) operations. While the count check provides a fast path for unequal-sized collections, comparing large collections with identical sizes requires examining every element.
+
+**Recommendations:**
+The library is intended to provide a default but extendable implementation of common collections. It works great for data models with small to medium-sized collections (typically hundreds to low thousands of elements). When used with very large collections (hundreds of thousands or millions of elements), performance will deteriorate, especially when:
+- Computing hash codes frequently (e.g., in hash-based collections or dictionaries)
+- Comparing collections that are equal or differ only in the last element
+- Using collections as keys in dictionaries or as elements in hash sets
+
+For large-scale scenarios, consider using custom comparers that implement caching or other optimization strategies.
 
 **Note:** See the [Cloning](#cloning) section for details on how collection cloning works.

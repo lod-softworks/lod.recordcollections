@@ -52,6 +52,29 @@ This document defines how automated agents (such as Cursor, GitHub Copilot, or o
 - When adding a new interface to a collection, introduce or update the corresponding partial file instead of expanding the base class.
 - Use the existing `RecordDictionary` split as the authoritative reference for how the files should nest and be named.
 
+## Achieving Record State
+
+Record Collections achieve `record` semantics through a combination of inheritance, manual method overrides, and post-compilation IL modification:
+
+1. **Inheritance**: Each collection inherits from its corresponding base type (e.g., `RecordList<T>` inherits from `List<T>`, `RecordDictionary<TKey, TValue>` inherits from `Dictionary<TKey, TValue>`).
+
+2. **Manual Record Contract Implementation**: The `<Type>.Record.cs` file implements the record specification by defining and overriding the following methods (as seen in `RecordList.Record.cs`):
+   - `EqualityContract` - protected virtual property returning the collection's type
+   - Protected constructor `RecordType(RecordType original)` - used for cloning via the protected record constructor pattern
+   - `GetHashCode()` - overridden to delegate to the collection's `Comparer`
+   - `Equals(object? obj)` - overridden to delegate to the collection's `Comparer`
+   - `Equals(BaseType other)` - public non-virtual method (e.g., `Equals(List<T> other)`)
+   - `Equals(RecordType? other)` - public virtual method (e.g., `Equals(RecordList<T>? other)`)
+   - `PrintMembers(StringBuilder builder)` - protected virtual method for record printing
+   - `operator ==` and `operator !=` - static operators for equality comparison
+
+3. **IL Assembler Post-Compilation**: The `Lod.RecordCollections.IlAssembler` project adds the `<Clone>$` method via IL modification after the main library is compiled. This method is required by the C# record specification but cannot be directly implemented in C#. The IL assembler:
+   - Decompiles the compiled assembly to IL
+   - Injects the `<Clone>$` method IL for each collection type
+   - Recompiles the modified IL back to the assembly
+
+This approach allows the collections to behave as `record class` types while inheriting from their base collection types, enabling drop-in replacement functionality.
+
 ## Comparers and Interface Implementations
 
 - All equality, comparison, and interface implementations **must directly delegate to the collection’s `Comparer`** (the `IRecordCollectionComparer` instance) and **must not**:

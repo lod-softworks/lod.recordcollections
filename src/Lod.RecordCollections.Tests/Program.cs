@@ -1,4 +1,4 @@
-﻿[assembly: DoNotParallelize]
+﻿[assembly: Parallelize]
 
 namespace Lod.RecordCollections.Tests;
 

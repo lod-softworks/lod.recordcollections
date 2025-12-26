@@ -1,12 +1,22 @@
+using System.Diagnostics;
+
 namespace Lod.RecordCollections.Tests.Collections.Generic;
 
 [TestClass]
 public class RecordSetTests
 {
+    public TestContext TestContext { get; set; } = null!;
+
     [TestInitialize]
     public void SetUp()
     {
         RecordCollectionComparer.Default = new RecordCollectionComparer();
+    }
+
+    private static int GetSizeOrDefault(int @default)
+    {
+        string? raw = Environment.GetEnvironmentVariable("RECORDCOLLECTION_STRESS_SIZE");
+        return int.TryParse(raw, out int size) && size > 0 ? size : @default;
     }
 
     /// <remarks>This test is a sanity check to ensure that the default HashSet.Equals behavior is as expected.</remarks>
@@ -26,6 +36,7 @@ public class RecordSetTests
 
     [TestMethod]
     [RepeatTestMethod(3)]
+    [DoNotParallelize]
     public void RecordSet_DefaultConstructor_UsesDefaultComparer()
     {
         // Arrange
@@ -84,6 +95,17 @@ public class RecordSetTests
     }
 
     [TestMethod]
+    public void RecordSet_Equals_Matching_SystemHashSet()
+    {
+        // Arrange
+        RecordSet<int> record = new([1, 2, 3]);
+        HashSet<int> system = new([3, 2, 1]);
+
+        // Act & Assert
+        Assert.IsTrue(record.Equals(system));
+    }
+
+    [TestMethod]
     public void RecordSet_SameStrings_EqualsMatchingSet()
     {
         // Arrange
@@ -123,6 +145,62 @@ public class RecordSetTests
 
         // Assert
         Assert.IsTrue(areEqual);
+    }
+
+    [TestMethod]
+    public void RecordSet_DifferentValues_NotEquals()
+    {
+        // Arrange
+        RecordSet<int> set1 = [92, 117, 420];
+        RecordSet<int> set2 = [92, 117, 421];
+
+        // Act
+        bool areEqual = set1.Equals(set2);
+
+        // Assert
+        Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    public void RecordSet_DifferentSizes_NotEquals()
+    {
+        // Arrange
+        RecordSet<int> set1 = [92, 117, 420];
+        RecordSet<int> set2 = [92, 117];
+
+        // Act
+        bool areEqual = set1.Equals(set2);
+
+        // Assert
+        Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    public void RecordSet_EmptyVsNonEmpty_NotEquals()
+    {
+        // Arrange
+        RecordSet<int> set1 = [];
+        RecordSet<int> set2 = [92, 117, 420];
+
+        // Act
+        bool areEqual = set1.Equals(set2);
+
+        // Assert
+        Assert.IsFalse(areEqual);
+    }
+
+    [TestMethod]
+    public void RecordSet_OneValueDifferent_NotEquals()
+    {
+        // Arrange
+        RecordSet<int> set1 = [1, 2, 3, 4, 5];
+        RecordSet<int> set2 = [1, 2, 99, 4, 5];
+
+        // Act
+        bool areEqual = set1.Equals(set2);
+
+        // Assert
+        Assert.IsFalse(areEqual);
     }
 
     //[TestMethod]
@@ -178,6 +256,129 @@ public class RecordSetTests
         Assert.IsTrue(set.IsSupersetOf(hashSet), "Deserialized set is not a subset of the original set.");
     }
 #endif
+
+    [TestMethod]
+    public void Stress_RecordSet_Int32_Compare_And_Time()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+
+        RecordSet<int> left = new(capacity: n);
+        RecordSet<int> right = new(capacity: n);
+
+        for (int i = 0; i < n; i++)
+        {
+            left.Add(i);
+            right.Add(i);
+        }
+
+        Stopwatch sw = Stopwatch.StartNew();
+        Assert.IsTrue(left.Equals(right));
+        sw.Stop();
+        TestContext.WriteLine($"RecordSet<int>.Equals (n={n:n0}) = {sw.ElapsedMilliseconds:n0} ms");
+
+        sw.Restart();
+        _ = left.GetHashCode();
+        _ = right.GetHashCode();
+        sw.Stop();
+        TestContext.WriteLine($"RecordSet<int>.GetHashCode x2 (n={n:n0}) = {sw.ElapsedMilliseconds:n0} ms");
+    }
+
+    [TestMethod]
+    [RepeatTestMethod(10)]
+    public void Stress_RecordSet_Int32_Random_Compare_And_Time()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+        Random random = new();
+
+        RecordSet<int> left = new(capacity: n);
+        RecordSet<int> right = new(capacity: n);
+
+        for (int i = 0; i < n; i++)
+        {
+            int value = random.Next();
+            left.Add(value);
+            right.Add(value);
+        }
+
+        Stopwatch sw = Stopwatch.StartNew();
+        Assert.IsTrue(left.Equals(right));
+        sw.Stop();
+        TestContext.WriteLine($"RecordSet<int>.Equals with random values (n={n:n0}) = {sw.ElapsedMilliseconds:n0} ms");
+    }
+
+    [TestMethod]
+    [RepeatTestMethod(10)]
+    public void Stress_RecordSet_Int32_Random_OneDifference_NotEquals()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+        Random random = new();
+
+        RecordSet<int> left = new(capacity: n);
+        RecordSet<int> right = new(capacity: n);
+
+        // Add same random values to both collections
+        List<int> values = new(capacity: n);
+        for (int i = 0; i < n; i++)
+        {
+            int value = random.Next();
+            values.Add(value);
+            left.Add(value);
+            right.Add(value);
+        }
+
+        // Introduce one difference - remove one value and add a different one to maintain same count
+        int valueToRemove = values[random.Next(0, n)];
+        int differentValue = random.Next();
+        while (left.Contains(differentValue))
+        {
+            differentValue = random.Next();
+        }
+        right.Remove(valueToRemove);
+        right.Add(differentValue);
+
+        // Act
+        bool areEqual = left.Equals(right);
+
+        // Assert
+        Assert.IsFalse(areEqual, $"Collections should not be equal with one value replaced (removed {valueToRemove}, added {differentValue})");
+    }
+
+    [TestMethod]
+    [RepeatTestMethod(10)]
+    public void Stress_RecordSet_String_Random_OneDifference_NotEquals()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+        Random random = new();
+
+        RecordSet<string> left = new(capacity: n);
+        RecordSet<string> right = new(capacity: n);
+
+        // Add same random values to both collections
+        List<string> values = new(capacity: n);
+        for (int i = 0; i < n; i++)
+        {
+            string value = random.Next().ToString();
+            values.Add(value);
+            left.Add(value);
+            right.Add(value);
+        }
+
+        // Introduce one difference - remove one value and add a different one to maintain same count
+        string valueToRemove = values[random.Next(0, n)];
+        string differentValue = random.Next().ToString();
+        while (left.Contains(differentValue))
+        {
+            differentValue = random.Next().ToString();
+        }
+        right.Remove(valueToRemove);
+        right.Add(differentValue);
+
+        // Act
+        bool areEqual = left.Equals(right);
+
+        // Assert
+        Assert.IsFalse(areEqual, $"Collections should not be equal with one value replaced (removed {valueToRemove}, added {differentValue})");
+    }
 
     #region Support Types
 
