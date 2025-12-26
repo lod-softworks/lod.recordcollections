@@ -47,138 +47,15 @@ public partial class RecordCollectionComparer
     /// <returns>The hash of the collection elements.</returns>
     public int GetHashCode(IReadOnlyRecordCollection? collection)
     {
-        if (collection is null) return default; // EqualityComparer<object>.Default.GetHashCode(null) returns 0
+        if (collection == null) return default; // EqualityComparer<object>.Default.GetHashCode(null) returns 0
 
-        // use hash of collection type. Type.GetHashCode is consistent per type
+        // Use hash of collection type. Type.GetHashCode is consistent per type
         int startingHash = collection.GetType().GetHashCode();
-        return GetHashCode(collection, startingHash, out _);
-    }
-
-    /// <summary>
-    /// Gets the hashcode of the specified <paramref name="collection"/> elements.
-    /// This method can be expensive based on the size of the collection.
-    /// </summary>
-    /// <param name="collection">The collection whose elements should be hashed.</param>
-    /// <param name="startingHash">The starting base hash to calculate the hash against.</param>
-    /// <param name="rollovers">The number of times the hash has exceeded <see cref="int.MaxValue"/>.</param>
-    /// <returns>The hash of the collection elements.</returns>
-    protected virtual int GetHashCode(IReadOnlyRecordCollection? collection, int startingHash, out int rollovers)
-    {
-        rollovers = 0;
-
-        if (collection is null) return default;
 
         IComparisonStrategy strategy = GetStrategy(collection.GetType());
-        return strategy.GetHashCode(collection, startingHash);
-    }
+        int hashCode = strategy.GetHashCode(collection, startingHash);
 
-    /// <summary>
-    /// Returns the hash of an <see cref="IList"/>, taking ordering into consideration.
-    /// </summary>
-    /// <param name="startingHash">The starting hash to calculate against.</param>
-    /// <param name="list">The list of elements whose hash will be calculated.</param>
-    /// <param name="rollovers">The number of times the hash rolles over past <see cref="int.MaxValue"/>.</param>
-    /// <returns>The hash of the collections elements.</returns>
-    protected virtual int GetHashCode(int startingHash, IList list, out int rollovers)
-    {
-        rollovers = 0;
-        unchecked
-        {
-            int hash = startingHash;
-            hash = Combine(hash, list.Count);
-
-            // order is important
-            for (int i = 0; i < list.Count; i++)
-            {
-                int itemHash = list[i]?.GetHashCode() ?? default;
-                hash = Combine(hash, Mix(itemHash ^ i));
-            }
-
-            return hash;
-        }
-    }
-
-    /// <summary>
-    /// Returns the hash of an <see cref="IDictionary"/>, hashing the keys and values.
-    /// </summary>
-    /// <param name="startingHash">The starting hash to calculate against.</param>
-    /// <param name="dictionary">The list of elements whose hash will be calculated.</param>
-    /// <param name="rollovers">The number of times the hash rolles over past <see cref="int.MaxValue"/>.</param>
-    /// <returns>The hash of the collections elements.</returns>
-    protected virtual int GetHashCode(int startingHash, IDictionary dictionary, out int rollovers)
-    {
-        rollovers = 0;
-        unchecked
-        {
-            int sum = 0;
-            int xor = 0;
-
-            foreach (DictionaryEntry entry in dictionary)
-            {
-                int keyHash = entry.Key?.GetHashCode() ?? default;
-                int valueHash = entry.Value?.GetHashCode() ?? default;
-                int entryHash = Combine(Mix(keyHash), Mix(valueHash));
-
-                sum += entryHash;
-                xor ^= entryHash;
-            }
-
-            int hash = startingHash;
-            hash = Combine(hash, dictionary.Count);
-            hash = Combine(hash, Mix(sum));
-            hash = Combine(hash, Mix(xor));
-            return hash;
-        }
-    }
-
-    /// <summary>
-    /// Returns the hash of an <see cref="IEnumerable"/>, ignoring order.
-    /// </summary>
-    /// <param name="startingHash">The starting hash to calculate against.</param>
-    /// <param name="collection">The list of elements whose hash will be calculated.</param>
-    /// <param name="ignoreOrder">Indicates whether element sequence order is important within the <paramref name="collection"/>.</param>
-    /// <param name="rollovers">The number of times the hash rolles over past <see cref="int.MaxValue"/>.</param>
-    /// <returns>The hash of the collections elements.</returns>
-    protected virtual int GetHashCode(int startingHash, IEnumerable collection, bool ignoreOrder, out int rollovers)
-    {
-        rollovers = 0;
-
-        unchecked
-        {
-            int hash = startingHash;
-            hash = Combine(hash, ignoreOrder ? 1 : 0);
-
-            if (ignoreOrder)
-            {
-                int sum = 0;
-                int xor = 0;
-                int count = 0;
-                foreach (object? item in collection)
-                {
-                    int itemHash = item?.GetHashCode() ?? default;
-                    int mixed = Mix(itemHash);
-                    sum += mixed;
-                    xor ^= mixed;
-                    count++;
-                }
-
-                hash = Combine(hash, count);
-                hash = Combine(hash, Mix(sum));
-                hash = Combine(hash, Mix(xor));
-                return hash;
-            }
-
-            int i = 0;
-            foreach (object? item in collection)
-            {
-                int itemHash = item?.GetHashCode() ?? default;
-                hash = Combine(hash, Mix(itemHash ^ i));
-                i++;
-            }
-
-            hash = Combine(hash, i);
-            return hash;
-        }
+        return hashCode;
     }
 
     #endregion
@@ -209,8 +86,8 @@ public partial class RecordCollectionComparer
     public virtual bool Equals(IReadOnlyRecordCollection? x, object? y)
     {
         if (ReferenceEquals(x, y)) return true;
-        if (x is null) return y is null;
-        if (y is null) return false;
+        if (x == null) return y == null;
+        if (y == null) return false;
 
         // If comparing against another record collection, use the strongly typed path.
         if (y is IReadOnlyRecordCollection rcy) return Equals(x, rcy);
@@ -227,11 +104,13 @@ public partial class RecordCollectionComparer
     public virtual bool Equals(IReadOnlyRecordCollection? x, IReadOnlyRecordCollection? y)
     {
         if (ReferenceEquals(x, y)) return true;
-        if (x is null || y is null) return false;
+        if (x == null || y == null) return false;
         if (x.Count != y.Count) return false;
 
         // Record equality contract: different collection types are not considered equal.
-        if (x.GetType() != y.GetType()) return false;
+        Type xType = x.GetType();
+        Type yType = y.GetType();
+        if (xType != yType && !xType.IsAssignableFrom(yType) && !yType.IsAssignableFrom(xType)) return false;
 
         IComparisonStrategy strategy = GetStrategy(x.GetType());
         return strategy.Equals(x, y);
