@@ -307,6 +307,7 @@ public class RecordSetTests
     }
 
     [TestMethod]
+    [RepeatTestMethod(10)]
     public void Stress_RecordSet_Int32_Random_OneDifference_NotEquals()
     {
         int n = GetSizeOrDefault(@default: 1_000_000);
@@ -316,26 +317,67 @@ public class RecordSetTests
         RecordSet<int> right = new(capacity: n);
 
         // Add same random values to both collections
+        List<int> values = new(capacity: n);
         for (int i = 0; i < n; i++)
         {
             int value = random.Next();
+            values.Add(value);
             left.Add(value);
             right.Add(value);
         }
 
-        // Introduce one difference - add a value that doesn't exist in left
+        // Introduce one difference - remove one value and add a different one to maintain same count
+        int valueToRemove = values[random.Next(0, n)];
         int differentValue = random.Next();
         while (left.Contains(differentValue))
         {
             differentValue = random.Next();
         }
+        right.Remove(valueToRemove);
         right.Add(differentValue);
 
         // Act
         bool areEqual = left.Equals(right);
 
         // Assert
-        Assert.IsFalse(areEqual, $"Collections should not be equal with one additional value {differentValue}");
+        Assert.IsFalse(areEqual, $"Collections should not be equal with one value replaced (removed {valueToRemove}, added {differentValue})");
+    }
+
+    [TestMethod]
+    [RepeatTestMethod(10)]
+    public void Stress_RecordSet_String_Random_OneDifference_NotEquals()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+        Random random = new();
+
+        RecordSet<string> left = new(capacity: n);
+        RecordSet<string> right = new(capacity: n);
+
+        // Add same random values to both collections
+        List<string> values = new(capacity: n);
+        for (int i = 0; i < n; i++)
+        {
+            string value = random.Next().ToString();
+            values.Add(value);
+            left.Add(value);
+            right.Add(value);
+        }
+
+        // Introduce one difference - remove one value and add a different one to maintain same count
+        string valueToRemove = values[random.Next(0, n)];
+        string differentValue = random.Next().ToString();
+        while (left.Contains(differentValue))
+        {
+            differentValue = random.Next().ToString();
+        }
+        right.Remove(valueToRemove);
+        right.Add(differentValue);
+
+        // Act
+        bool areEqual = left.Equals(right);
+
+        // Assert
+        Assert.IsFalse(areEqual, $"Collections should not be equal with one value replaced (removed {valueToRemove}, added {differentValue})");
     }
 
     #region Support Types

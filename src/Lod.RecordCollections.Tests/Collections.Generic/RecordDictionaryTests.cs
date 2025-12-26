@@ -321,6 +321,7 @@ public class RecordDictionaryTests
     }
 
     [TestMethod]
+    [RepeatTestMethod(10)]
     public void Stress_RecordDictionary_Int32_Int32_Random_OneDifference_NotEquals()
     {
         int n = GetSizeOrDefault(@default: 1_000_000);
@@ -354,6 +355,51 @@ public class RecordDictionaryTests
         while (differentValue == originalValue)
         {
             differentValue = random.Next();
+        }
+        right[differenceKey] = differentValue;
+
+        // Act
+        bool areEqual = left.Equals(right);
+
+        // Assert
+        Assert.IsFalse(areEqual, $"Collections should not be equal with one difference at key {differenceKey}");
+    }
+
+    [TestMethod]
+    [RepeatTestMethod(10)]
+    public void Stress_RecordDictionary_String_String_Random_OneDifference_NotEquals()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+        Random random = new();
+        HashSet<string> usedKeys = new(capacity: n);
+        List<string> keys = new(capacity: n);
+
+        RecordDictionary<string, string> left = new(capacity: n);
+        RecordDictionary<string, string> right = new(capacity: n);
+
+        // Add same random key-value pairs to both collections
+        for (int i = 0; i < n; i++)
+        {
+            string key;
+            do
+            {
+                key = random.Next().ToString();
+            } while (!usedKeys.Add(key));
+
+            keys.Add(key);
+            string value = random.Next().ToString();
+            left[key] = value;
+            right[key] = value;
+        }
+
+        // Introduce one difference at a random key
+        string differenceKey = keys[random.Next(0, n)];
+        string originalValue = left[differenceKey];
+        string differentValue = random.Next().ToString();
+        // Ensure the different value is actually different
+        while (differentValue == originalValue)
+        {
+            differentValue = random.Next().ToString();
         }
         right[differenceKey] = differentValue;
 

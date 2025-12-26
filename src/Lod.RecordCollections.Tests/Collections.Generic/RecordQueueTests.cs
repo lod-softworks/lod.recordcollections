@@ -305,6 +305,7 @@ public class RecordQueueTests
     }
 
     [TestMethod]
+    [RepeatTestMethod(10)]
     public void Stress_RecordQueue_Int32_Random_OneDifference_NotEquals()
     {
         int n = GetSizeOrDefault(@default: 1_000_000);
@@ -332,6 +333,56 @@ public class RecordQueueTests
         while (differentValue == originalValue)
         {
             differentValue = random.Next();
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+            if (i == differenceIndex)
+            {
+                right.Enqueue(differentValue);
+            }
+            else
+            {
+                right.Enqueue(values[i]);
+            }
+        }
+
+        // Act
+        bool areEqual = left.Equals(right);
+
+        // Assert
+        Assert.IsFalse(areEqual, $"Collections should not be equal with one difference at index {differenceIndex}");
+    }
+
+    [TestMethod]
+    [RepeatTestMethod(10)]
+    public void Stress_RecordQueue_String_Random_OneDifference_NotEquals()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+        Random random = new();
+        List<string> values = new(capacity: n);
+
+        RecordQueue<string> left = new(capacity: n);
+        RecordQueue<string> right = new(capacity: n);
+
+        // Add same random values to both collections
+        for (int i = 0; i < n; i++)
+        {
+            string value = random.Next().ToString();
+            values.Add(value);
+            left.Enqueue(value);
+            right.Enqueue(value);
+        }
+
+        // Rebuild right queue with one difference at a random position
+        right = new RecordQueue<string>(capacity: n);
+        int differenceIndex = random.Next(0, n);
+        string originalValue = values[differenceIndex];
+        string differentValue = random.Next().ToString();
+        // Ensure the different value is actually different
+        while (differentValue == originalValue)
+        {
+            differentValue = random.Next().ToString();
         }
 
         for (int i = 0; i < n; i++)

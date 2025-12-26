@@ -319,6 +319,7 @@ public class RecordStackTests
     }
 
     [TestMethod]
+    [RepeatTestMethod(10)]
     public void Stress_RecordStack_Int32_Random_OneDifference_NotEquals()
     {
         int n = GetSizeOrDefault(@default: 1_000_000);
@@ -346,6 +347,57 @@ public class RecordStackTests
         while (differentValue == originalValue)
         {
             differentValue = random.Next();
+        }
+
+        // Push values in reverse order (stack is LIFO)
+        for (int i = n - 1; i >= 0; i--)
+        {
+            if (i == differenceIndex)
+            {
+                right.Push(differentValue);
+            }
+            else
+            {
+                right.Push(values[i]);
+            }
+        }
+
+        // Act
+        bool areEqual = left.Equals(right);
+
+        // Assert
+        Assert.IsFalse(areEqual, $"Collections should not be equal with one difference at index {differenceIndex}");
+    }
+
+    [TestMethod]
+    [RepeatTestMethod(10)]
+    public void Stress_RecordStack_String_Random_OneDifference_NotEquals()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+        Random random = new();
+        List<string> values = new(capacity: n);
+
+        RecordStack<string> left = new(capacity: n);
+        RecordStack<string> right = new(capacity: n);
+
+        // Add same random values to both collections
+        for (int i = 0; i < n; i++)
+        {
+            string value = random.Next().ToString();
+            values.Add(value);
+            left.Push(value);
+            right.Push(value);
+        }
+
+        // Rebuild right stack with one difference at a random position
+        right = new RecordStack<string>(capacity: n);
+        int differenceIndex = random.Next(0, n);
+        string originalValue = values[differenceIndex];
+        string differentValue = random.Next().ToString();
+        // Ensure the different value is actually different
+        while (differentValue == originalValue)
+        {
+            differentValue = random.Next().ToString();
         }
 
         // Push values in reverse order (stack is LIFO)

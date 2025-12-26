@@ -313,6 +313,7 @@ public class RecordListTests
     }
 
     [TestMethod]
+    [RepeatTestMethod(10)]
     public void Stress_RecordList_Int32_Random_OneDifference_NotEquals()
     {
         int n = GetSizeOrDefault(@default: 1_000_000);
@@ -337,6 +338,42 @@ public class RecordListTests
         while (differentValue == originalValue)
         {
             differentValue = random.Next();
+        }
+        right[differenceIndex] = differentValue;
+
+        // Act
+        bool areEqual = left.Equals(right);
+
+        // Assert
+        Assert.IsFalse(areEqual, $"Collections should not be equal with one difference at index {differenceIndex}");
+    }
+
+    [TestMethod]
+    [RepeatTestMethod(10)]
+    public void Stress_RecordList_String_Random_OneDifference_NotEquals()
+    {
+        int n = GetSizeOrDefault(@default: 1_000_000);
+        Random random = new();
+
+        RecordList<string> left = new(n);
+        RecordList<string> right = new(n);
+
+        // Add same random values to both collections
+        for (int i = 0; i < n; i++)
+        {
+            string value = random.Next().ToString();
+            left.Add(value);
+            right.Add(value);
+        }
+
+        // Introduce one difference at a random position
+        int differenceIndex = random.Next(0, n);
+        string originalValue = left[differenceIndex];
+        string differentValue = random.Next().ToString();
+        // Ensure the different value is actually different
+        while (differentValue == originalValue)
+        {
+            differentValue = random.Next().ToString();
         }
         right[differenceIndex] = differentValue;
 
